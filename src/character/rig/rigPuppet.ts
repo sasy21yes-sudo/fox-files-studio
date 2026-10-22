@@ -174,7 +174,8 @@ export function tube(g: G, name: string, a: V2, b: V2) {
  * a -> c -> b with constant width, round end beyond a, cuff/end beyond b.
  * `from`/`to` (0..1) draw only part of it. Returns the end tangent angle.
  */
-export function noodle(g: G, name: string, a: V2, c: V2, b: V2, from = 0, to = 1): number {
+/** `widen(t)`: width multiplier along the limb (t 0 = top joint, 1 = end), e.g. a fuller shoulder. */
+export function noodle(g: G, name: string, a: V2, c: V2, b: V2, from = 0, to = 1, widen?: (t: number) => number): number {
   const p = RIG.parts[name];
   const img = images[name];
   const pt = (t: number): V2 => {
@@ -216,11 +217,13 @@ export function noodle(g: G, name: string, a: V2, c: V2, b: V2, from = 0, to = 1
   for (let i = i0; i < i1; i++) {
     const [v0, c0, d0] = rows[i];
     const [v1, c1, d1] = rows[i + 1];
+    const k0 = widen ? widen(Math.min(1, Math.max(0, (v0 - ay) / (by - ay)))) : 1;
+    const k1 = widen ? widen(Math.min(1, Math.max(0, (v1 - ay) / (by - ay)))) : 1;
     // Quad edges, perpendicular to the tangent (texture x grows to the right of the direction).
-    const L0: V2 = [c0[0] + d0[1] * cx, c0[1] - d0[0] * cx];
-    const R0: V2 = [c0[0] - d0[1] * (w - cx), c0[1] + d0[0] * (w - cx)];
-    const L1: V2 = [c1[0] + d1[1] * cx, c1[1] - d1[0] * cx];
-    const R1: V2 = [c1[0] - d1[1] * (w - cx), c1[1] + d1[0] * (w - cx)];
+    const L0: V2 = [c0[0] + d0[1] * cx * k0, c0[1] - d0[0] * cx * k0];
+    const R0: V2 = [c0[0] - d0[1] * (w - cx) * k0, c0[1] + d0[0] * (w - cx) * k0];
+    const L1: V2 = [c1[0] + d1[1] * cx * k1, c1[1] - d1[0] * cx * k1];
+    const R1: V2 = [c1[0] - d1[1] * (w - cx) * k1, c1[1] + d1[0] * (w - cx) * k1];
     // Clip to the quad grown along the tangent so neighbouring strips overlap (no seams).
     const gx0 = d0[0] * growPx, gy0 = d0[1] * growPx, gx1 = d1[0] * growPx, gy1 = d1[1] * growPx;
     g.save();

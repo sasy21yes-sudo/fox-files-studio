@@ -1750,7 +1750,9 @@ function drawRigArm(g: G, A: RigArm) {
   if (A.prop === 'pencil' && A.phys === 'far') anchored(g, 'prop_pencil', gx, gy, -0.9);
   if (A.prop === 'hold' && A.phys === 'near') drawHeldPaper(g, h.hx + 60, h.hy - 120);
   drawGloveRig(g, A);
-  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand);
+  // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
+  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, (t) => 1 + 0.24 * Math.pow(Math.max(0, 1 - t / 0.45), 1.6));
+  // The far arm comes out from under the coat's shoulder; the near arm's rounded top IS the shoulder (master).
   if (A.phys === 'far' && A.layer !== 'behind') placed(g, CAP.far);
   if (A.prop === 'notebook' && A.phys === 'near') anchored(g, 'prop_notebook', h.hx + 95, h.hy - 75, -0.12);
 }
