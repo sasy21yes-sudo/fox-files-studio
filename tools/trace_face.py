@@ -57,6 +57,64 @@ def profile(curve, xs):
     return top, bot
 
 
+def catmull(pts, closed, per=24):
+    """Centripetal Catmull-Rom through control points (what the tracer page draws)."""
+    P = np.asarray(pts, float)
+    if closed:
+        P = np.vstack([P[-1:], P, P[:2]])
+    else:
+        P = np.vstack([P[:1], P, P[-1:]])
+    out = []
+    for i in range(1, len(P) - 2):
+        p0, p1, p2, p3 = P[i - 1], P[i], P[i + 1], P[i + 2]
+        t0 = 0.0
+        t1 = t0 + max(np.linalg.norm(p1 - p0), 1e-6) ** 0.5
+        t2 = t1 + max(np.linalg.norm(p2 - p1), 1e-6) ** 0.5
+        t3 = t2 + max(np.linalg.norm(p3 - p2), 1e-6) ** 0.5
+        for t in np.linspace(t1, t2, per, endpoint=False):
+            a1 = (t1 - t) / (t1 - t0) * p0 + (t - t0) / (t1 - t0) * p1
+            a2 = (t2 - t) / (t2 - t1) * p1 + (t - t1) / (t2 - t1) * p2
+            a3 = (t3 - t) / (t3 - t2) * p2 + (t - t2) / (t3 - t2) * p3
+            b1 = (t2 - t) / (t2 - t0) * a1 + (t - t0) / (t2 - t0) * a2
+            b2 = (t3 - t) / (t3 - t1) * a2 + (t - t1) / (t3 - t1) * a3
+            out.append((t2 - t) / (t2 - t1) * b1 + (t - t1) / (t2 - t1) * b2)
+    if not closed:
+        out.append(P[-2])
+    return np.array(out)
+
+
+def bezier_path(path, per=40):
+    """Dense points of a pen path from the tracer page: {closed, a: [{p, i, o}]} (cubic Béziers)."""
+    A = path['a']
+    n = len(A)
+    segs = n if path.get('closed') else n - 1
+    out = []
+    for k in range(segs):
+        a, b = A[k], A[(k + 1) % n]
+        p0, p3 = np.array(a['p'], float), np.array(b['p'], float)
+        p1 = np.array(a['o'] if a.get('o') else a['p'], float)
+        p2 = np.array(b['i'] if b.get('i') else b['p'], float)
+        for t in np.linspace(0, 1, per, endpoint=False):
+            u = 1 - t
+            out.append(u ** 3 * p0 + 3 * u * u * t * p1 + 3 * u * t * t * p2 + t ** 3 * p3)
+    if not path.get('closed'):
+        out.append(np.array(A[-1]['p'], float))
+    return np.array(out)
+
+
+def shape_points(v, closed):
+    """A shape from manual.json: a pen path (dict) or an older list of Catmull-Rom points."""
+    return bezier_path(v) if isinstance(v, dict) else catmull(v, closed)
+
+
+def control(curve, n):
+    """n evenly spaced points along a dense curve (start points for the tracer page)."""
+    seg = np.hypot(*np.diff(np.vstack([curve, curve[:1]]), axis=0).T)
+    t = np.concatenate([[0], np.cumsum(seg)])[:-1]
+    u = np.linspace(0, t[-1], n, endpoint=False)
+    return [[round(float(np.interp(v, t, curve[:, 0])), 1), round(float(np.interp(v, t, curve[:, 1])), 1)] for v in u]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--ts', default=None)
@@ -95,7 +153,11 @@ def main():
         pup = ndi.binary_opening(dark & inside, iterations=2)
         pl, pn = ndi.label(pup)
         pup = pl == 1 + int(np.argmax(ndi.sum(pup, pl, range(1, pn + 1))))
-        (pcx, pcy), (pa, pb), pang = cv2.fitEllipse(contour(pup).astype(np.float32))
+        # Where the pupil touches the rim the dark merges: fit the ellipse only on its free outline.
+        pc_ = contour(pup, 0.5)
+        far_from_rim = ndi.distance_transform_edt(ndi.binary_fill_holes(sil))
+        free = np.array([q for q in pc_ if far_from_rim[int(q[1]), int(q[0])] > 14])
+        (pcx, pcy), (pa, pb), pang = cv2.fitEllipse((free if len(free) >= 8 else pc_).astype(np.float32))
         # Where the pupil meets the rim the dark pixels merge: the inside is the convex shape holding the
         # white and the whole fitted pupil ellipse, kept within the silhouette.
         ell = cv2.ellipse2Poly((int(pcx), int(pcy)), (int(pa / 2), int(pb / 2)), int(pang), 0, 360, 5)
@@ -140,6 +202,59 @@ def main():
     nl, nn = ndi.label(nb)
     ys_, xs_ = np.nonzero(nl == 1 + int(np.argmax(ndi.sum(nb, nl, range(1, nn + 1)))))
     nose = (xs_.mean() + 480, ys_.mean() + 595)
+    # The line under the far eye (master: from below the far eye down to the cheek spike): per column,
+    # the dark pixel nearest the far eye's bottom, outside the eye.
+    fz = ndi.binary_dilation(eyes['far']['sil'], iterations=8)
+    fy0 = int(np.nonzero(eyes['far']['sil'])[0].max())
+    ux, uy = [], []
+    for x in range(int(eyes['far']['centre'][0]) - 10, int(eyes['far']['centre'][0]) + 110):
+        ys = np.nonzero(dark[fy0 - 40:fy0 + 60, x] & ~fz[fy0 - 40:fy0 + 60, x])[0]
+        if not len(uy) and len(ys):
+            ys = ys[ys + fy0 - 40 >= fy0 - 6]  # start just under the eye
+        ys = ys + fy0 - 40
+        if len(uy):
+            ys = ys[np.abs(ys - uy[-1]) < 8]  # follow the same line, not the head outline above it
+        if len(ys):
+            ux.append(x)
+            uy.append(ys.min())
+    underline = np.column_stack([ux, ndi.median_filter(np.array(uy, float), 9)]) if ux else np.zeros((0, 2))
+
+    # Hand-drawn shapes (art/reference/trace/manual.json, from the studio's tracer page) replace the
+    # automatic ones; the automatic ones are written to auto.json as the page's starting point.
+    auto = {
+        'near.silhouette': control(eyes['near']['silhouette'], 20), 'near.white': control(eyes['near']['white'], 18),
+        'far.silhouette': control(eyes['far']['silhouette'], 16), 'far.white': control(eyes['far']['white'], 14),
+        'brow.near': control(brows['near'], 18), 'brow.far': control(brows['far'], 12),
+        'near.pupil': control(cv2.ellipse2Poly((int(eyes['near']['pupil'][0]), int(eyes['near']['pupil'][1])), (int(eyes['near']['pupil'][2]), int(eyes['near']['pupil'][3])), int(eyes['near']['pupil'][4]), 0, 360, 4).astype(float), 10),
+        'far.pupil': control(cv2.ellipse2Poly((int(eyes['far']['pupil'][0]), int(eyes['far']['pupil'][1])), (int(eyes['far']['pupil'][2]), int(eyes['far']['pupil'][3])), int(eyes['far']['pupil'][4]), 0, 360, 4).astype(float), 10),
+        'far.underline': [[round(float(x), 1), round(float(y), 1)] for x, y in underline[:: max(1, len(underline) // 6)]],
+    }
+    TRACE = os.path.dirname(SRC)
+    json.dump(auto, open(os.path.join(TRACE, 'auto.json'), 'w'), indent=1)
+    man_path = os.path.join(TRACE, 'manual.json')
+    if os.path.exists(man_path):
+        man = json.load(open(man_path, encoding='utf8'))
+        man = {k: v for k, v in man.items() if len(v['a'] if isinstance(v, dict) else v) >= (2 if k == 'far.underline' else 3)}
+        for side in ('near', 'far'):
+            if f'{side}.silhouette' in man:
+                eyes[side]['silhouette'] = shape_points(man[f'{side}.silhouette'], True)
+            if f'{side}.white' in man:
+                wh = shape_points(man[f'{side}.white'], True)
+                eyes[side]['white'] = wh
+                eyes[side]['centre'] = (wh[:, 0].mean(), wh[:, 1].mean())
+                eyes[side]['height'] = float(np.ptp(wh[:, 1]))
+                eyes[side]['width'] = float(np.ptp(wh[:, 0]))
+            if f'{side}.pupil' in man:
+                pp = shape_points(man[f'{side}.pupil'], True).astype(np.float32)
+                (pcx, pcy), (pa, pb), pang = cv2.fitEllipse(pp)
+                eyes[side]['pupil'] = (pcx, pcy, pa / 2, pb / 2, pang)
+            if f'brow.{side}' in man:
+                brows[side] = shape_points(man[f'brow.{side}'], True)
+        ul = man.get('far.underline')
+        if ul and len(ul['a'] if isinstance(ul, dict) else ul) >= 2:
+            underline = shape_points(ul, False)
+        print('manual shapes used:', ', '.join(sorted(man)))
+
     # Normalise: origin = near white centre, unit = near white height.
     ox, oy = eyes['near']['centre']
     unit = eyes['near']['height']
@@ -156,12 +271,15 @@ def main():
             'silhouette': norm(e['silhouette']),
             # Pupil as drawn (the master looks down and to the right) + its size.
             'pupil': {'x': round((pcx - ox) / unit, 4), 'y': round((pcy - oy) / unit, 4), 'rx': round(min(pa, pb) / unit, 4),
-                      'ry': round(max(pa, pb) / unit, 4)},
+                      'ry': round(max(pa, pb) / unit, 4),
+                      # Angle of the long axis from vertical, degrees (clockwise), in the master's (rolled) frame.
+                      'angle': round(float(pang if pa <= pb else pang - 90), 2)},
             'highlight': ({'x': round((e['hl'][0] - ox) / unit, 4), 'y': round((e['hl'][1] - oy) / unit, 4), 'r': round(e['hl'][2] / unit, 4)}
                           if e['hl'] else None),
         }
     for side, b in brows.items():
         out['brows'][side] = norm(b[::2])
+    out['underline'] = norm(underline[:: max(1, len(underline) // 40)]) if len(underline) else []
     # Eye profiles for the animated lid: at N columns across the silhouette, the silhouette's and the
     # white's top and bottom (where the white does not reach, its top = bottom = the lid's closing line).
     N = 81
@@ -183,8 +301,28 @@ def main():
         nx = lambda v: [round((x - ox) / unit, 4) for x in v]
         ny = lambda v: [round((y - oy) / unit, 4) for y in v]
         out['eyes'][side]['profile'] = {'x': nx(xs), 'silTop': ny(st), 'silBot': ny(sb), 'whiteTop': ny(wt), 'whiteBot': ny(wb)}
-        out['eyes'][side]['white'] = norm(wh[::4])
-        out['eyes'][side]['silhouette'] = norm(sil[::4])
+        out['eyes'][side]['white'] = norm(wh[::2])
+        out['eyes'][side]['silhouette'] = norm(sil[::2])
+
+    # Snout bridge: the head's outer outline (last non-green pixel before the green) from the top of the
+    # far eye down to the top of the nose, scanning right from the far eye's centre.
+    green = (H > 40) & (H < 80) & (S > 120)
+    fcx, fcy = eyes['far']['centre']
+    ftop = int(np.nonzero(eyes['far']['sil'])[0].min())
+    bridge = []
+    for y in range(ftop, int(nose[1]) - 20):
+        row = green[y, int(fcx):590].astype(int)
+        run = np.convolve(row, np.ones(6, int), 'valid')  # a real run of green, not an anti-aliased pixel
+        g = np.nonzero(run == 6)[0]
+        if len(g):
+            bridge.append((int(fcx) + g[0] - 1, y))
+    bridge = np.array(bridge, float)
+    # Smooth outline x(y): median over 31 rows (drops the cheek spike), then a quartic fit.
+    xm = ndi.median_filter(bridge[:, 0], size=31, mode='nearest')
+    keep = np.abs(bridge[:, 0] - xm) < 5  # rows of the cheek spike stick out: fit on the true outline only
+    cf = np.polyfit(bridge[keep, 1], bridge[keep, 0], 5)
+    bridge = np.column_stack([np.polyval(cf, bridge[:, 1]), bridge[:, 1]])
+    out['bridge'] = norm(bridge[::6])
 
     # Debug overlay.
     dbg = img.copy()
@@ -195,6 +333,7 @@ def main():
         cv2.ellipse(dbg, ((pcx, pcy), (pa * 2, pb * 2), pang), (0, 0, 255), 2)
     for b in brows.values():
         cv2.polylines(dbg, [b.astype(np.int32)], True, (0, 255, 255), 2)
+    cv2.polylines(dbg, [bridge.astype(np.int32)], False, (255, 0, 0), 3)
     # Grid every 0.1 unit (near eye-white height) centred on the near eye, to check the fit by eye.
     for v in np.arange(-3, 3.01, 0.1):
         for p_ in ((int(ox + v * unit), 0, int(ox + v * unit), dbg.shape[0]), (0, int(oy + v * unit), dbg.shape[1], int(oy + v * unit))):

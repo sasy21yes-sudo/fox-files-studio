@@ -573,6 +573,68 @@ for k, (dx, dy) in PARAMS.get('joints', {}).items():  # reference px offsets for
 META['joints'] = {k: ref2rig(v) for k, v in J.items()}
 META['headRef'] = ref2rig((545.0, 140.0))
 
+# Snout bridge after the master (art/reference/trace, tools/trace_face.py writes masterFace.ts): the head
+# sprite is stretched row by row so its upper muzzle outline, from the far eye to the nose, lies on the
+# master's outline, posed like the face is at runtime (near eye + nose similarity). Then the eye clip is
+# rebuilt from the stretched head.
+FACE_TS = os.path.join(OUT, 'masterFace.ts')
+if RESTYLED_HEAD and os.path.exists(FACE_TS) and PARAMS.get('stretch_bridge'):  # off: not what the master needs
+    _t = open(FACE_TS, encoding='utf8').read()
+    MF = json.loads(_t[_t.index('{'):_t.rindex('}') + 1])
+    ne = np.array(META['eyes']['near']['white'])
+    rn = np.array(META['nose'])
+    mn = np.array(MF['nose'])
+    roll = math.atan2(mn[1], mn[0]) - math.atan2(rn[1] - ne[1], rn[0] - ne[0])
+    kf = np.linalg.norm(rn - ne) / np.linalg.norm(mn)
+    c_, s_ = math.cos(-roll), math.sin(-roll)
+    tgt = np.array([ne + kf * np.array([x * c_ - y * s_, x * s_ + y * c_]) for x, y in MF['bridge']])
+    tgt = tgt[np.argsort(tgt[:, 1])]
+    hp = META['parts']['head']
+    img = cv2.imread(os.path.join(OUT, 'head.webp'), cv2.IMREAD_UNCHANGED)
+    PADR = 140
+    img = cv2.copyMakeBorder(img, 0, 0, 0, PADR, cv2.BORDER_CONSTANT, value=(0, 0, 0, 0))
+    H_, W_ = img.shape[:2]
+    y0, y1 = int(tgt[0, 1] - hp['y']), int(tgt[-1, 1] - hp['y'])
+    dx = np.zeros(H_)
+    xc = np.zeros(H_)
+    for y in range(max(0, y0), min(H_, y1)):
+        cols = np.nonzero(img[y, :, 3] > 128)[0]
+        if not len(cols):
+            continue
+        xc[y] = cols.max()
+        dx[y] = np.interp(y + hp['y'], tgt[:, 1], tgt[:, 0]) - hp['x'] - xc[y]
+    rows = np.arange(H_)
+    on = (rows >= y0) & (rows < y1) & (xc > 0)
+    # Smooth over rows and fade in/out over 40 rows at both ends of the bridge.
+    dx = ndi.gaussian_filter1d(np.where(on, dx, 0.0), 6)
+    fade = np.clip(np.minimum(rows - y0, y1 - rows) / 40.0, 0, 1)
+    dx *= fade
+    xc = np.where(on, xc, np.interp(rows, rows[on], xc[on]) if on.any() else 0)
+    Wz = 130.0  # stretch zone inside the outline
+    xs = np.arange(W_, dtype=np.float32)[None, :].repeat(H_, 0)
+    mx = xs.copy()
+    for y in range(H_):
+        if abs(dx[y]) < 0.3:
+            continue
+        a0 = xc[y] - Wz
+        e1 = xc[y] + dx[y]
+        z = (xs[y] >= a0) & (xs[y] <= e1)
+        mx[y, z] = a0 + (xs[y, z] - a0) * Wz / max(1.0, Wz + dx[y])
+        mx[y, xs[y] > e1] = xs[y, xs[y] > e1] - dx[y]
+    my = np.arange(H_, dtype=np.float32)[:, None].repeat(W_, 1)
+    pm = premul(img)
+    out = cv2.remap(pm, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    al = out[:, :, 3:4]
+    out[:, :, :3] = np.where(al > 0, out[:, :, :3] * 255 / np.maximum(al, 1e-3), 0)
+    img = np.clip(out, 0, 255).astype(np.uint8)
+    cv2.imwrite(os.path.join(OUT, 'head.webp'), img, [cv2.IMWRITE_WEBP_QUALITY, 92])
+    META['parts']['head']['w'] = int(W_)
+    _a = cv2.erode((img[:, :, 3] > 128).astype(np.uint8), np.ones((9, 9), np.uint8))
+    _cs, _ = cv2.findContours(_a, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _c = cv2.approxPolyDP(max(_cs, key=cv2.contourArea), 2.0, True).reshape(-1, 2)
+    META['headClip'] = [[round(float(x + hp['x']), 1), round(float(y + hp['y']), 1)] for x, y in _c]
+    print('snout bridge: max stretch', round(float(np.abs(dx).max()), 1), 'rig px')
+
 json.dump(META, open(os.path.join(OUT, 'rig.json'), 'w'), indent=1)
 files = sorted(f for f in os.listdir(OUT) if f.endswith('.webp'))
 with open(os.path.join(OUT, 'assets.ts'), 'w') as fh:
