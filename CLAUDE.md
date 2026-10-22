@@ -65,7 +65,7 @@ Done: painted rig, six scenes, Vox-style narration + 17 pop-ups, catchy score, n
 Next (agreed direction, engine choice still open):
 1. Free "Cuphead" polish in code: character animated on twos (12 fps) while camera/effects stay at 24–30, line boil on outlines, smear frames/multiples on fast moves, stronger anticipation and squash on key beats. Do it on a branch with before/after frames.
 2. Animation engine decision (ask Salvatore): **Rive** (he animates visually; ~$9/month yearly, `.riv` export needs a paid plan) vs **Spine Pro** ($379, text JSON — Claude can generate the skeleton and first animations, he refines) vs staying on the current rig. Pilot on scene 1 only, then extend.
-3. New assets from Gemini (Nano Banana 2.1, up to 14 reference images): 3/4 and profile heads, more hands (front/back), layered scene backgrounds, emotion mouths, a few frame-by-frame key moments (8–12 drawings). Same green background, scale and light; one part per cell.
+3. New assets from Gemini (prompts: `art/GEMINI_PROMPTS.md`; Salvatore drops results in `art/incoming/` — integrate them through the bake pipeline, check them against the prompt's checklist first) — (Nano Banana 2.1, up to 14 reference images): 3/4 and profile heads, more hands (front/back), layered scene backgrounds, emotion mouths, a few frame-by-frame key moments (8–12 drawings). Same green background, scale and light; one part per cell.
 4. Possibly: localise the publishing kit text (it is English only).
 
 A published claude.ai artifact of the app exists (owned by Salvatore); it was updated from the claude.ai session by publishing `dist/` — Claude Code can't publish it, so mention when a new build should be republished.
