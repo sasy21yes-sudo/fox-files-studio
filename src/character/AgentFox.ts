@@ -1,5 +1,5 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
-import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, hoseControl, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
+import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 export { loadRig as loadPuppet } from './rig/rigPuppet';
 
 /**
@@ -1721,6 +1721,9 @@ function drawMultiples(g: G, st: ArmState, phys: Phys, pose: FoxPose) {
   for (const [lag, al] of [[0.22, 0.18], [0.11, 0.32]] as const) drawGloveRig(g, rigArm({ ...st, b: Math.max(0, st.b - lag) }, phys, pose), al);
 }
 
+/** Rig px the hat sits above its baked place (master look: brows clear of the brim). */
+const HAT_RAISE = 34;
+
 function drawFoxSheetRig(g: G, pose: FoxPose): void {
   const time = pose.time;
   const facing = pose.facing ?? 1;
@@ -1820,8 +1823,9 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     const liftAmt = Math.max(0, Math.cos(ph)) * walk;
     const ankle: V2 = [hip0[0] + Math.sin(ph) * stride, hip0[1] + L - liftAmt * 26 * RK];
     const { c } = hoseControl(hip, ankle, L, -1);
-    noodle(g, `leg_${name}`, hip, c, ankle);
+    // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
     anchored(g, `shoe_${name}`, ankle[0], ankle[1], -liftAmt * 0.35 + (walk ? Math.sin(ph) * 0.08 : 0));
+    noodle(g, `leg_${name}`, hip, c, ankle);
   };
   // Spine: idle sway, talking emphasis, recoil on a take, lean toward a reach; the coat hem trails.
   const reach = ['point', 'magnify', 'wave'].includes(far.prop) ? 1 : 0;
@@ -1874,12 +1878,16 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     const pivot: V2 = [hp.x + hp.w * 0.5, hp.y + hp.h * 0.85];
     // Follow-through: the hat lags the head's bounce a little and settles.
     const hatLag = (beatLift(time - 0.16) - beatLift(time - 0.08)) * 14 * bounceAmt * RK;
-    g.translate(pivot[0], pivot[1] - hatLift + hatLag);
+    // Master look: the hat sits a little higher, leaving fur between the brows and the brim.
+    g.translate(pivot[0], pivot[1] - hatLift + hatLag - HAT_RAISE);
     g.rotate(-0.1 * clamp(hatLift / 60) - surprise * 0.08 + (beatLift(time - 0.2) - 0.5) * 0.025 * bounceAmt);
     g.translate(-pivot[0], -pivot[1]);
     placed(g, 'hat');
     g.restore();
   }
+  // Master look: the far ear stands in front of the hat brim, the brows are never hidden by it.
+  if (RIG.parts.ear_over) placed(g, 'ear_over');
+  drawFaceBrows(g, face);
   // Sweat drop.
   const sweat = clamp(pose.sweat ?? 0);
   if (sweat > 0) {

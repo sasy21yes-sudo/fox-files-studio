@@ -8,6 +8,7 @@
  */
 import rigJson from './rig.json';
 import { RIG_ASSETS } from './assets';
+import { MASTER_FACE } from './masterFace';
 
 type G = CanvasRenderingContext2D;
 export type V2 = [number, number];
@@ -292,179 +293,251 @@ export interface Face {
   mouth: MouthId;
 }
 
-const INK = '#170d07';
 
-function fur(k = 1) {
-  const [r, g_, b] = RIG.furColor;
-  return `rgb(${Math.round(r * k)}, ${Math.round(g_ * k)}, ${Math.round(b * k)})`;
-}
-
+/** Mouth and eyes (drawn under the hat). The brows go over the hat brim: see drawFaceBrows. */
 export function drawFace(g: G, f: Face) {
   placed(g, `mouth_${f.mouth}`);
   (['near', 'far'] as const).forEach((side, i) => drawEye(g, side, i, f));
+}
+
+/** Brows, drawn after the hat so the brim never hides them (as in the master drawing). */
+export function drawFaceBrows(g: G, f: Face) {
   drawBrows(g, f);
 }
 
+/** Eye and brow ink of the master look: a warm near-black brown. */
+const EYE_INK = '#1c0e07';
+const BROW_FILL = '#3a2416';
+
+/** Traced shapes are in units of the master's near eye-white height; this is that height in rig px. */
+// Measured: the master's near eye is 0.46 of the eye-to-nose distance (tools/trace_face.py, face_4x).
+const FACE_UNIT = 143;
+
+/**
+ * The master's head is rolled clockwise (it looks down into the lens): its eye line falls 10.6 deg
+ * where the rig's rises 2.7 deg, while the muzzle points the same way (17 vs 18 deg). The traced
+ * shapes are turned back by that roll so they sit upright on the rig's head.
+ */
+const MASTER_ROLL = (13.3 * Math.PI) / 180;
+const unroll = ([x, y]: readonly [number, number]): V2 => {
+  const c = Math.cos(-MASTER_ROLL);
+  const s = Math.sin(-MASTER_ROLL);
+  return [x * c - y * s, x * s + y * c];
+};
+
+interface EyeShape {
+  /** Centre relative to the near eye's centre (traced units, upright). */
+  centre: V2;
+  width: number;
+  height: number;
+  /** Columns across the eye (upright): ink silhouette and white, top and bottom, relative to the centre. */
+  silTop: V2[];
+  silBot: V2[];
+  whiteTop: V2[];
+  whiteBot: V2[];
+  pupil: { x: number; y: number; rx: number; ry: number };
+  highlight: { x: number; y: number; r: number } | null;
+  /** Ink thickness above the lid edge / below the white, per column (the side walls of the drawing capped). */
+  lidInk: number[];
+  rimInk: number[];
+}
+
+/** Per-column ink thickness, capped at 1.3x the median of the middle half (the eye's side walls are not lid). */
+function inkBand(a: V2[], b: V2[]): number[] {
+  const d = a.map((p, j) => Math.abs(b[j][1] - p[1]));
+  const mid = d.slice(Math.floor(d.length / 4), Math.ceil((d.length * 3) / 4)).sort((x, y) => x - y);
+  const cap = mid[Math.floor(mid.length / 2)] * 1.3;
+  return d.map((v) => Math.min(v, cap));
+}
+
+interface TracedEye {
+  centre: readonly [number, number];
+  width: number;
+  height: number;
+  pupil: { x: number; y: number; rx: number; ry: number };
+  highlight: { x: number; y: number; r: number } | null;
+  profile: { x: readonly number[]; silTop: readonly number[]; silBot: readonly number[]; whiteTop: readonly number[]; whiteBot: readonly number[] };
+}
+
+const EYES: Record<'near' | 'far', EyeShape> = (() => {
+  const one = (e: TracedEye): EyeShape => {
+    const c = unroll(e.centre);
+    const rel = (p: readonly [number, number]): V2 => {
+      const q = unroll(p);
+      return [q[0] - c[0], q[1] - c[1]];
+    };
+    const col = (ys: readonly number[]) => e.profile.x.map((x, i) => rel([x, ys[i]]));
+    const pc = rel([e.pupil.x, e.pupil.y]);
+    const hl = e.highlight ? rel([e.highlight.x, e.highlight.y]) : null;
+    return {
+      centre: c,
+      width: e.width,
+      height: e.height,
+      silTop: col(e.profile.silTop),
+      silBot: col(e.profile.silBot),
+      whiteTop: col(e.profile.whiteTop),
+      whiteBot: col(e.profile.whiteBot),
+      pupil: { x: pc[0], y: pc[1], rx: e.pupil.rx, ry: e.pupil.ry },
+      highlight: hl && e.highlight ? { x: hl[0], y: hl[1], r: e.highlight.r } : null,
+      lidInk: inkBand(col(e.profile.whiteTop), col(e.profile.silTop)),
+      rimInk: inkBand(col(e.profile.whiteBot), col(e.profile.silBot)),
+    };
+  };
+  return { near: one(MASTER_FACE.eyes.near as TracedEye), far: one(MASTER_FACE.eyes.far as TracedEye) };
+})();
+
+/** Where each eye is drawn (rig px): the near eye where the head was drawn for it, the far one at the master's spacing. */
+function eyeCentre(side: 'near' | 'far', k: number): V2 {
+  const n = RIG.eyes.near.white;
+  if (side === 'near') return [n[0], n[1]];
+  // -0.1: measured on an overlay with the upright master (the far eye sat 12 px / 0.1 unit low).
+  return [n[0] + EYES.far.centre[0] * k, n[1] + (EYES.far.centre[1] - 0.1) * k];
+}
+
+const mix = (a: V2, b: V2, t: number): V2 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+
+function poly(g: G, pts: V2[]) {
+  g.beginPath();
+  g.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+  g.closePath();
+}
+
+/**
+ * Eyes traced from the master drawing (masterFace.ts, made by tools/trace_face.py), drawn from
+ * column profiles so the lid is part of the eye: the upper lid edge slides from the top of the
+ * white down to a closing curve near its bottom, bending with the eye; the heavy lid ink rides on
+ * it with the master's thickness, the lower rim stays. Closed = the two ink bands meet in one arc.
+ */
 function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
-  const e = RIG.eyes[side];
-  const [cx, cy0] = e.white;
-  // Master look (art/reference/agent-fox-master.png): smaller upright ovals with a fine rim,
-  // a solid round pupil and a round catch-light (the old pie-cut eye had a heavy ink rim and a wedge).
-  const rx = e.rx * 0.76 * f.eyeScale;
-  const ry = e.ry * 0.98 * f.eyeScale;
-  const cy = cy0 - e.ry * 0.1;
-  const lw = Math.max(4, e.rx * 0.13);
+  const E = EYES[side];
+  const k = FACE_UNIT * f.eyeScale;
+  const [ex, ey] = eyeCentre(side, k);
+  const w = E.width * k;
+  const h = E.height * k;
+  const at = (p: V2): V2 => [ex + p[0] * k, ey + p[1] * k];
   g.lineCap = 'round';
   g.lineJoin = 'round';
   if (f.happy || (f.wink && i === 0)) {
-    // Happy closed eye: a thick upward arc.
-    g.strokeStyle = INK;
-    g.lineWidth = lw * 1.3;
+    // Happy: the lid line bends up into an arch.
+    g.strokeStyle = EYE_INK;
+    g.lineWidth = h * 0.09;
     g.beginPath();
-    g.moveTo(cx - rx * 0.9, cy + ry * 0.2);
-    g.quadraticCurveTo(cx, cy - ry * 0.75, cx + rx * 0.9, cy + ry * 0.2);
+    g.moveTo(ex - w * 0.5, ey + h * 0.1);
+    g.quadraticCurveTo(ex, ey - h * 0.38, ex + w * 0.5, ey + h * 0.1);
     g.stroke();
     return;
   }
-  const lid = Math.min(1, f.lid[i]);
-  if (lid > 0.88) {
-    // Closed: fur lid with a thick lash arc.
-    g.fillStyle = fur(0.96);
-    g.beginPath();
-    g.ellipse(cx, cy, rx + lw * 0.6, ry + lw * 0.6, 0, 0, Math.PI * 2);
-    g.fill();
-    g.strokeStyle = INK;
-    g.lineWidth = lw * 1.3;
-    g.beginPath();
-    g.moveTo(cx - rx * 0.95, cy + ry * 0.05);
-    g.quadraticCurveTo(cx, cy + ry * 0.6, cx + rx * 0.95, cy + ry * 0.05);
-    g.stroke();
-    g.lineWidth = lw * 0.6;
-    g.beginPath();
-    g.moveTo(cx + rx * 0.8, cy + ry * 0.12);
-    g.lineTo(cx + rx * 1.1, cy - ry * 0.05);
-    g.stroke();
-    return;
+  // The traced heavy lid is the rest pose: the animated lid starts beyond the rig's resting value.
+  const lid = Math.min(1, Math.max(0, (f.lid[i] - 0.1) / 0.9));
+  const n = E.whiteTop.length;
+  const tilt = f.lidTilt * 0.22; // inner corner (+x) lower when angry, higher when worried
+  const edge: V2[] = [];
+  const bottom: V2[] = [];
+  // Closing line: one gentle arc (convex down) from the outer corner to the inner corner, a little
+  // below the middle of the eye. Both lids travel to it, so a closed eye is a single clean arc.
+  const c0 = mix(E.whiteTop[0], E.whiteBot[0], 0.5);
+  const c1 = mix(E.whiteTop[n - 1], E.whiteBot[n - 1], 0.5);
+  const sag = E.height * 0.16;
+  const lowLid = Math.pow(lid, 1.6) * 0.75 + f.squint * 0.45;
+  for (let j = 0; j < n; j++) {
+    const top = E.whiteTop[j];
+    const bot = E.whiteBot[j];
+    const u = j / (n - 1);
+    const cy = c0[1] + (c1[1] - c0[1]) * u + sag * 4 * u * (1 - u);
+    const close: V2 = [top[0], Math.min(Math.max(cy, top[1]), bot[1])];
+    const t = (top[0] / Math.max(1e-6, E.width)) * 2; // -1 outer .. +1 inner
+    const ey0 = top[1] + (close[1] - top[1]) * lid + tilt * t * (1 - lid) * 0.6;
+    const ed: V2 = [top[0], Math.min(Math.max(ey0, top[1]), bot[1])];
+    const bo: V2 = [bot[0], bot[1] + (close[1] - bot[1]) * Math.min(1, lid >= 0.98 ? 1 : lowLid)];
+    edge.push(ed);
+    bottom.push([bo[0], Math.max(bo[1], ed[1])]);
   }
-  // White with a fine ink rim.
-  g.fillStyle = INK;
-  g.beginPath();
-  g.ellipse(cx, cy, rx + lw * 0.3, ry + lw * 0.3, 0, 0, Math.PI * 2);
-  g.fill();
-  const sg = g.createLinearGradient(0, cy - ry, 0, cy + ry);
-  sg.addColorStop(0, '#ece6dc');
-  sg.addColorStop(0.3, '#ffffff');
-  sg.addColorStop(1, '#fbf8f1');
-  g.fillStyle = sg;
-  g.beginPath();
-  g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-  g.fill();
-  g.save();
-  g.beginPath();
-  g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
-  g.clip();
-  // Solid pupil with a round catch-light (upper right) and a small second one.
-  const px = cx + f.lookX * rx * 0.4 + rx * 0.06;
-  const py = cy + f.lookY * ry * 0.3 + ry * 0.08;
-  const pr = rx * 0.62 * f.pupil;
-  const pry = ry * 0.64 * f.pupil;
-  g.fillStyle = '#120a06';
-  g.beginPath();
-  g.ellipse(px, py, pr, pry, 0, 0, Math.PI * 2);
-  g.fill();
-  g.fillStyle = '#ffffff';
-  g.beginPath();
-  g.arc(px + pr * 0.32, py - pry * 0.38, pr * 0.3, 0, Math.PI * 2);
-  g.fill();
-  g.beginPath();
-  g.arc(px - pr * 0.3, py + pry * 0.38, pr * 0.12, 0, Math.PI * 2);
-  g.fill();
-  // Upper lid (fur) with a lash line; tilted for moods. Inner corner is +x.
-  const tilt = f.lidTilt * ry * 0.5;
-  if (lid > 0.02 || Math.abs(tilt) > 0.5) {
-    const base = cy - ry - 3 + (ry * 2 + 6) * lid;
-    const yl = base - tilt;
-    const yr = base + tilt;
-    const ctrl = (yl + yr) / 2 + ry * 0.16;
-    g.fillStyle = fur();
-    g.beginPath();
-    g.moveTo(cx - rx - 8, cy - ry - 20);
-    g.lineTo(cx + rx + 8, cy - ry - 20);
-    g.lineTo(cx + rx + 8, yr);
-    g.quadraticCurveTo(cx, ctrl, cx - rx - 8, yl);
-    g.closePath();
+  // White opening between the lid edge and the bottom of the white.
+  const open = [...edge.map(at), ...bottom.map(at).reverse()];
+  if (lid < 0.98) {
+    const sg = g.createLinearGradient(0, ey - h / 2, 0, ey + h / 2);
+    sg.addColorStop(0, '#d2ccc6');
+    sg.addColorStop(0.3, '#ffffff');
+    sg.addColorStop(1, '#fdfbf8');
+    g.fillStyle = sg;
+    poly(g, open);
     g.fill();
-    g.strokeStyle = INK;
-    g.lineWidth = lw * 0.95;
+    g.save();
+    poly(g, open);
+    g.clip();
+    const pr = E.pupil.rx * k * f.pupil;
+    const pry = E.pupil.ry * k * f.pupil;
+    const px = ex + f.lookX * (w / 2 - pr) * 0.85;
+    const py = ey + h * 0.06 + f.lookY * (h / 2 - pry) * 0.7;
+    g.fillStyle = '#2a160b';
     g.beginPath();
-    g.moveTo(cx - rx - 8, yl);
-    g.quadraticCurveTo(cx, ctrl, cx + rx + 8, yr);
-    g.stroke();
-  }
-  if (f.squint > 0.02) {
-    const yb = cy + ry + 3 - ry * 0.7 * f.squint;
-    g.fillStyle = fur(1.03);
-    g.beginPath();
-    g.moveTo(cx - rx - 8, cy + ry + 20);
-    g.lineTo(cx + rx + 8, cy + ry + 20);
-    g.lineTo(cx + rx + 8, yb);
-    g.quadraticCurveTo(cx, yb - ry * 0.2, cx - rx - 8, yb);
-    g.closePath();
+    g.ellipse(px, py, pr, pry, 0, 0, Math.PI * 2);
     g.fill();
-    g.strokeStyle = INK;
-    g.lineWidth = lw * 0.7;
-    g.beginPath();
-    g.moveTo(cx - rx - 8, yb);
-    g.quadraticCurveTo(cx, yb - ry * 0.2, cx + rx + 8, yb);
-    g.stroke();
+    if (E.highlight) {
+      g.fillStyle = '#ffffff';
+      g.beginPath();
+      g.arc(px + (E.highlight.x - E.pupil.x) * k, py + (E.highlight.y - E.pupil.y) * k, E.highlight.r * k, 0, Math.PI * 2);
+      g.fill();
+    }
+    // Soft shadow of the lid on the eyeball.
+    const sh = g.createLinearGradient(0, ey - h / 2, 0, ey);
+    sh.addColorStop(0, 'rgba(60, 30, 15, 0.16)');
+    sh.addColorStop(1, 'rgba(60, 30, 15, 0)');
+    g.fillStyle = sh;
+    poly(g, open);
+    g.fill();
+    g.restore();
   }
-  g.restore();
-  g.strokeStyle = INK;
-  g.lineWidth = lw * 0.7;
-  g.beginPath();
-  g.ellipse(cx, cy, rx + lw * 0.15, ry + lw * 0.15, 0, 0, Math.PI * 2);
-  g.stroke();
+  g.fillStyle = EYE_INK;
+  // Lower rim: the master's thickness under the bottom of the white.
+  const lower = [...bottom.map(at), ...bottom.map((b, j): V2 => at([b[0], b[1] + E.rimInk[j]])).reverse()];
+  poly(g, lower);
+  g.fill();
+  // Upper lid ink: the master's thickness, riding on the lid edge (slightly thinner as it closes).
+  const thin = 1 - lid * 0.25;
+  const upper = [...edge.map(at), ...edge.map((ed, j): V2 => at([ed[0], ed[1] - E.lidInk[j] * thin])).reverse()];
+  poly(g, upper);
+  g.fill();
 }
 
-function taper(g: G, a: V2, c: V2, b: V2, w: number) {
-  const N = 18;
-  const L: V2[] = [];
-  const R: V2[] = [];
-  for (let i = 0; i <= N; i++) {
-    const t = i / N;
-    const mt = 1 - t;
-    const x = mt * mt * a[0] + 2 * mt * t * c[0] + t * t * b[0];
-    const y = mt * mt * a[1] + 2 * mt * t * c[1] + t * t * b[1];
-    const dx = 2 * mt * (c[0] - a[0]) + 2 * t * (b[0] - c[0]);
-    const dy = 2 * mt * (c[1] - a[1]) + 2 * t * (b[1] - c[1]);
-    const l = Math.hypot(dx, dy) || 1;
-    const half = (w / 2) * Math.max(0.25, Math.pow(Math.sin(Math.PI * (0.12 + t * 0.8)), 0.55));
-    L.push([x - (dy / l) * half, y + (dx / l) * half]);
-    R.push([x + (dy / l) * half, y - (dx / l) * half]);
-  }
-  g.beginPath();
-  g.moveTo(L[0][0], L[0][1]);
-  for (const p of L) g.lineTo(p[0], p[1]);
-  for (const p of R.reverse()) g.lineTo(p[0], p[1]);
-  g.closePath();
-}
+/**
+ * Brows traced from the master drawing: the near one long and arched with a dropping tip, the far
+ * one short and slanted. Moods bend them: raise lifts the whole brow, angry pulls the inner end
+ * (+x, toward the nose) down, worry lifts it, skeptic raises one and lowers the other.
+ */
+const BROWS: Record<'near' | 'far', V2[]> = {
+  near: MASTER_FACE.brows.near.map((p) => unroll(p)).map((q): V2 => [q[0] - EYES.near.centre[0], q[1] - EYES.near.centre[1]]),
+  far: MASTER_FACE.brows.far.map((p) => unroll(p)).map((q): V2 => [q[0] - EYES.far.centre[0], q[1] - EYES.far.centre[1]]),
+};
 
 function drawBrows(g: G, f: Face) {
   const { raise, worry, angry, skeptic } = f.brows;
   (['near', 'far'] as const).forEach((side, i) => {
-    const e = RIG.eyes[side];
-    const [cx, cy] = e.white;
-    const w = e.rx * 2.1;
-    const h = e.ry;
-    const y0 = cy - e.ry * 1.5 - raise * h * 0.3;
-    const innerDy = (angry * 0.42 - worry * 0.42) * h;
-    const outerDy = (-angry * 0.08 + worry * 0.16) * h;
-    const sk = i === 1 ? -skeptic * h * 0.35 : skeptic * h * 0.12;
-    const a: V2 = [cx - w * 0.5, y0 + outerDy + sk + h * 0.1];
-    const c: V2 = [cx - w * 0.02, y0 - h * 0.22 + (innerDy + outerDy) * 0.3 + sk];
-    const b: V2 = [cx + w * 0.5, y0 + innerDy + sk];
-    taper(g, a, c, b, e.rx * 0.46);
-    g.fillStyle = INK;
+    const pts = BROWS[side];
+    const k = FACE_UNIT * f.eyeScale;
+    const [ex, ey] = eyeCentre(side, k);
+    const xs = pts.map((p) => p[0]);
+    const xMin = Math.min(...xs);
+    const xMax = Math.max(...xs);
+    const sk = i === 1 ? -skeptic * 0.3 : skeptic * 0.1;
+    const lift = -raise * 0.22 + sk;
+    const inner = angry * 0.32 - worry * 0.3;
+    const outer = -angry * 0.05 + worry * 0.1;
+    const cx = xs.reduce((a, b) => a + b, 0) / xs.length;
+    const cy = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    const map = (p: V2, inset: boolean): V2 => {
+      const x = inset ? cx + (p[0] - cx) * 0.9 : p[0];
+      const y = inset ? cy + (p[1] - cy) * 0.62 : p[1];
+      const t = (p[0] - xMin) / Math.max(1e-6, xMax - xMin); // 0 outer end .. 1 inner end
+      return [ex + x * k, ey + (y + lift + outer * (1 - t) + inner * t) * k];
+    };
+    g.fillStyle = EYE_INK;
+    poly(g, pts.map((p) => map(p, false)));
+    g.fill();
+    // Dark-brown fill inside the ink outline.
+    g.fillStyle = BROW_FILL;
+    poly(g, pts.map((p) => map(p, true)));
     g.fill();
   });
 }

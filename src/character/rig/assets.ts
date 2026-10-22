@@ -5,56 +5,57 @@ import a2 from './arm_front_lower.webp';
 import a3 from './arm_front_upper.webp';
 import a4 from './cap_back.webp';
 import a5 from './cap_front.webp';
-import a6 from './eye_far_closed.webp';
-import a7 from './eye_far_happy.webp';
-import a8 from './eye_far_pupil.webp';
-import a9 from './eye_far_white.webp';
-import a10 from './eye_near_closed.webp';
-import a11 from './eye_near_happy.webp';
-import a12 from './eye_near_pupil.webp';
-import a13 from './eye_near_white.webp';
-import a14 from './hand_fist.webp';
-import a15 from './hand_fist_back.webp';
-import a16 from './hand_flat.webp';
-import a17 from './hand_flat_back.webp';
-import a18 from './hand_grip.webp';
-import a19 from './hand_grip_back.webp';
-import a20 from './hand_open.webp';
-import a21 from './hand_open_back.webp';
-import a22 from './hand_point.webp';
-import a23 from './hand_point_back.webp';
-import a24 from './hand_relaxed.webp';
-import a25 from './hand_relaxed_back.webp';
-import a26 from './hand_thumb.webp';
-import a27 from './hand_thumb_back.webp';
-import a28 from './hand_wave.webp';
-import a29 from './hand_wave_back.webp';
-import a30 from './hat.webp';
-import a31 from './head.webp';
-import a32 from './leg_far.webp';
-import a33 from './leg_near.webp';
-import a34 from './mouth_1.webp';
-import a35 from './mouth_10.webp';
-import a36 from './mouth_11.webp';
-import a37 from './mouth_12.webp';
-import a38 from './mouth_2.webp';
-import a39 from './mouth_3.webp';
-import a40 from './mouth_4.webp';
-import a41 from './mouth_5.webp';
-import a42 from './mouth_6.webp';
-import a43 from './mouth_7.webp';
-import a44 from './mouth_8.webp';
-import a45 from './mouth_9.webp';
-import a46 from './neck.webp';
-import a47 from './prop_magnifier.webp';
-import a48 from './prop_notebook.webp';
-import a49 from './prop_pencil.webp';
-import a50 from './shoe_far.webp';
-import a51 from './shoe_near.webp';
-import a52 from './sleeve_back.webp';
-import a53 from './sleeve_front.webp';
-import a54 from './tail.webp';
-import a55 from './torso.webp';
+import a6 from './ear_over.webp';
+import a7 from './eye_far_closed.webp';
+import a8 from './eye_far_happy.webp';
+import a9 from './eye_far_pupil.webp';
+import a10 from './eye_far_white.webp';
+import a11 from './eye_near_closed.webp';
+import a12 from './eye_near_happy.webp';
+import a13 from './eye_near_pupil.webp';
+import a14 from './eye_near_white.webp';
+import a15 from './hand_fist.webp';
+import a16 from './hand_fist_back.webp';
+import a17 from './hand_flat.webp';
+import a18 from './hand_flat_back.webp';
+import a19 from './hand_grip.webp';
+import a20 from './hand_grip_back.webp';
+import a21 from './hand_open.webp';
+import a22 from './hand_open_back.webp';
+import a23 from './hand_point.webp';
+import a24 from './hand_point_back.webp';
+import a25 from './hand_relaxed.webp';
+import a26 from './hand_relaxed_back.webp';
+import a27 from './hand_thumb.webp';
+import a28 from './hand_thumb_back.webp';
+import a29 from './hand_wave.webp';
+import a30 from './hand_wave_back.webp';
+import a31 from './hat.webp';
+import a32 from './head.webp';
+import a33 from './leg_far.webp';
+import a34 from './leg_near.webp';
+import a35 from './mouth_1.webp';
+import a36 from './mouth_10.webp';
+import a37 from './mouth_11.webp';
+import a38 from './mouth_12.webp';
+import a39 from './mouth_2.webp';
+import a40 from './mouth_3.webp';
+import a41 from './mouth_4.webp';
+import a42 from './mouth_5.webp';
+import a43 from './mouth_6.webp';
+import a44 from './mouth_7.webp';
+import a45 from './mouth_8.webp';
+import a46 from './mouth_9.webp';
+import a47 from './neck.webp';
+import a48 from './prop_magnifier.webp';
+import a49 from './prop_notebook.webp';
+import a50 from './prop_pencil.webp';
+import a51 from './shoe_far.webp';
+import a52 from './shoe_near.webp';
+import a53 from './sleeve_back.webp';
+import a54 from './sleeve_front.webp';
+import a55 from './tail.webp';
+import a56 from './torso.webp';
 
 export const RIG_ASSETS: Record<string, string> = {
   'arm_back_lower': a0,
@@ -63,54 +64,55 @@ export const RIG_ASSETS: Record<string, string> = {
   'arm_front_upper': a3,
   'cap_back': a4,
   'cap_front': a5,
-  'eye_far_closed': a6,
-  'eye_far_happy': a7,
-  'eye_far_pupil': a8,
-  'eye_far_white': a9,
-  'eye_near_closed': a10,
-  'eye_near_happy': a11,
-  'eye_near_pupil': a12,
-  'eye_near_white': a13,
-  'hand_fist': a14,
-  'hand_fist_back': a15,
-  'hand_flat': a16,
-  'hand_flat_back': a17,
-  'hand_grip': a18,
-  'hand_grip_back': a19,
-  'hand_open': a20,
-  'hand_open_back': a21,
-  'hand_point': a22,
-  'hand_point_back': a23,
-  'hand_relaxed': a24,
-  'hand_relaxed_back': a25,
-  'hand_thumb': a26,
-  'hand_thumb_back': a27,
-  'hand_wave': a28,
-  'hand_wave_back': a29,
-  'hat': a30,
-  'head': a31,
-  'leg_far': a32,
-  'leg_near': a33,
-  'mouth_1': a34,
-  'mouth_10': a35,
-  'mouth_11': a36,
-  'mouth_12': a37,
-  'mouth_2': a38,
-  'mouth_3': a39,
-  'mouth_4': a40,
-  'mouth_5': a41,
-  'mouth_6': a42,
-  'mouth_7': a43,
-  'mouth_8': a44,
-  'mouth_9': a45,
-  'neck': a46,
-  'prop_magnifier': a47,
-  'prop_notebook': a48,
-  'prop_pencil': a49,
-  'shoe_far': a50,
-  'shoe_near': a51,
-  'sleeve_back': a52,
-  'sleeve_front': a53,
-  'tail': a54,
-  'torso': a55,
+  'ear_over': a6,
+  'eye_far_closed': a7,
+  'eye_far_happy': a8,
+  'eye_far_pupil': a9,
+  'eye_far_white': a10,
+  'eye_near_closed': a11,
+  'eye_near_happy': a12,
+  'eye_near_pupil': a13,
+  'eye_near_white': a14,
+  'hand_fist': a15,
+  'hand_fist_back': a16,
+  'hand_flat': a17,
+  'hand_flat_back': a18,
+  'hand_grip': a19,
+  'hand_grip_back': a20,
+  'hand_open': a21,
+  'hand_open_back': a22,
+  'hand_point': a23,
+  'hand_point_back': a24,
+  'hand_relaxed': a25,
+  'hand_relaxed_back': a26,
+  'hand_thumb': a27,
+  'hand_thumb_back': a28,
+  'hand_wave': a29,
+  'hand_wave_back': a30,
+  'hat': a31,
+  'head': a32,
+  'leg_far': a33,
+  'leg_near': a34,
+  'mouth_1': a35,
+  'mouth_10': a36,
+  'mouth_11': a37,
+  'mouth_12': a38,
+  'mouth_2': a39,
+  'mouth_3': a40,
+  'mouth_4': a41,
+  'mouth_5': a42,
+  'mouth_6': a43,
+  'mouth_7': a44,
+  'mouth_8': a45,
+  'mouth_9': a46,
+  'neck': a47,
+  'prop_magnifier': a48,
+  'prop_notebook': a49,
+  'prop_pencil': a50,
+  'shoe_far': a51,
+  'shoe_near': a52,
+  'sleeve_back': a53,
+  'sleeve_front': a54,
+  'tail': a55,
+  'torso': a56,
 };
