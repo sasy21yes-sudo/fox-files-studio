@@ -175,6 +175,12 @@ META = {'K': K, 'origin': ref2rig(ORIGIN), 'unit': 1.0 / K, 'parts': {}}
 
 
 def save(name, img, origin, **extra):
+    if name in globals().get('PARAMS', {}).get('mirror', []):
+        # Mirrored left-right (e.g. the far sleeve, so its light and cuff face the other way); anchors follow.
+        img = cv2.flip(img, 1)
+        for k in ('ax', 'bx'):
+            if k in extra:
+                extra[k] = float(img.shape[1] - extra[k])
     cv2.imwrite(os.path.join(OUT, name + '.webp'), img, [cv2.IMWRITE_WEBP_QUALITY, 92])
     META['parts'][name] = {'x': float(origin[0]), 'y': float(origin[1]), 'w': int(img.shape[1]), 'h': int(img.shape[0]), **extra}
 
@@ -198,6 +204,9 @@ def blob(img, reg, thr=55):
 
 headB, oB = cut('head', 790, 200)    # blank head without hat
 headA, oA = cut('head', 260, 190)    # head with hat (for the hat and alignment)
+# Restyled sheets come with art/parts_v4/rig_params.json: tail anchor/turn, joint offsets, mirrored
+# sprites and the polygon of the ear drawn over the hat (head crop px of the restyled sheet).
+PARAMS = json.load(open(os.path.join(ALT, 'rig_params.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_params.json')) else {}
 FITS = os.path.join(ALT, 'fits.json') if ALT and os.path.exists(os.path.join(ALT, 'fits.json')) else os.path.join(ART, 'fits.json')
 fits = json.load(open(FITS))
 A_to_B = np.array(fits['a_to_b'])     # headA crop px -> headB crop px (1x)
@@ -223,8 +232,29 @@ stub = (orange | cream_neck) & (yy > (268 - SHIFT[1]) * 4)
 stub = ndi.binary_opening(stub, iterations=3)
 keep = 1 - cv2.GaussianBlur(ndi.binary_dilation(stub, iterations=2).astype(np.float32), (0, 0), 2)
 hb[:, :, 3] = (hb[:, :, 3] * keep).astype(np.uint8)
+MUZZLE = os.path.join(ALT, 'muzzle_mask.png') if ALT else ''
+if EXACT_MOUTHS := bool(fits.get('exact')) and os.path.exists(MUZZLE):
+    # Restyled mouths carry the whole muzzle: take it out of the head so there is only ever one nose.
+    mm = cv2.imread(MUZZLE, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
+    h1, w1 = hb.shape[0] // 4, hb.shape[1] // 4
+    crop = np.zeros((h1, w1), np.float32)
+    sub = mm[oB[1]:oB[1] + h1, oB[0]:oB[0] + w1]
+    crop[:sub.shape[0], :sub.shape[1]] = sub
+    m4 = cv2.resize(crop, (hb.shape[1], hb.shape[0]), interpolation=cv2.INTER_LINEAR)
+    hb[:, :, 3] = (hb[:, :, 3] * (1 - m4)).astype(np.uint8)
 img, o = warp(hb, at4(B_to_rig, SHIFT))
 save('head', img, o)
+
+if 'ear_over' in PARAMS:
+    # The far ear stands in front of the hat (master look): the same head pixels inside a polygon,
+    # feathered, drawn again after the hat.
+    em = np.zeros(hb.shape[:2], np.uint8)
+    cv2.fillPoly(em, [np.array(PARAMS['ear_over'], np.float32).reshape(-1, 2).__mul__(4).astype(np.int32)], 1)
+    em = cv2.GaussianBlur(em.astype(np.float32), (0, 0), 3)
+    ear = hb.copy()
+    ear[:, :, 3] = (ear[:, :, 3] * em).astype(np.uint8)
+    img, o = warp(ear, at4(B_to_rig, SHIFT))
+    save('ear_over', img, o)
 
 # Neck pivot (where the head turns): centre of the collar, in rig px.
 NECK_REF = (532.0, 205.0)
@@ -503,8 +533,6 @@ for nm, (pt, wrist, axis) in HANDS.items():
     save('hand_' + nm + '_back', img, o)
 
 # Tail: base on the right end of the piece; turned so it rises behind the back as in the reference.
-# Restyled sheets can move the tail's base and turn: art/parts_v4/rig_params.json overrides them.
-PARAMS = json.load(open(os.path.join(ALT, 'rig_params.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_params.json')) else {}
 TAIL = PARAMS.get('tail', {})
 img, o = part_at('legs9', (820, 200), 0.48 * TAIL.get('scale', 1.0), anchor_px=tuple(TAIL.get('anchor', (955, 115))), rot=TAIL.get('rot', 92))
 save('tail', img, o)
@@ -524,6 +552,8 @@ J = {
     'hipNear': (490.0, 363.0), 'hipFar': (553.0, 356.0),
     'tailBase': (445.0, 360.0),
 }
+for k, (dx, dy) in PARAMS.get('joints', {}).items():  # reference px offsets for restyled parts
+    J[k] = (J[k][0] + dx, J[k][1] + dy)
 META['joints'] = {k: ref2rig(v) for k, v in J.items()}
 META['headRef'] = ref2rig((545.0, 140.0))
 

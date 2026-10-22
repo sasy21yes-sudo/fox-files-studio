@@ -41,6 +41,14 @@ def crop_origin(sheet, pt):
     return max(int(xs.min()) - 3, 0), max(int(ys.min()) - 3, 0)
 
 
+def nose_at(bgr):
+    """Centre of the black nose: the compact dark blob furthest to the right."""
+    dark = cv2.morphologyEx((bgr.astype(int).max(2) < 60).astype(np.uint8), cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
+    n, _, st, cen = cv2.connectedComponentsWithStats(dark)
+    best = max(range(1, n), key=lambda i: (st[i, 0] + st[i, 2]) if st[i, 4] > 300 and st[i, 2] < st[i, 3] * 3 else -1)
+    return cen[best]
+
+
 def approved(man, key, use=None):
     vs = man.get(key, {}).get('versions', [])
     pick = [v for v in vs if use and v['version'] == use] or [v for v in vs if v['status'] in ('approved', 'final')]
@@ -57,19 +65,31 @@ def main():
     head_v = approved(man, 'rig_head/p1')
     H = cv2.imread(os.path.join(ROOT, head_v['file']))
     renders = {}
+    owns = []
     for k in range(12):
         v = approved(man, f'rig_mouthheads/m{k}', use.get(f'm{k}'))
         if not v:
             raise SystemExit(f'rig_mouthheads/m{k}: nothing approved (use --use m{k}=vN)')
-        renders[k] = cv2.resize(cv2.imread(os.path.join(ROOT, v['file'])), (H.shape[1], H.shape[0]), interpolation=cv2.INTER_AREA)
+        R = cv2.resize(cv2.imread(os.path.join(ROOT, v['file'])), (H.shape[1], H.shape[0]), interpolation=cv2.INTER_AREA)
+        # Where this mouth differs from the blank head (measured before any shift): its largest region.
+        d = np.abs(R.astype(int) - H.astype(int)).sum(2) > 60
+        d &= (alpha_of(R) > 0.5) | (alpha_of(H) > 0.5)
+        d = ndi.binary_opening(d, iterations=2)
+        dl, dn = ndi.label(d)
+        own = dl == 1 + int(np.argmax(ndi.sum(d, dl, range(1, dn + 1)))) if dn else d
+        # The model sometimes lifts the whole snout on a wide mouth: move the render so its nose sits
+        # exactly on the blank head's nose (only the jaw should move between mouth shapes).
+        dx, dy = nose_at(R) - nose_at(H)
+        if abs(dx) > 1 or abs(dy) > 1:
+            M = np.float32([[1, 0, -dx], [0, 1, -dy]])
+            R = cv2.warpAffine(R, M, (R.shape[1], R.shape[0]), borderMode=cv2.BORDER_CONSTANT, borderValue=(0, 255, 0))
+            own = cv2.warpAffine(own.astype(np.uint8), M, (R.shape[1], R.shape[0])) > 0
+            print(f'm{k}: nose re-aligned by ({-dx:.1f}, {-dy:.1f}) px')
+        renders[k] = R
+        owns.append(own)
 
     # Muzzle mask: wherever any mouth differs from the blank head (ignoring render noise), grown and feathered.
-    aH = alpha_of(H)
-    diff = np.zeros(H.shape[:2], bool)
-    for R in renders.values():
-        d = np.abs(R.astype(int) - H.astype(int)).sum(2) > 60
-        d &= (alpha_of(R) > 0.5) | (aH > 0.5)
-        diff |= ndi.binary_opening(d, iterations=2)
+    diff = np.logical_or.reduce(owns)
     lab, n = ndi.label(diff)
     sizes = ndi.sum(diff, lab, range(1, n + 1))
     diff = lab == 1 + int(np.argmax(sizes))  # the mouth: render noise elsewhere (ear edge, brow area) is dropped
@@ -83,7 +103,9 @@ def main():
     hx, hy, hw, hh = pieces_of(cv2.imread(os.path.join(ROOT, 'art', 'parts', 'head.jpg')))[1]
     pad = int(0.25 * max(hw, hh))
     cx0, cy0 = hx - pad, hy - pad
-    s = (hw + 2 * pad) / H.shape[1]
+    # The head canvas is not square: keep the two axes' scales apart (one shared scale was ~1-2 px off).
+    sx_h, sy_h = (hw + 2 * pad) / H.shape[1], (hh + 2 * pad) / H.shape[0]
+    s = sx_h
     hb_o = crop_origin(head_sheet, (790, 200))  # same point bake_rig.py cuts the blank head at
     # The bake keeps the ORIGINAL head frame: offsets are expressed in it (+ shift of the crop origin).
     o_old = crop_origin(cv2.imread(os.path.join(ROOT, 'art', 'parts', 'head.jpg')), (790, 200))
@@ -93,7 +115,9 @@ def main():
     old = cv2.imread(os.path.join(ROOT, 'art', 'parts', 'mouths.jpg'))
     bg = np.median(old[alpha_of(old) < 0.02], axis=0)
     ids = [3, 4, 2, 1, 6, 8, 7, 5, 9, 10, 11, 12]  # bake_rig.py's mouth id at each row-major position of mouths.jpg
-    sw, sh_ = round((rb[2] - rb[0]) * s), round((rb[3] - rb[1]) * s)
+    sw, sh_ = round((rb[2] - rb[0]) * sx_h), round((rb[3] - rb[1]) * sy_h)
+    # Sprite px -> head sheet px, exactly (after the integer resize).
+    kx, ky = (rb[2] - rb[0]) * sx_h / sw, (rb[3] - rb[1]) * sy_h / sh_
     gap = 40
     sheet = np.empty((3 * (sh_ + gap) + gap, 4 * (sw + gap) + gap, 3), np.uint8)
     sheet[:] = bg
@@ -121,9 +145,21 @@ def main():
         points[str(mid)] = list(pt)
         mc_o = crop_origin(sheet, pt)
         # mouth crop px -> sheet px (+mc_o) -> render px -> head sheet px -> headB crop px (-hb_o)
-        tx = mc_o[0] - qx + cx0 + rb[0] * s - hb_o[0] + shift[0]
-        ty = mc_o[1] - qy + cy0 + rb[1] * s - hb_o[1] + shift[1]
-        fits[str(mid)] = [[1.0, 0.0, tx], [0.0, 1.0, ty]]
+        # mouth crop px m -> sheet q = m + mc_o -> head sheet p = c0 + rb*s_h + (q - q0)*k -> headB = p - hb_o + shift
+        tx = cx0 + rb[0] * sx_h + (mc_o[0] - qx) * kx - hb_o[0] + shift[0]
+        ty = cy0 + rb[1] * sy_h + (mc_o[1] - qy) * ky - hb_o[1] + shift[1]
+        fits[str(mid)] = [[kx, 0.0, tx], [0.0, ky, ty]]
+
+    # Muzzle mask on the head sheet: bake_rig.py removes the head's own muzzle there, so the mouth sprite
+    # (which always carries a whole muzzle) is the only nose on screen. Shrunk so the sprite's soft edge
+    # still lies over head pixels.
+    mm = np.zeros(head_sheet.shape[:2], np.uint8)
+    cw_, ch_ = hw + 2 * pad, hh + 2 * pad
+    mres = cv2.resize(mask.astype(np.uint8) * 255, (cw_, ch_), interpolation=cv2.INTER_AREA)
+    X0, Y0, X1, Y1 = max(cx0, 0), max(cy0, 0), min(cx0 + cw_, mm.shape[1]), min(cy0 + ch_, mm.shape[0])
+    mm[Y0:Y1, X0:X1] = mres[Y0 - cy0:Y1 - cy0, X0 - cx0:X1 - cx0]
+    mm = cv2.GaussianBlur(cv2.erode(mm, np.ones((17, 17), np.uint8)), (0, 0), 2)
+    cv2.imwrite(os.path.join(OUT, 'muzzle_mask.png'), mm)
 
     old_fits = json.load(open(os.path.join(ROOT, 'art', 'parts', 'fits.json')))
     json.dump({'a_to_b': old_fits['a_to_b'], 'mouths': fits, 'points': points, 'exact': True, 'b_shift': list(shift)}, open(os.path.join(OUT, 'fits.json'), 'w'), indent=1)

@@ -5867,7 +5867,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/rig_mouthheads/m3_v1.png",
-          "status": "approved",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/rig_head/p1_v2.png",
           "refs": [
@@ -5884,7 +5884,151 @@
           "height": 1024,
           "seconds": 170.5,
           "created": "2026-10-22T16:31:20",
-          "review": "wide-open A on the new muzzle; the rest of the head unchanged"
+          "review": "lifted the upper muzzle and nose: the head's own nose showed under it (double nose)"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 543782638,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 120.2,
+          "created": "2026-10-22T18:18:58",
+          "review": "the whole snout and nose lifted (yawn), not just the jaw"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v3.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1422878658,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 106.2,
+          "created": "2026-10-22T18:20:44",
+          "review": "the whole snout and nose lifted (yawn), not just the jaw"
+        },
+        {
+          "version": "v4",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v4.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1308031104,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 90.3,
+          "created": "2026-10-22T18:22:14",
+          "review": "the whole snout and nose lifted (yawn), not just the jaw"
+        },
+        {
+          "version": "v5",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v5.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_mouthheads/m4_v1.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1165619333,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 124.3,
+          "created": "2026-10-22T18:25:06",
+          "review": "wide A; its nose sits higher, re-aligned to the head's nose when the sprite is cut | the lifted snout does not fit the head even re-aligned"
+        },
+        {
+          "version": "v6",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v6.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_mouthheads/m4_v1.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1283603371,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 108.4,
+          "created": "2026-10-22T18:26:55",
+          "review": "whole snout lifted (yawn)"
+        },
+        {
+          "version": "v7",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v7.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_mouthheads/m4_v1.png",
+          "refs": [
+            "art/parts/mouths.jpg#3"
+          ],
+          "instruction": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move at all. Change nothing else. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 119324852,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 108.5,
+          "created": "2026-10-22T18:28:43",
+          "review": "whole snout lifted (yawn)"
+        },
+        {
+          "version": "v8",
+          "file": "art/incoming/pieces/rig_mouthheads/m3_v8.png",
+          "status": "approved",
+          "model": "copy of rig_mouthheads/m4",
+          "image": "art/incoming/pieces/rig_mouthheads/m4_v1.png",
+          "refs": [],
+          "instruction": "temporary A = the E/I mouth (every generated wide A lifted the whole snout)",
+          "review": "temporary: A uses the E/I mouth",
+          "corrections": [],
+          "created": "2026-10-22T18:36:54"
         }
       ]
     },

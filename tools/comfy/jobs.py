@@ -288,3 +288,14 @@ JOBS['hands_new_front']['three'] = dict(image='approved:hands_new_front/two', re
 JOBS['hands_new_front']['one'] = dict(image='approved:hands_new_front/fist_tremble', refs=[MS_HANDS], prompt=KEEP_PALM + (
     'raise ONLY the index finger (the one at the top of the fist) straight up, pointing up, counting one; the other two '
     'fingers stay curled and the thumb stays folded over them. Exactly three fingers and one thumb.'))
+# m3 (A) v1 lifted the whole upper muzzle and nose: the head's own nose showed under it (double nose).
+JOBS['rig_mouthheads']['m3'] = dict(image='approved:rig_head/p1', refs=['art/parts/mouths.jpg#3'], prompt=(
+    'Give the fox head in image 1 a wide open mouth for the sound A (as drawn in image 2): ONLY the lower jaw drops '
+    'down, showing the dark mouth, a pink tongue and small fangs. The upper muzzle, the black nose and the top line of '
+    'the snout stay EXACTLY where they are in image 1, not lifted, not moved. Change nothing else: same head, ears, fur, '
+    'ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.'))
+# m3 round 3: start from the approved E/I mouth (nose in place, mouth half open) and only drop the jaw further.
+JOBS['rig_mouthheads']['m3'] = dict(image='approved:rig_mouthheads/m4', refs=['art/parts/mouths.jpg#3'], prompt=(
+    'Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, '
+    'the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move '
+    'at all. Change nothing else. Plain green background, no shadow.'))

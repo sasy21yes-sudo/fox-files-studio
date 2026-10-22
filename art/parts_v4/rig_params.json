@@ -6,5 +6,49 @@
   ],
   "rot": 40,
   "why": "restyled tail (rig_legs9/p4 v6, fitted 1.15:right): base measured at (962,150), tip direction -160.5 deg vs -179.5 originally; rot 40 so the tip rises up-left beside the back (as in the master) instead of straight up behind it"
- }
+ },
+ "joints": {
+  "shoulderFront": [
+   -3,
+   14
+  ],
+  "shoulderBack": [
+   3,
+   15
+  ]
+ },
+ "mirror": [
+  "sleeve_back"
+ ],
+ "ear_over": [
+  [
+   0,
+   0
+  ],
+  [
+   62,
+   0
+  ],
+  [
+   104,
+   78
+  ],
+  [
+   101,
+   96
+  ],
+  [
+   72,
+   124
+  ],
+  [
+   40,
+   140
+  ],
+  [
+   0,
+   140
+  ]
+ ],
+ "notes": "joints: shoulders lowered ~48 rig px so the sleeve cap starts at the coat shoulder (it stood ~30-40 px above); mirror: the far (right) sleeve texture; ear_over: far ear polygon in restyled head crop px, drawn over the hat"
 }
