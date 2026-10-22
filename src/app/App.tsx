@@ -23,6 +23,7 @@ import { LeftPanel } from '../editor/LeftPanel';
 import { TimelineEditor } from '../editor/TimelineEditor';
 import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
+import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
 
@@ -443,6 +444,8 @@ export function App() {
           <main className="center">
             <PreviewPlayer project={project} timeline={timeline} playback={playback} audioLabel={audioLabel} />
           </main>
+          <div className="right-col">
+          <AiPanel project={project} scene={selected} onChange={change} onUndo={hist.undo} />
           {sel.kind === 'scene' ? (
             <PropertiesPanel
               project={project}
@@ -478,6 +481,7 @@ export function App() {
           ) : (
             <Inspector project={project} timeline={timeline} time={playback.time} selection={sel} onSelect={setSelection} onChange={change} onSeek={playback.seek} />
           )}
+          </div>
           <TimelineEditor
             project={project}
             timeline={timeline}

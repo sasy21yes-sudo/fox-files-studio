@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "typecheck": "tsc --noEmit",
+    "build": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json && vite build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.node.json",
     "preview": "vite preview",
     "qa:frames": "node tools/qa/frames.mjs",
     "qa:labels": "node tools/qa/labels.mjs",
@@ -19,6 +19,8 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^1.1.0",
+    "@types/node": "^22.20.5",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@vitejs/plugin-react": "^5.0.0",

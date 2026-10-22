@@ -724,3 +724,75 @@ textarea.itext {
   max-height: none;
   width: min(880px, 100%);
 }
+
+/* ------------------------------------------------------------------ right column + Claude */
+
+.right-col {
+  grid-area: props;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+.right-col > .properties,
+.right-col > .inspector {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  border-left: 0;
+}
+.studio.editor.theater .right-col {
+  display: none;
+}
+.ai-panel {
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(184, 144, 63, 0.1), transparent);
+}
+.ai-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 9px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+.ai-head .chev {
+  margin-left: auto;
+  color: var(--muted);
+}
+.ai-spark {
+  color: var(--brass-hi);
+}
+.ai-body {
+  padding: 0 12px 10px;
+  display: grid;
+  gap: 6px;
+}
+.ai-prompt {
+  min-height: 64px;
+}
+.ai-busy {
+  font-size: 12.5px;
+  color: var(--brass-hi);
+  animation: ai-pulse 1.4s ease-in-out infinite;
+}
+@keyframes ai-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+.ai-result {
+  border: 1px solid var(--line-2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: var(--bg-2);
+  font-size: 13px;
+}
+.ai-result p {
+  margin: 0 0 6px;
+}
