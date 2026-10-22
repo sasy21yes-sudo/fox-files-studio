@@ -299,3 +299,15 @@ JOBS['rig_mouthheads']['m3'] = dict(image='approved:rig_mouthheads/m4', refs=['a
     'Open this mouth (image 1) much wider for the sound A, as in image 2, by dropping ONLY the lower jaw: the dark mouth, '
     'the pink tongue and small fangs show more. The black nose, the top line of the snout and the upper lip do not move '
     'at all. Change nothing else. Plain green background, no shadow.'))
+
+# Emotion mouths on the restyled head (the mouths_emotions sheet was drawn on the old muzzle): the approved
+# blank head with the expression of the approved emotion piece (image 2), cut like the lip-sync mouths.
+_EMO = {k: v['prompt'].split('New mouth: ', 1)[1] for k, v in JOBS['mouths_emotions'].items() if k != 'blow'}
+JOBS['rig_emotions'] = {
+    k: dict(image='approved:rig_head/p1', refs=[f'approved:mouths_emotions/{k}'], prompt=(
+        f'Give the fox head in image 1 this mouth: {expr} (as drawn in image 2), fitted to the long muzzle of image 1 '
+        'under its black nose. The black nose and the top line of the snout stay exactly where they are; only the '
+        'mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and '
+        'position, still no eyes and no eyebrows. Plain green background, no shadow.'))
+    for k, expr in _EMO.items()
+}

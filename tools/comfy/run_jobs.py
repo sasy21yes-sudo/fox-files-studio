@@ -59,7 +59,15 @@ def main():
         cmd = [sys.executable, os.path.join(HERE, 'edit.py'), a.sheet, n, '--image', image,
                '--prompt', j['prompt'], '--count', str(a.count)]
         for r in j.get('refs', []):
+            if r.startswith('approved:'):
+                src = [v for v in man['sheets'].get(r[9:], {}).get('versions', []) if v['status'] in ('approved', 'final')]
+                if not src:
+                    print(f'{a.sheet}/{n}: reference {r[9:]} not approved yet, skipped', flush=True)
+                    break
+                r = src[-1]['file']
             cmd += ['--ref', r]
+        else:
+            pass
         for c in a.correction:
             cmd += ['--correction', c]
         if a.front:

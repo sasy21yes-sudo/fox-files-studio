@@ -548,6 +548,82 @@ for nm, (pt, wrist, axis) in HANDS.items():
     img, o = part_at('hands', pt, HAND_S, anchor_px=wrist, rot=-axis, dark=0.86)
     save('hand_' + nm + '_back', img, o)
 
+# New gloves (art/incoming hands_new_back / hands_new_front, approved renders): the glove is cut
+# from its render without the short brown cuff (the restyled sleeve has its own), anchored at the
+# wrist (where glove and cuff meet) and turned so its axis is +x, like the sheet gloves; the cuff's
+# thickness sets the scale so every glove matches the sleeve's width.
+NEW_GLOVES = ['one', 'two', 'three', 'pinch_paper', 'pencil', 'magnifier', 'stop', 'chin', 'fist_tremble', 'relaxed', 'knock']
+def new_glove(path):
+    bgr = cv2.imread(path)
+    f = bgr.astype(np.float32)
+    dom = f[..., 1] - np.maximum(f[..., 0], f[..., 2])
+    alpha = np.clip((150 - dom) / 90.0, 0, 1)
+    f[..., 1] = np.minimum(f[..., 1], np.maximum(f[..., 0], f[..., 2]))
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV).astype(int)
+    fg = alpha > 0.5
+    # The cuff's brown fabric (the ink lines are darker, the brass button brighter and more yellow).
+    cuff = fg & (hsv[..., 0] >= 5) & (hsv[..., 0] <= 22) & (hsv[..., 1] > 110) & (hsv[..., 2] > 70) & (hsv[..., 2] < 175)
+    cuff = ndi.binary_opening(cuff, iterations=4)
+    lab, n = ndi.label(cuff)
+    if not n:
+        return None
+    cuff = ndi.binary_fill_holes(lab == 1 + int(np.argmax(ndi.sum(cuff, lab, range(1, n + 1)))))  # with its button
+    glove = fg & (hsv[..., 2] > 150) & (hsv[..., 1] < 70)
+    gl, gn = ndi.label(ndi.binary_opening(glove, iterations=2))
+    glove = gl == 1 + int(np.argmax(ndi.sum(glove, gl, range(1, gn + 1))))
+    # Keep everything but the cuff (and the button/ink inside it), grown a little to take its outline.
+    # Wrist: the white pixels (glove + shirt cuff) closest to the brown cuff, across its ink line.
+    dcuff = ndi.distance_transform_edt(~cuff)
+    near = glove & (dcuff < dcuff[glove].min() + 14)
+    ys, xs = np.nonzero(near)
+    wrist = (float(xs.mean()), float(ys.mean()))
+    gy, gx = np.nonzero(glove)
+    axis = math.degrees(math.atan2(gy.mean() - wrist[1], gx.mean() - wrist[0]))
+    # Remove the whole cuff (fabric, shade, ink outline, button): the brown-or-dark region joined to the
+    # cuff that lies behind the wrist along the hand's axis.
+    fabric = fg & (hsv[..., 0] >= 4) & (hsv[..., 0] <= 24) & (hsv[..., 1] > 100) & (hsv[..., 2] > 45) & (hsv[..., 2] < 180)
+    fl, fn = ndi.label(ndi.binary_opening(fabric, iterations=2))
+    ids = np.unique(fl[cuff & (fl > 0)])
+    region = ndi.binary_dilation(ndi.binary_fill_holes(np.isin(fl, ids) | cuff), iterations=14)
+    ax, ay = math.cos(math.radians(axis)), math.sin(math.radians(axis))
+    yy, xx = np.mgrid[0:bgr.shape[0], 0:bgr.shape[1]]
+    behind = (xx - wrist[0]) * ax + (yy - wrist[1]) * ay < 6
+    alpha = alpha * ~(region & behind)
+    # Drop whatever is left detached from the glove (bits of outline, the button); held props stay.
+    keep = alpha > 0.5
+    kl, kn = ndi.label(keep)
+    sizes = ndi.sum(keep, kl, range(1, kn + 1))
+    big = [i + 1 for i, v in enumerate(sizes) if v > 0.08 * sizes.max()]
+    alpha = alpha * (cv2.dilate(np.isin(kl, big).astype(np.uint8), np.ones((3, 3), np.uint8)) > 0)
+    # Scale: the white glove's area matches the rig's own fist glove (its inner ink lines make the
+    # palm-circle measure unreliable).
+    s = math.sqrt(FIST_AREA / max(float(ndi.binary_fill_holes(glove).sum()), 1.0))
+    img = np.dstack([np.clip(f, 0, 255).astype(np.uint8), (alpha * 255).astype(np.uint8)])
+    A = sim(s, -axis, wrist, (0, 0))
+    return warp(img, A)
+
+def _glove_area(name):
+    im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
+    h = cv2.cvtColor(im[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
+    m = (im[:, :, 3] > 128) & (h[..., 2] > 150) & (h[..., 1] < 70)
+    return float(ndi.binary_fill_holes(m).sum())
+
+if PARAMS.get('new_gloves'):
+    FIST_AREA = _glove_area('hand_fist') * 1.1
+    _man = json.load(open(os.path.join(ROOT, 'art', 'incoming', 'manifest.json'), encoding='utf8'))['sheets']
+    def _approved(key):
+        vs = [v for v in _man.get(key, {}).get('versions', []) if v['status'] in ('approved', 'final')]
+        return os.path.join(ROOT, vs[-1]['file']) if vs else None
+    for nm in NEW_GLOVES:
+        for sheet_, suffix in (('hands_new_back', ''), ('hands_new_front', '_palm')):
+            src = _approved(f'{sheet_}/{nm}')
+            r = new_glove(src) if src else None
+            if r is None:
+                continue
+            img, o = r
+            save(f'hand_n_{nm}{suffix}', img, o)
+            save(f'hand_n_{nm}{suffix}_back', darken(img, 0.86), o)
+
 # Tail: base on the right end of the piece; turned so it rises behind the back as in the reference.
 TAIL = PARAMS.get('tail', {})
 img, o = part_at('legs9', (820, 200), 0.48 * TAIL.get('scale', 1.0), anchor_px=tuple(TAIL.get('anchor', (955, 115))), rot=TAIL.get('rot', 92))
