@@ -427,9 +427,23 @@ if n:
     sz = ndi.sum(hole, lab, range(1, n + 1))
     hole = ndi.binary_fill_holes(lab == int(np.argmax(sz)) + 1)
     hole = ndi.binary_erosion(hole, iterations=6)
-    torso[:, :, 3] = (torso[:, :, 3] * (1 - cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 2))).astype(np.uint8)
+    if RESTYLED_HEAD:
+        # Master look: the collar opening is filled with the cream neck fur (shaded under the collar's
+        # back edge), so there is never a gap between shirt and fur; the head's ruff tucks into it.
+        TORSO_HOLE = hole.copy()
+        cream = np.array([196, 228, 244], np.float32)
+        yy_, xx_ = np.mgrid[0:hole.shape[0], 0:hole.shape[1]]
+        ys_ = np.nonzero(hole)[0]
+        t = np.clip((yy_ - ys_.min()) / max(1, np.ptp(ys_)), 0, 1)[..., None]
+        shade = 0.62 + 0.38 * t  # darker at the top: the inside of the collar
+        fill = np.clip(cream * shade, 0, 255)
+        soft = cv2.GaussianBlur(ndi.binary_dilation(hole, iterations=4).astype(np.float32), (0, 0), 2)[..., None]
+        torso[:, :, :3] = (torso[:, :, :3] * (1 - soft) + fill * soft).astype(np.uint8)
+    else:
+        torso[:, :, 3] = (torso[:, :, 3] * (1 - cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 2))).astype(np.uint8)
 img, o = warp(torso, at4(to_rig(T_ref), o1))
 save('torso', img, o)
+o1_torso = o1
 
 neck, o1 = cut('torso', 740, 260)
 nh, nw = neck.shape[0] / 4, neck.shape[1] / 4
@@ -737,6 +751,44 @@ if RESTYLED_HEAD and os.path.exists(FACE_TS) and PARAMS.get('stretch_bridge'):  
     _c = cv2.approxPolyDP(max(_cs, key=cv2.contourArea), 2.0, True).reshape(-1, 2)
     META['headClip'] = [[round(float(x + hp['x']), 1), round(float(y + hp['y']), 1)] for x, y in _c]
     print('snout bridge: max stretch', round(float(np.abs(dx).max()), 1), 'rig px')
+
+if RESTYLED_HEAD and 'TORSO_HOLE' in globals():
+    # The head (and every mouth) tucks under the shirt: below the top of the collar opening, head pixels
+    # survive only inside the opening, so the ruff goes INTO the collar instead of over the shirt.
+    tp = META['parts']['torso']
+    tor = cv2.imread(os.path.join(OUT, 'torso.webp'), cv2.IMREAD_UNCHANGED)
+    hole_r = cv2.resize(TORSO_HOLE.astype(np.uint8) * 255, (0, 0), fx=1, fy=1)
+    # TORSO_HOLE is in 4x torso-crop px; map it into rig px with the same warp as the torso.
+    hole_img = np.zeros(TORSO_HOLE.shape + (4,), np.uint8)
+    hole_img[..., 3] = TORSO_HOLE.astype(np.uint8) * 255
+    himg, ho = warp(hole_img, at4(to_rig(T_ref), o1_torso))
+    hole_rig = np.zeros((int(tp['h']) + 400, int(tp['w']) + 400), np.float32)
+    def paste(dst, img, ox, oy):
+        h, w = img.shape[:2]
+        dst[oy:oy + h, ox:ox + w] = np.maximum(dst[oy:oy + h, ox:ox + w], img)
+    OXr, OYr = int(tp['x']) - 200, int(tp['y']) - 200
+    paste(hole_rig, himg[..., 3].astype(np.float32) / 255, int(ho[0]) - OXr, int(ho[1]) - OYr)
+    torso_a = np.zeros_like(hole_rig)
+    paste(torso_a, tor[..., 3].astype(np.float32) / 255, int(tp['x']) - OXr, int(tp['y']) - OYr)
+    top_y = np.nonzero(hole_rig.max(1) > 0.5)[0].min() + OYr + 18
+    inside = cv2.dilate((hole_rig > 0.5).astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32)
+    covered = (torso_a > 0.5).astype(np.float32) * (1 - inside)
+    covered = cv2.GaussianBlur(covered, (0, 0), 2)
+    for name in [n for n in META['parts'] if n == 'head' or n.startswith('mouth_')]:
+        pp = META['parts'][name]
+        im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
+        if im is None:
+            continue
+        h, w = im.shape[:2]
+        ys, xs = np.mgrid[0:h, 0:w]
+        gy = ys + int(pp['y']) - OYr
+        gx = xs + int(pp['x']) - OXr
+        ok = (gy >= 0) & (gy < covered.shape[0]) & (gx >= 0) & (gx < covered.shape[1])
+        cov = np.zeros((h, w), np.float32)
+        cov[ok] = covered[gy[ok], gx[ok]]
+        below = ((ys + pp['y']) > top_y).astype(np.float32)
+        im[..., 3] = (im[..., 3] * (1 - cov * below)).astype(np.uint8)
+        cv2.imwrite(os.path.join(OUT, name + '.webp'), im, [cv2.IMWRITE_WEBP_QUALITY, 92])
 
 json.dump(META, open(os.path.join(OUT, 'rig.json'), 'w'), indent=1)
 files = sorted(f for f in os.listdir(OUT) if f.endswith('.webp'))
