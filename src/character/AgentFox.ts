@@ -1687,7 +1687,8 @@ function hoseHand(A: RigArm) {
   const d = Math.hypot(dx, dy) || 1;
   const out = A.phys === 'far' ? 1 : -1;
   const side = (-dy / d) * out * 0.6 + (dx / d) * 1 >= 0 ? 1 : -1;
-  const { c } = hoseControl(S, A.hand, L, side);
+  // Arms hang straight (master look): the sleeve shortens up to 22% before the elbow bows.
+  const { c } = hoseControl(S, A.hand, L, side, 0.22);
   const ang = Math.atan2(A.hand[1] - c[1], A.hand[0] - c[0]);
   const hx = A.hand[0] + Math.cos(ang) * 10;
   const hy = A.hand[1] + Math.sin(ang) * 10;

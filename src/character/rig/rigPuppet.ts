@@ -246,10 +246,12 @@ export function noodle(g: G, name: string, a: V2, c: V2, b: V2, from = 0, to = 1
 }
 
 /** Control point for a rubber-hose limb of length L between a and b (bows out when shorter). */
-export function hoseControl(a: V2, b: V2, L: number, side: number): { c: V2; stretch: number } {
+export function hoseControl(a: V2, b: V2, L0: number, side: number, give = 0): { c: V2; stretch: number } {
   const dx = b[0] - a[0];
   const dy = b[1] - a[1];
   const d = Math.hypot(dx, dy) || 1;
+  // `give`: how much the hose may shorten while staying straight before it starts to bow.
+  const L = Math.max(d, L0 * (1 - give));
   // Bow out when the limb is shorter, but never fold into a hairpin (the hose shortens instead).
   const h = d < L ? Math.min(Math.sqrt(((L * L - d * d) * 3) / 16), L * 0.22) : 0;
   const nx = -dy / d;
@@ -411,32 +413,78 @@ interface TracedEye {
   profile: { x: readonly number[]; silTop: readonly number[]; silBot: readonly number[]; whiteTop: readonly number[]; whiteBot: readonly number[] };
 }
 
+/** Top and bottom y of a closed curve at x (NaN where the curve does not reach). */
+function crossings(curve: V2[], x: number): [number, number] {
+  let lo = Infinity;
+  let hi = -Infinity;
+  for (let i = 0; i < curve.length; i++) {
+    const [x0, y0] = curve[i];
+    const [x1, y1] = curve[(i + 1) % curve.length];
+    if ((x0 - x) * (x1 - x) <= 0 && x0 !== x1) {
+      const y = y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+      lo = Math.min(lo, y);
+      hi = Math.max(hi, y);
+    }
+  }
+  return lo === Infinity ? [NaN, NaN] : [lo, hi];
+}
+
+/**
+ * Eye shapes, upright: the traced outlines are turned back by the master's head roll, then cut into
+ * vertical columns HERE (not in the master's tilted frame), so the lids travel straight down on the
+ * rig's head and a closed eye is a level arc.
+ */
 const EYES: Record<'near' | 'far', EyeShape> = (() => {
+  const N = 81;
   const one = (e: TracedEye): EyeShape => {
     const c = unroll(e.centre);
     const rel = (p: readonly [number, number]): V2 => {
       const q = unroll(p);
       return [q[0] - c[0], q[1] - c[1]];
     };
-    const col = (ys: readonly number[]) => e.profile.x.map((x, i) => rel([x, ys[i]]));
+    const sil = e.silhouette.map(rel);
+    const white = e.white.map(rel);
+    const xs0 = Math.min(...sil.map((p) => p[0])) + 0.002;
+    const xs1 = Math.max(...sil.map((p) => p[0])) - 0.002;
+    const xs = Array.from({ length: N }, (_, j) => (xs0 + xs1) / 2 - ((xs1 - xs0) / 2) * Math.cos((Math.PI * j) / (N - 1)));
+    const S = xs.map((x) => crossings(sil, x));
+    const W = xs.map((x) => crossings(white, x));
+    // Where the white does not reach, both its edges sit on the line joining its two ends (inside the ink).
+    const ok = W.map((w) => !Number.isNaN(w[0]));
+    const first = ok.indexOf(true);
+    const last = ok.lastIndexOf(true);
+    const mid = (j: number) => (W[j][0] + W[j][1]) / 2;
+    const closeAt = (j: number) => {
+      const y = j < first ? mid(first) : j > last ? mid(last) : mid(j);
+      return Math.min(Math.max(y, S[j][0]), S[j][1]);
+    };
+    const wt = W.map((w, j) => (ok[j] ? w[0] : closeAt(j)));
+    const wb = W.map((w, j) => (ok[j] ? w[1] : closeAt(j)));
+    const at = (ys: number[]): V2[] => xs.map((x, j) => [x, ys[j]]);
+    const whiteTop = at(wt);
+    const whiteBot = at(wb);
+    const silTop = at(S.map((v) => v[0]));
+    const silBot = at(S.map((v) => v[1]));
     const pc = rel([e.pupil.x, e.pupil.y]);
     const hl = e.highlight ? rel([e.highlight.x, e.highlight.y]) : null;
+    const wy = white.map((p) => p[1]);
+    const wx = white.map((p) => p[0]);
     return {
       centre: c,
-      width: e.width,
-      height: e.height,
-      silTop: col(e.profile.silTop),
-      silBot: col(e.profile.silBot),
-      whiteTop: col(e.profile.whiteTop),
-      whiteBot: col(e.profile.whiteBot),
+      width: Math.max(...wx) - Math.min(...wx),
+      height: Math.max(...wy) - Math.min(...wy),
+      silTop,
+      silBot,
+      whiteTop,
+      whiteBot,
       pupil: { x: pc[0], y: pc[1], rx: e.pupil.rx, ry: e.pupil.ry },
       highlight: hl && e.highlight ? { x: hl[0], y: hl[1], r: e.highlight.r } : null,
-      lidInk: inkBand(col(e.profile.whiteTop), col(e.profile.silTop)),
-      rimInk: inkBand(col(e.profile.whiteBot), col(e.profile.silBot)),
-      lidInkFull: col(e.profile.whiteTop).map((p, j) => Math.hypot(col(e.profile.silTop)[j][0] - p[0], col(e.profile.silTop)[j][1] - p[1])),
-      rimInkFull: col(e.profile.whiteBot).map((p, j) => Math.hypot(col(e.profile.silBot)[j][0] - p[0], col(e.profile.silBot)[j][1] - p[1])),
-      silhouette: e.silhouette.map(rel),
-      white: e.white.map(rel),
+      lidInk: inkBand(whiteTop, silTop),
+      rimInk: inkBand(whiteBot, silBot),
+      lidInkFull: whiteTop.map((p, j) => Math.abs(silTop[j][1] - p[1])),
+      rimInkFull: whiteBot.map((p, j) => Math.abs(silBot[j][1] - p[1])),
+      silhouette: sil,
+      white,
     };
   };
   return { near: one(MASTER_FACE.eyes.near as TracedEye), far: one(MASTER_FACE.eyes.far as TracedEye) };
@@ -528,7 +576,9 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   // The traced heavy lid is the rest pose: the animated lid starts beyond the rig's resting value.
   const lid = Math.min(1, Math.max(0, (f.lid[i] - 0.1) / 0.9));
   const n = E.whiteTop.length;
-  const tilt = f.lidTilt * 0.22; // inner corner (+x) lower when angry, higher when worried
+  const tilt = f.lidTilt * 0.22; // inner corner lower when angry, higher when worried
+  // 3/4 view: the inner corner (toward the nose bridge) is +x on the near eye, -x on the far eye.
+  const inward = side === 'near' ? 1 : -1;
   const edge: V2[] = [];
   const bottom: V2[] = [];
   // Closing line: one gentle arc (convex down) from the outer corner to the inner corner, a little
@@ -546,7 +596,7 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
     // the head is upright, so lids travel along it, not straight down.
     const span = bot[1] - top[1];
     const uc = span > 1e-6 ? Math.min(1, Math.max(0, (cy - top[1]) / span)) : 0.5;
-    const t = (top[0] / Math.max(1e-6, E.width)) * 2; // -1 outer .. +1 inner
+    const t = ((inward * top[0]) / Math.max(1e-6, E.width)) * 2; // -1 outer .. +1 inner
     const ue = Math.min(1, Math.max(0, uc * lid + (span > 1e-6 ? (tilt * t * (1 - lid) * 0.6) / span : 0)));
     const ub = Math.max(ue, 1 - (1 - uc) * Math.min(1, lid >= 0.98 ? 1 : lowLid));
     edge.push(mix(top, bot, ue));
@@ -559,7 +609,9 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
     const T = top.map(at);
     const B = bot.map(at);
     // Widen the two ends a little so the strip never cuts the outline's own tips.
-    const wide = (P: V2[]) => [[P[0][0] - w * 0.2, P[0][1]] as V2, ...P, [P[P.length - 1][0] + w * 0.2, P[P.length - 1][1]] as V2];
+    // (the side walls of the drawing belong to the open eye: they fade out as the lids close)
+    const ext = w * 0.2 * Math.max(0, 1 - lid * 1.6);
+    const wide = (P: V2[]) => [[P[0][0] - ext, P[0][1]] as V2, ...P, [P[P.length - 1][0] + ext, P[P.length - 1][1]] as V2];
     const t = wide(T);
     const bb = wide(B);
     g.beginPath();
@@ -650,16 +702,17 @@ function drawBrows(g: G, f: Face) {
     const xs = pts.map((p) => p[0]);
     const xMin = Math.min(...xs);
     const xMax = Math.max(...xs);
-    const sk = i === 1 ? -skeptic * 0.3 : skeptic * 0.1;
-    const lift = -raise * 0.22 + sk;
-    const inner = angry * 0.32 - worry * 0.3;
-    const outer = -angry * 0.05 + worry * 0.1;
+    const sk = i === 1 ? -skeptic * 0.16 : skeptic * 0.06;
+    const lift = -raise * 0.12 + sk;
+    const inner = angry * 0.32 - worry * 0.18;
+    const outer = -angry * 0.05 + worry * 0.06;
     const cx = xs.reduce((a, b) => a + b, 0) / xs.length;
     const cy = pts.reduce((a, p) => a + p[1], 0) / pts.length;
     const map = (p: V2, inset: boolean): V2 => {
       const x = inset ? cx + (p[0] - cx) * 0.9 : p[0];
       const y = inset ? cy + (p[1] - cy) * 0.62 : p[1];
-      const t = (p[0] - xMin) / Math.max(1e-6, xMax - xMin); // 0 outer end .. 1 inner end
+      // 0 outer end .. 1 inner end (toward the nose bridge: +x on the near brow, -x on the far one)
+      const t = side === 'near' ? (p[0] - xMin) / Math.max(1e-6, xMax - xMin) : (xMax - p[0]) / Math.max(1e-6, xMax - xMin);
       return [ex + x * k, ey + (y + lift + outer * (1 - t) + inner * t) * k];
     };
     g.fillStyle = EYE_INK;
