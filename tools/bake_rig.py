@@ -375,6 +375,7 @@ MOUTHS = {  # id on the 1x mouth sheet -> a point inside it
 # Restyled mouths (tools/comfy/rig_mouths.py) were cut from renders of the blank head itself:
 # their points come with the fits and they are used as they are.
 EXACT = bool(fits.get('exact'))
+META['emotionMouths'] = {v: int(k) for k, v in fits.get('emotions', {}).items()}
 if 'points' in fits:
     MOUTHS = {int(k): tuple(v) for k, v in fits['points'].items()}
 for mid, pt in MOUTHS.items():

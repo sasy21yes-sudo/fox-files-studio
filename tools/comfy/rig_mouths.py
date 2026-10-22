@@ -41,6 +41,10 @@ def crop_origin(sheet, pt):
     return max(int(xs.min()) - 3, 0), max(int(ys.min()) - 3, 0)
 
 
+# Emotion mouths, in this order: bake id 13 + index (AgentFox's emotion mouth names).
+EMOTIONS = ['scream', 'gasp', 'whisper', 'smirk', 'gritted', 'laugh', 'frown', 'disgust', 'nervous', 'grin', 'jawdrop']
+
+
 def nose_at(bgr):
     """Centre of the black nose: the compact dark blob furthest to the right."""
     dark = cv2.morphologyEx((bgr.astype(int).max(2) < 60).astype(np.uint8), cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))
@@ -66,10 +70,14 @@ def main():
     H = cv2.imread(os.path.join(ROOT, head_v['file']))
     renders = {}
     owns = []
-    for k in range(12):
-        v = approved(man, f'rig_mouthheads/m{k}', use.get(f'm{k}'))
+    # 12 lip-sync mouths (keys 0..11) + the approved emotion mouths (keys 12.., bake ids 13..).
+    sources = [(f'rig_mouthheads/m{k}', use.get(f'm{k}')) for k in range(12)]
+    emos = [e for e in EMOTIONS if approved(man, f'rig_emotions/{e}', use.get(e))]
+    sources += [(f'rig_emotions/{e}', use.get(e)) for e in emos]
+    for k, (key, want) in enumerate(sources):
+        v = approved(man, key, want)
         if not v:
-            raise SystemExit(f'rig_mouthheads/m{k}: nothing approved (use --use m{k}=vN)')
+            raise SystemExit(f'{key}: nothing approved (use --use)')
         R = cv2.resize(cv2.imread(os.path.join(ROOT, v['file'])), (H.shape[1], H.shape[0]), interpolation=cv2.INTER_AREA)
         # Where this mouth differs from the blank head (measured before any shift): its largest region.
         d = np.abs(R.astype(int) - H.astype(int)).sum(2) > 60
@@ -114,15 +122,16 @@ def main():
     # Sprites on a fresh mouth sheet, in a 4x3 grid with room between them; the bake reads the points from fits.json.
     old = cv2.imread(os.path.join(ROOT, 'art', 'parts', 'mouths.jpg'))
     bg = np.median(old[alpha_of(old) < 0.02], axis=0)
-    ids = [3, 4, 2, 1, 6, 8, 7, 5, 9, 10, 11, 12]  # bake_rig.py's mouth id at each row-major position of mouths.jpg
+    ids = [3, 4, 2, 1, 6, 8, 7, 5, 9, 10, 11, 12] + [13 + EMOTIONS.index(e) for e in emos]  # bake_rig.py's mouth ids
     sw, sh_ = round((rb[2] - rb[0]) * sx_h), round((rb[3] - rb[1]) * sy_h)
     # Sprite px -> head sheet px, exactly (after the integer resize).
     kx, ky = (rb[2] - rb[0]) * sx_h / sw, (rb[3] - rb[1]) * sy_h / sh_
     gap = 40
-    sheet = np.empty((3 * (sh_ + gap) + gap, 4 * (sw + gap) + gap, 3), np.uint8)
+    rows_ = -(-len(sources) // 4)
+    sheet = np.empty((rows_ * (sh_ + gap) + gap, 4 * (sw + gap) + gap, 3), np.uint8)
     sheet[:] = bg
     fits, points, placed = {}, {}, []
-    for k in range(12):
+    for k in range(len(sources)):
         R = renders[k][rb[1]:rb[3], rb[0]:rb[2]].astype(np.float32)
         # Hard edge on the green sheet (a soft one would mix in green); bake_rig.py feathers it after keying.
         al = ((mask[rb[1]:rb[3], rb[0]:rb[2]] * alpha_of(renders[k][rb[1]:rb[3], rb[0]:rb[2]])) > 0.5).astype(np.float32)[..., None]
@@ -162,7 +171,7 @@ def main():
     cv2.imwrite(os.path.join(OUT, 'muzzle_mask.png'), mm)
 
     old_fits = json.load(open(os.path.join(ROOT, 'art', 'parts', 'fits.json')))
-    json.dump({'a_to_b': old_fits['a_to_b'], 'mouths': fits, 'points': points, 'exact': True, 'b_shift': list(shift)}, open(os.path.join(OUT, 'fits.json'), 'w'), indent=1)
+    json.dump({'a_to_b': old_fits['a_to_b'], 'mouths': fits, 'points': points, 'exact': True, 'b_shift': list(shift), 'emotions': {str(13 + EMOTIONS.index(e)): e for e in emos}}, open(os.path.join(OUT, 'fits.json'), 'w'), indent=1)
     cv2.imwrite(os.path.join(OUT, 'mouths.jpg'), sheet, [cv2.IMWRITE_JPEG_QUALITY, 96])
     
     print('art/parts_v4/mouths.jpg', sheet.shape[1], 'x', sheet.shape[0], '+ fits.json: 12 mouths, sprite', sw, 'x', sh_, 'px at 1x')

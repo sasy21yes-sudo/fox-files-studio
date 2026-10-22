@@ -6730,6 +6730,534 @@
           "review": "v1 closer to the shape"
         }
       ]
+    },
+    "rig_emotions/scream": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/scream_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/scream_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a big scream, the jaw wide open, the pink tongue visible, small fangs. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a big scream, the jaw wide open, the pink tongue visible, small fangs. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1635153708,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 84.3,
+          "created": "2026-10-22T22:36:21",
+          "review": "snout lifted"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/scream_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/scream_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a big scream, the jaw wide open, the pink tongue visible, small fangs. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a big scream, the jaw wide open, the pink tongue visible, small fangs. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 432520002,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.3,
+          "created": "2026-10-22T22:37:35",
+          "review": "snout lifted"
+        }
+      ]
+    },
+    "rig_emotions/gasp": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/gasp_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/gasp_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a gasp, a small round open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a gasp, a small round open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1838243216,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 82.3,
+          "created": "2026-10-22T22:38:58",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/gasp_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/gasp_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a gasp, a small round open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a gasp, a small round open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1605125491,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.3,
+          "created": "2026-10-22T22:40:12",
+          "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "rig_emotions/whisper": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/whisper_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/whisper_v2.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: whispering, the lips barely parted, a thin dark gap. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: whispering, the lips barely parted, a thin dark gap. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1875507690,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 82.3,
+          "created": "2026-10-22T22:41:35",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/whisper_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/whisper_v2.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: whispering, the lips barely parted, a thin dark gap. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: whispering, the lips barely parted, a thin dark gap. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 644767215,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.2,
+          "created": "2026-10-22T22:42:49",
+          "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "rig_emotions/smirk": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/smirk_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/smirk_v3.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a sly smirk, one corner of the mouth raised, mouth closed. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a sly smirk, one corner of the mouth raised, mouth closed. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1169957189,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 84.3,
+          "created": "2026-10-22T22:44:14",
+          "review": "the other version is cleaner"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/smirk_v2.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/smirk_v3.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a sly smirk, one corner of the mouth raised, mouth closed. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a sly smirk, one corner of the mouth raised, mouth closed. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1730039872,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.2,
+          "created": "2026-10-22T22:45:28",
+          "review": "nose and snout in place on the new head"
+        }
+      ]
+    },
+    "rig_emotions/gritted": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/gritted_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/gritted_v6.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: gritted teeth, both rows of white teeth clenched and visible, lips pulled back. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: gritted teeth, both rows of white teeth clenched and visible, lips pulled back. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 809198470,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 82.2,
+          "created": "2026-10-22T22:46:51",
+          "review": "an eye drawn on the muzzle"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/gritted_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/gritted_v6.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: gritted teeth, both rows of white teeth clenched and visible, lips pulled back. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: gritted teeth, both rows of white teeth clenched and visible, lips pulled back. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 2029512885,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.4,
+          "created": "2026-10-22T22:48:05",
+          "review": "snout shifted"
+        }
+      ]
+    },
+    "rig_emotions/laugh": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/laugh_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/laugh_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a big laugh, the mouth wide open and curved up, tongue visible. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a big laugh, the mouth wide open and curved up, tongue visible. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1845588605,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 82.3,
+          "created": "2026-10-22T22:49:28",
+          "review": "snout lifted"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/laugh_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/laugh_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a big laugh, the mouth wide open and curved up, tongue visible. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a big laugh, the mouth wide open and curved up, tongue visible. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1729249455,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.3,
+          "created": "2026-10-22T22:50:42",
+          "review": "snout lifted"
+        }
+      ]
+    },
+    "rig_emotions/frown": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/frown_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/frown_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a sad frown, the closed mouth line curving down. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a sad frown, the closed mouth line curving down. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 968947388,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 80.3,
+          "created": "2026-10-22T22:52:03",
+          "review": "the other version is cleaner"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/frown_v2.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/frown_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a sad frown, the closed mouth line curving down. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a sad frown, the closed mouth line curving down. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 755521977,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 72.5,
+          "created": "2026-10-22T22:53:15",
+          "review": "nose and snout in place on the new head"
+        }
+      ]
+    },
+    "rig_emotions/disgust": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/disgust_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/disgust_v3.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a disgusted grimace, the upper lip pulled up on one side, a crooked mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a disgusted grimace, the upper lip pulled up on one side, a crooked mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1192330384,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 80.3,
+          "created": "2026-10-22T22:54:36",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/disgust_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/disgust_v3.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a disgusted grimace, the upper lip pulled up on one side, a crooked mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a disgusted grimace, the upper lip pulled up on one side, a crooked mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 655991040,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 72.3,
+          "created": "2026-10-22T22:55:48",
+          "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "rig_emotions/nervous": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/nervous_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/nervous_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a nervous wavy mouth, a closed zigzag line. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a nervous wavy mouth, a closed zigzag line. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 891028145,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 80.3,
+          "created": "2026-10-22T22:57:09",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/nervous_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/nervous_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a nervous wavy mouth, a closed zigzag line. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a nervous wavy mouth, a closed zigzag line. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 182757097,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 72.4,
+          "created": "2026-10-22T22:58:21",
+          "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "rig_emotions/grin": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/grin_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/grin_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a confident grin, a wide closed-teeth smile curving up. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a confident grin, a wide closed-teeth smile curving up. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 791591442,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 80.4,
+          "created": "2026-10-22T22:59:42",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/grin_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/grin_v1.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: a confident grin, a wide closed-teeth smile curving up. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: a confident grin, a wide closed-teeth smile curving up. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1737824226,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 72.5,
+          "created": "2026-10-22T23:00:55",
+          "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "rig_emotions/jawdrop": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/rig_emotions/jawdrop_v1.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/jawdrop_v2.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: the jaw dropped in shock, the lower jaw hanging very low, a tall open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: the jaw dropped in shock, the lower jaw hanging very low, a tall open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1522762599,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 80.4,
+          "created": "2026-10-22T23:02:15",
+          "review": "nose and snout in place on the new head"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/rig_emotions/jawdrop_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/rig_head/p1_v2.png",
+          "refs": [
+            "art/incoming/pieces/mouths_emotions/jawdrop_v2.png"
+          ],
+          "instruction": "Give the fox head in image 1 this mouth: the jaw dropped in shock, the lower jaw hanging very low, a tall open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Give the fox head in image 1 this mouth: the jaw dropped in shock, the lower jaw hanging very low, a tall open mouth. (as drawn in image 2), fitted to the long muzzle of image 1 under its black nose. The black nose and the top line of the snout stay exactly where they are; only the mouth and the lower jaw change. Change NOTHING else: same head, ears, fur, cheek ruff, outline, size and position, still no eyes and no eyebrows. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 2085532393,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1024,
+          "height": 1024,
+          "seconds": 74.2,
+          "created": "2026-10-22T23:03:30",
+          "review": "the other version is cleaner"
+        }
+      ]
     }
   }
 }
