@@ -1,4 +1,4 @@
-import type { Hook, Project, ProjectSettings, Scene, Source, TransitionType } from '../types';
+import type { Hook, MediaItem, Project, ProjectSettings, Scene, Source, TransitionType } from '../types';
 import type { Beat } from './mkultraScript';
 import { createMkultraProject } from './mkultraProject';
 import { starterSpec } from './specs';
@@ -112,6 +112,7 @@ function restoreScene(raw: unknown, base: Scene | undefined, index: number): Sce
     duration,
     authoredDuration: base && isMkScene(raw.id) ? base.authoredDuration : clampNum(raw.authoredDuration, 0.5, MAX_SCENE_DURATION, duration),
     transition: TRANSITIONS.includes(raw.transition as TransitionType) ? (raw.transition as TransitionType) : fallback.transition,
+    chapterCard: raw.chapterCard === false ? false : undefined,
     narration: str(raw.narration, fallback.narration),
     keywords: strs(raw.keywords, fallback.keywords),
     sourceIds: strs(raw.sourceIds, fallback.sourceIds),
@@ -150,6 +151,9 @@ export function restoreProject(raw: unknown): Project | null {
     episodeTitle: template === 'mkultra' ? base.episodeTitle : str(stored.episodeTitle, base.episodeTitle),
     episodeSubtitle: template === 'mkultra' ? base.episodeSubtitle : str(stored.episodeSubtitle, base.episodeSubtitle),
     hooks: perLang(stored.hooks, isHook) ?? base.hooks,
+    media: Array.isArray(stored.media)
+      ? (stored.media.filter((m) => isObj(m) && typeof m.id === 'string' && typeof m.width === 'number' && typeof m.height === 'number') as MediaItem[])
+      : undefined,
     sources,
     scenes,
     settings: {

@@ -58,6 +58,7 @@ export type ElementType =
   | 'capitolSketch'
   | 'puff'
   | 'stamp'
+  | 'picture'
   | 'fox';
 
 export type EnterKind = 'none' | 'drop' | 'pop' | 'fade' | 'slideLeft' | 'slideRight';

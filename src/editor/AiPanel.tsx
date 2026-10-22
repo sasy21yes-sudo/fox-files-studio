@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../types';
+import type { Timeline } from '../animation/timeline';
 import { aiStatus, editWithClaude, type AiResult, type AiStatus, type AiTarget } from '../ai/claude';
 import { MAX_SCENE_DURATION, MIN_SCENE_DURATION } from '../data/project';
 import { updateScene } from './model';
@@ -9,6 +10,7 @@ type Change = (fn: (p: Project) => Project, key?: string) => void;
 
 interface Props {
   project: Project;
+  timeline: Timeline;
   scene: number;
   onChange: Change;
   onUndo(): void;
@@ -50,7 +52,7 @@ function applyResult(p: Project, r: AiResult): Project {
 }
 
 /** "Ask Claude" box: edit the selected scene or the whole episode with a prompt. */
-export function AiPanel({ project, scene, onChange, onUndo }: Props) {
+export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
   const [status, setStatus] = useState<AiStatus | null>(null);
   const [open, setOpen] = useState(true);
   const [scope, setScope] = useState<'scene' | 'all'>('scene');
@@ -82,7 +84,7 @@ export function AiPanel({ project, scene, onChange, onUndo }: Props) {
     setLast(null);
     abort.current = new AbortController();
     try {
-      const result = await editWithClaude(project, target, prompt.trim(), abort.current.signal);
+      const result = await editWithClaude(project, target, prompt.trim(), abort.current.signal, timeline);
       if (result.scenes.length) onChange((p) => applyResult(p, result), `ai:${Date.now()}`);
       setLast(result);
     } catch (e) {

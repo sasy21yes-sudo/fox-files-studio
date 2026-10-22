@@ -1,4 +1,4 @@
-import type { Project, Scene } from '../types';
+import type { MediaItem, Project, Scene } from '../types';
 import type { Timeline } from '../animation/timeline';
 import { ARM_MODES, ELEMENTS, FACE_KEYS, MOUTHS } from '../scene/elements';
 import type { ElementBase, EnterKind, FoxAction, FoxElement, Key, Num, SceneElement, ShotKind, ShotSpec } from '../scene/spec';
@@ -53,7 +53,8 @@ export const BEAT_TEMPLATES: Record<Beat['kind'], Beat> = {
 
 // ------------------------------------------------------------------ elements
 
-function ElementPanel({ el, scene, vertical, onChange, onSelect, specLen }: {
+function ElementPanel({ el, scene, vertical, onChange, onSelect, specLen, media }: {
+  media: MediaItem[];
   el: ElementBase;
   scene: number;
   vertical: boolean;
@@ -119,6 +120,26 @@ function ElementPanel({ el, scene, vertical, onChange, onSelect, specLen }: {
         <Group title="Parameters">
           {Object.entries(def.params).map(([name, info]) => {
             const v = el.params?.[name] ?? info.default;
+            if (info.kind === 'media')
+              return (
+                <Field key={name} label="Image" hint={info.desc}>
+                  <select className="isel" value={String(v ?? '')} onChange={(e) => setParam(name, e.target.value)}>
+                    <option value="">— choose —</option>
+                    {media.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name}
+                      </option>
+                    ))}
+                    {v && !media.some((m) => m.id === v) ? <option value={String(v)}>missing image ({String(v)})</option> : null}
+                  </select>
+                </Field>
+              );
+            if (info.options)
+              return (
+                <Field key={name} label={name} hint={info.desc}>
+                  <Select value={String(v ?? info.default)} options={info.options} onChange={(o) => setParam(name, o)} />
+                </Field>
+              );
             if (typeof info.default === 'boolean') return <Check key={name} value={v === true} onChange={(b) => setParam(name, b)} label={info.desc} />;
             if (typeof info.default === 'string')
               return (
@@ -519,7 +540,7 @@ export function Inspector({ project, timeline, time, selection, onSelect, onChan
   if (selection.kind === 'element' && spec) {
     const el = spec.elements.find((e) => e.id === selection.id);
     if (el?.type === 'fox') body = <FoxPanel fox={el as FoxElement} scene={selection.scene} vertical={vertical} onChange={onChange} onSelect={onSelect} kNow={kNow} ids={ids} />;
-    else if (el) body = <ElementPanel el={el} scene={selection.scene} vertical={vertical} onChange={onChange} onSelect={onSelect} specLen={scene.authoredDuration} />;
+    else if (el) body = <ElementPanel el={el} scene={selection.scene} vertical={vertical} onChange={onChange} onSelect={onSelect} specLen={scene.authoredDuration} media={project.media ?? []} />;
   } else if (selection.kind === 'shot' && spec?.camera[selection.index]) {
     body = <ShotPanel shot={spec.camera[selection.index]} index={selection.index} scene={selection.scene} vertical={vertical} ids={ids} onChange={onChange} onSelect={onSelect} />;
   } else if (selection.kind === 'action' && fox?.actions?.[selection.index]) {

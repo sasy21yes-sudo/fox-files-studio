@@ -6,6 +6,19 @@ export const FONT_TITLE = '"Playfair Display", "Didot", "Bodoni 72", Georgia, "T
 export const FONT_TYPE = '"Special Elite", "American Typewriter", "Courier New", Courier, monospace';
 export const FONT_SANS = '"IBM Plex Sans", "Helvetica Neue", Arial, sans-serif';
 
+/**
+ * Filled by the renderer when the editor asks (preview only): where each
+ * element of a data scene landed, so the preview can draw handles on it.
+ * Points are world (pre-camera) pixels; `matrix` maps them to canvas pixels.
+ */
+export interface RenderProbe {
+  scene: number;
+  matrix: DOMMatrix | null;
+  /** Transform of screen-layer elements (no camera). */
+  screen?: DOMMatrix | null;
+  anchors: { id: string; x: number; y: number; box?: { w: number; h: number; rot: number }; screen?: boolean }[];
+}
+
 /** Everything a scene needs to draw one frame. */
 export interface Stage {
   g: CanvasRenderingContext2D;
@@ -27,6 +40,7 @@ export interface Stage {
   /** Mouth shape for the letter being narrated right now (text-driven lip-sync). */
   viseme?: MouthShape;
   project: Project;
+  probe?: RenderProbe;
 }
 
 export interface SceneOutput {

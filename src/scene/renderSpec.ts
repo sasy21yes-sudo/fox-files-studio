@@ -35,6 +35,8 @@ function placeElement(el: ElementBase, s: Stage, light: number): ElCtx {
     scale: num(el.scale, V, 1),
     rot: evalNum(el.rot, k, V, undefined, 0),
     params: el.params ?? {},
+    from: el.from ?? 0,
+    to: el.to ?? s.authored,
   };
 }
 
@@ -109,6 +111,7 @@ function drawElement(s: Stage, light: number, el: ElementBase) {
   if (!def) return;
   const { g, w, h, k } = s;
   const c = placeElement(el, s, light);
+  s.probe?.anchors.push({ id: el.id, x: c.x, y: c.y, box: def.bounds?.(c) });
   const base = def.base ? def.base(c) : { x: c.x, y: c.y };
   const enter = el.enter && el.enter.kind !== 'none' ? el.enter : null;
   const p = enter ? seg(k, enter.at, enter.dur) : 1;
@@ -272,16 +275,26 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
     (spec.camera.length ? spec.camera : [{ at: 0, kind: 'wide' as const }]).map((shot) => toShot(spec, s, light, shot, fox)),
   );
 
+  const visible = (el: SceneElement) => !(el.hidden || (el.from !== undefined && k < el.from) || (el.to !== undefined && k >= el.to));
+  const onScreen = (el: SceneElement) => el.params?.layer === 'screen';
   withShot(s, cam, () => {
+    if (s.probe) s.probe.matrix = g.getTransform();
     for (const el of spec.elements) {
-      if (el.hidden || (el.from !== undefined && k < el.from) || (el.to !== undefined && k >= el.to)) continue;
+      if (!visible(el) || onScreen(el)) continue;
       if (isFox(el)) {
         const p = el === fox && place ? place : foxPlace(el, s);
+        s.probe?.anchors.push({ id: el.id, x: p.x, y: p.y });
         drawFox(g, foxPose(spec, s, light, el, p));
       } else drawElement(s, light, el);
     }
   });
   drawWhip(s, cam);
+
+  // Screen-layer elements (cutaway pictures): above the scene, outside the camera.
+  if (s.probe) s.probe.screen = g.getTransform();
+  const anchors = s.probe?.anchors.length ?? 0;
+  for (const el of spec.elements) if (visible(el) && onScreen(el) && !isFox(el)) drawElement(s, light, el);
+  if (s.probe) for (const a of s.probe.anchors.slice(anchors)) a.screen = true;
 
   for (const o of spec.overlays ?? []) if (o.kind === 'title') drawTitleOverlay(s, o);
 

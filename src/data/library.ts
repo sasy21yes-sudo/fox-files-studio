@@ -1,6 +1,7 @@
 import type { Project } from '../types';
 import { MKULTRA_PROJECT_ID, STORAGE_KEY as LEGACY_KEY, createMkultraProject } from './mkultraProject';
 import { PROJECT_SCHEMA_VERSION, restoreProject } from './project';
+import { mediaDataUrls, storeMediaDataUrls } from '../media/store';
 
 /**
  * The project library: every episode is stored on its own key in
@@ -127,14 +128,18 @@ export function duplicateProject(p: Project): Project {
 }
 
 /** A project file to download (.foxproj.json). */
-export function exportProjectFile(p: Project): Blob {
-  return new Blob([JSON.stringify({ ...p, schemaVersion: PROJECT_SCHEMA_VERSION }, null, 2)], { type: 'application/json' });
+/** A self-contained project file: the episode plus its images (as data URLs under `mediaData`). */
+export async function exportProjectFile(p: Project): Promise<Blob> {
+  const mediaData = p.media?.length ? await mediaDataUrls(p) : undefined;
+  return new Blob([JSON.stringify({ ...p, schemaVersion: PROJECT_SCHEMA_VERSION, ...(mediaData ? { mediaData } : {}) }, null, 2)], { type: 'application/json' });
 }
 
 /** Read a project file. Imports never overwrite: an id already in the library gets a new one. */
 export async function importProjectFile(file: File): Promise<Project> {
-  const p = restoreProject(JSON.parse(await file.text()));
+  const raw = JSON.parse(await file.text());
+  const p = restoreProject(raw);
   if (!p) throw new Error('This file is not a Fox Files project (or uses an unknown version).');
+  if (raw && typeof raw.mediaData === 'object') await storeMediaDataUrls(raw.mediaData as Record<string, string>);
   const taken = listProjects().some((e) => e.id === p.id) || p.id === MKULTRA_PROJECT_ID;
   return taken ? duplicateProject(p) : p;
 }

@@ -19,6 +19,8 @@ export const LABELS: Partial<Record<Lang, LabelTable>> = {
       ['^CASE FILE  №  (\\d+)$', 'FASCICOLO  №  $1'],
     ],
     strings: {
+      'Choose an image': "Scegli un'immagine",
+      'Image loading…': 'Immagine in caricamento…',
       '185 outside researchers and assistants': '185 ricercatori e assistenti esterni',
       '1975  ·  ILLUSTRATED EDITION': '1975  ·  EDIZIONE ILLUSTRATA',
       '1977 hearing': 'Audizione del 1977',
@@ -123,6 +125,8 @@ export const LABELS: Partial<Record<Lang, LabelTable>> = {
       ['^CASE FILE  №  (\\d+)$', 'EXPEDIENTE  №  $1'],
     ],
     strings: {
+      'Choose an image': 'Elige una imagen',
+      'Image loading…': 'Cargando imagen…',
       '185 outside researchers and assistants': '185 investigadores y asistentes externos',
       '1975  ·  ILLUSTRATED EDITION': '1975  ·  EDICIÓN ILUSTRADA',
       '1977 hearing': 'Audiencia de 1977',
@@ -228,6 +232,8 @@ export const LABELS: Partial<Record<Lang, LabelTable>> = {
       ['^CASE FILE  №  (\\d+)$', 'DOSSIER  №  $1'],
     ],
     strings: {
+      'Choose an image': 'Choisissez une image',
+      'Image loading…': 'Image en cours de chargement…',
       '185 outside researchers and assistants': '185 chercheurs et assistants extérieurs',
       '1975  ·  ILLUSTRATED EDITION': '1975  ·  ÉDITION ILLUSTRÉE',
       '1977 hearing': 'Audition de 1977',
@@ -332,6 +338,8 @@ export const LABELS: Partial<Record<Lang, LabelTable>> = {
       ['^CASE FILE  №  (\\d+)$', 'ARQUIVO  №  $1'],
     ],
     strings: {
+      'Choose an image': 'Escolha uma imagem',
+      'Image loading…': 'Carregando imagem…',
       '185 outside researchers and assistants': '185 pesquisadores e assistentes externos',
       '1975  ·  ILLUSTRATED EDITION': '1975  ·  EDIÇÃO ILUSTRADA',
       '1977 hearing': 'Audiência de 1977',

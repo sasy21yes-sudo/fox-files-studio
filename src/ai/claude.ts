@@ -3,6 +3,8 @@ import type { SceneSpec } from '../scene/spec';
 import type { Beat } from '../data/mkultraScript';
 import { sceneBeats } from '../data/projectText';
 import { sourceById } from '../data/sources';
+import type { Timeline } from '../animation/timeline';
+import { toAuthored } from '../editor/model';
 
 /**
  * Browser side of "edit with a prompt". The request goes to the dev server
@@ -48,7 +50,11 @@ export async function aiStatus(): Promise<AiStatus> {
   }
 }
 
-export async function editWithClaude(project: Project, target: AiTarget, prompt: string, signal?: AbortSignal): Promise<AiResult> {
+/**
+ * `timeline` (optional) adds when each subtitle cue of the scenes in scope is heard, in the
+ * scene's authored seconds, so Claude can time things to words.
+ */
+export async function editWithClaude(project: Project, target: AiTarget, prompt: string, signal?: AbortSignal, timeline?: Timeline): Promise<AiResult> {
   const lang = project.settings.language;
   // A one-scene edit still sends its neighbours' narration, so Claude knows the story around it.
   const scenes = project.scenes.map((s, index) => ({
@@ -61,6 +67,17 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
     spec: target === 'all' || target === index ? (s.spec ?? null) : null,
     beats: target === 'all' || target === index ? sceneBeats(s, lang) : [],
     sourceIds: s.sourceIds,
+    speech:
+      timeline && (target === 'all' || target === index) && timeline.spans[index]
+        ? timeline.cues
+            .filter((c) => c.sceneIndex === index)
+            .map((c) => ({
+              text: c.text,
+              from: Math.round(toAuthored(timeline.spans[index], c.start) * 100) / 100,
+              to: Math.round(toAuthored(timeline.spans[index], c.end) * 100) / 100,
+              exact: c.timing === 'exact',
+            }))
+        : undefined,
   }));
   const ids = [...new Set((target === 'all' ? project.scenes : [project.scenes[target]]).flatMap((s) => s.sourceIds))];
   const sources = ids
@@ -73,6 +90,7 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
     episode: { title: project.episodeTitle, language: lang, aspect: project.settings.aspect, template: project.template },
     scenes,
     sources,
+    media: (project.media ?? []).map((m) => ({ id: m.id, name: m.name, prompt: m.prompt ?? '', width: m.width, height: m.height })),
   };
   const r = await fetch('/api/claude/edit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
   const j = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));

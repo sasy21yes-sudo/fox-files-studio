@@ -37,6 +37,8 @@ interface SceneIn {
   spec: unknown | null;
   beats: unknown[];
   sourceIds: string[];
+  /** When each subtitle cue is heard, in the scene's authored seconds (exact = from the real voice clips). */
+  speech?: { text: string; from: number; to: number; exact: boolean }[];
 }
 
 interface EditRequest {
@@ -46,6 +48,8 @@ interface EditRequest {
   episode: { title: string; language: string; aspect: string; template: string };
   scenes: SceneIn[];
   sources: { id: string; title: string; publisher?: string; date?: string; claims: string[] }[];
+  /** The episode's image library (picture elements may only use these ids). */
+  media?: { id: string; name: string; prompt: string; width: number; height: number }[];
 }
 
 interface SceneOut {
@@ -115,7 +119,7 @@ function systemPrompt(cat: Catalog, example: unknown): string {
 { "version": 1, "light"?, "shake"?, "focus"?, "sepia"?, "gloom"?, "elements": [...], "camera": [...], "overlays"? }
 
 Conventions:
-- Times are "authored seconds" from 0 to the scene's authoredDuration; the studio stretches them to the real scene length. Keep every time inside that range.
+- Times are "authored seconds" from 0 to the scene's authoredDuration; the studio stretches them to the real scene length. Keep every time inside that range. When a scene lists "Spoken" lines, they say when each subtitle cue is heard in those same authored seconds: use them to land actions, cuts and pictures on words.
 - Positions are fractions of the WIDE frame: x 0 = left edge, 1 = right edge; y 0 = top, 1 = bottom. Sizes marked "u" are layout units (1 u = 1 px at 1080 px on the short side).
 - The scene renders both as 16:9 (YouTube) and 9:16 (Short). Any number may be a plain number (same in both) or {"h": <16:9 value>, "v": <9:16 value>}. In 9:16 the useful area is the central part of the composition: place important things so they work in both, using {h,v} values like the reference.
 - Tracks are lists of keys {"at": t, "value": v, "dur"?: seconds, "ease"?: "linear"|"smooth"|"in"|"out"|"inOut"|"back"|"bounce"}: the value holds until "at", then moves to the new value over "dur" (0 = cut). Keys sorted by "at".
@@ -153,6 +157,7 @@ Some scenes have no spec ("spec": null): they are drawn by code. You can still c
 3. Facts: this is a documentary. Text in pop-ups and on props must be supported by the narration or the listed sources. Never invent numbers, names, dates or quotes. If the instruction asks for a fact that is not supported, do the rest and say so in the summary.
 4. Good cartoon staging: anticipation before big moves, overlapping action, a camera change every 2-4 seconds, key moments on close-ups or inserts, Agent Fox fully in frame in both formats, nothing important hidden behind the subtitles (bottom 20%).
 5. Use only the element types, poses and fields listed above. Element ids are lowercase words with dashes.
+   Picture elements may only use image ids from the episode's image library given in the request. You cannot create images: if none fits, say so in the summary (the director can generate one in the studio).
 6. Pop-ups: beats_json is the complete list for that scene when you change it, else "". Each cue must be a phrase that appears verbatim in that scene's narration.
 7. duration: 0 unless the instruction needs a different scene length (3-90 s).
 8. The summary is for the director: plain words, saying which scenes you changed. Write it in the language of the director's instruction (an Italian instruction gets an Italian summary), whatever the language of the rest of this prompt.
@@ -174,6 +179,9 @@ function userMessage(r: EditRequest): string {
       s.summary ? `Intent: ${s.summary}` : '',
       s.sourceIds.length ? `Sources: ${s.sourceIds.map((id) => sourceTitle.get(id) ?? id).join('; ')}` : 'No sources listed: add no new facts.',
       `Narration:\n"""${s.narration}"""`,
+      s.speech?.length
+        ? `Spoken (authored s, ${s.speech.every((x) => x.exact) ? 'exact, from the voice clips' : 'estimated'}):\n${s.speech.map((x) => `${x.from.toFixed(2)}-${x.to.toFixed(2)} "${x.text}"`).join('\n')}`
+        : '',
       `Pop-ups: ${JSON.stringify(s.beats)}`,
       s.spec ? `Spec: ${JSON.stringify(s.spec)}` : 'Spec: null (hand-coded scene).',
     ]
@@ -181,6 +189,9 @@ function userMessage(r: EditRequest): string {
       .join('\n');
   return [
     `Episode: "${r.episode.title}" (${r.episode.template === 'mkultra' ? 'MKUltra episode' : 'custom episode'}), language ${r.episode.language}, editing in ${r.episode.aspect}, ${r.scenes.length} scene(s).`,
+    r.media?.length
+      ? `# Image library (for picture elements)\n${r.media.map((m) => `- ${m.id}: "${m.name}" ${m.width}x${m.height}${m.prompt ? ` — ${m.prompt}` : ''}`).join('\n')}`
+      : '# Image library\nEmpty: no picture elements possible.',
     r.sources.length ? `# Sources\n${r.sources.map((s) => `- ${s.title}${[s.publisher, s.date].filter(Boolean).map((x) => ` (${x})`).join('')}: ${s.claims.join(' | ')}`).join('\n')}` : '',
     `# Scenes\n${r.scenes.map(scene).join('\n\n')}`,
     target
@@ -220,6 +231,10 @@ function checkReply(
       if (s.spec_json) {
         spec = JSON.parse(s.spec_json);
         problems.push(...validateSpec(spec).map((p) => `${at}: ${p}`));
+        const known = new Set((r.media ?? []).map((m) => m.id));
+        for (const el of (spec as { elements?: { type?: string; id?: string; params?: { media?: unknown } }[] }).elements ?? []) {
+          if (el.type === 'picture' && !known.has(String(el.params?.media ?? ''))) problems.push(`${at}: picture "${el.id}" uses an image id that is not in the library`);
+        }
       }
       if (s.beats_json) beats = JSON.parse(s.beats_json);
     } catch (e) {

@@ -1,5 +1,6 @@
 import type { ExportResult, ExportSettings, Project } from '../types';
 import { renderFrame } from '../animation/renderScene';
+import { loadProjectMedia } from '../media/store';
 import type { Timeline } from '../animation/timeline';
 import { mixExportAudio } from '../audio/audioCapture';
 import { recordWithMediaRecorder } from './browserRecorder';
@@ -26,8 +27,8 @@ export async function runExport(inp: ExportInputs): Promise<ExportResult> {
   const { project, timeline, settings: es, signal } = inp;
   const notes: string[] = [];
 
-  // Make sure web fonts (if they loaded) are ready before the first frame.
-  await loadCanvasFonts();
+  // Make sure web fonts (if they loaded) and the episode's images are ready before the first frame.
+  await Promise.all([loadCanvasFonts(), loadProjectMedia(project)]);
 
   // A dedicated canvas at the target resolution, separate from the preview.
   const canvas = document.createElement('canvas');

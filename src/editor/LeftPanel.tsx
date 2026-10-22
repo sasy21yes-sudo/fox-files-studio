@@ -5,7 +5,8 @@ import { SceneList } from '../components/SceneList';
 import { ELEMENTS, ELEMENT_PLACE, type ElementDef } from '../scene/elements';
 import type { ElementType, SceneElement } from '../scene/spec';
 import { newScene } from '../data/project';
-import { deleteScene, duplicateScene, insertScene, moveScene, toAuthored, uniqueId, updateSpec, type Selection } from './model';
+import { addPictureElement, deleteScene, duplicateScene, insertPictureScene, insertScene, moveScene, toAuthored, uniqueId, updateSpec, type Selection } from './model';
+import { ImageBin } from './ImageBin';
 
 type Change = (fn: (p: Project) => Project, key?: string) => void;
 
@@ -24,7 +25,7 @@ const CATEGORY: Record<ElementDef['category'], string> = { set: 'Sets', prop: 'P
 
 /** Media pool of the Edit page: the episode's scenes and the element library. */
 export function LeftPanel({ project, timeline, time, selection, current, onSelect, onSelectScene, onChange }: Props) {
-  const [tab, setTab] = useState<'scenes' | 'elements'>('scenes');
+  const [tab, setTab] = useState<'scenes' | 'elements' | 'images'>('scenes');
   const si = selection.scene;
   const scene = project.scenes[si];
   const span = timeline.spans[si];
@@ -57,6 +58,9 @@ export function LeftPanel({ project, timeline, time, selection, current, onSelec
         </button>
         <button className={tab === 'elements' ? 'on' : ''} onClick={() => setTab('elements')}>
           Elements
+        </button>
+        <button className={tab === 'images' ? 'on' : ''} onClick={() => setTab('images')}>
+          Images
         </button>
       </div>
 
@@ -96,6 +100,33 @@ export function LeftPanel({ project, timeline, time, selection, current, onSelec
           </div>
           <SceneList project={project} timeline={timeline} selected={si} current={current} onSelect={onSelectScene} />
         </>
+      )}
+
+      {tab === 'images' && (
+        <div className="element-lib">
+          <ImageBin
+            compact
+            project={project}
+            onChange={onChange}
+            addLabel={`Into scene ${si + 1} here`}
+            onAddToScene={
+              scene?.spec && span
+                ? (item) => {
+                    // Same id addPictureElement will pick (the state updater may run later).
+                    const id = uniqueId(scene.spec!, 'picture');
+                    onChange((p) => addPictureElement(p, si, toAuthored(span, time), item).project);
+                    onSelect({ kind: 'element', scene: si, id });
+                  }
+                : undefined
+            }
+            onPictureScene={(item) => {
+              onChange((p) => insertPictureScene(p, si, item));
+              // The new scene starts where the next one starts now: select it and jump there.
+              if (timeline.spans[si + 1]) onSelectScene(si + 1);
+              else onSelect({ kind: 'scene', scene: si + 1 });
+            }}
+          />
+        </div>
       )}
 
       {tab === 'elements' && (

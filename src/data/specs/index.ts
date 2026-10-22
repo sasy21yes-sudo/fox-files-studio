@@ -51,3 +51,18 @@ export function starterSpec(): SceneSpec {
     ],
   };
 }
+
+/**
+ * A cutaway made of one library image: full frame, a slow Ken Burns push and
+ * drift over the whole scene, camera locked so only the picture moves.
+ */
+export function pictureSpec(media: string): SceneSpec {
+  return {
+    version: 1,
+    sepia: 0.7,
+    elements: [
+      { id: 'picture', type: 'picture', label: 'Picture', x: 0.5, y: 0.5, params: { media, zoomFrom: 1.02, zoomTo: 1.14, panX: 0.03, panY: -0.01 } },
+    ],
+    camera: [{ at: 0, kind: 'wide', locked: true, drift: 0 }],
+  };
+}

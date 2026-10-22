@@ -27,6 +27,8 @@ export interface Scene {
   authoredDuration: number;
   /** Transition used when entering this scene. */
   transition: TransitionType;
+  /** false = no chapter intertitle on this scene even when the episode uses them (cutaways). */
+  chapterCard?: boolean;
   /** Narration text in the current language. It drives the voice and the subtitle cues. */
   narration: string;
   /** Narration kept per language, so switching languages never loses an edit. */
@@ -85,6 +87,20 @@ export interface Hook {
   keywords: string[];
 }
 
+/** An image in the episode's library (pixels in IndexedDB, see media/store.ts). */
+export interface MediaItem {
+  id: string;
+  name: string;
+  width: number;
+  height: number;
+  created: number;
+  /** 'generated' = made by the local image model; 'imported' = a file the user added. */
+  source: 'generated' | 'imported';
+  prompt?: string;
+  style?: string;
+  seed?: number;
+}
+
 export interface Project {
   id: string;
   schemaVersion: number;
@@ -92,6 +108,8 @@ export interface Project {
   template: 'mkultra' | 'custom';
   /** Last edit (ms since epoch), for the project library. */
   updated?: number;
+  /** Images that picture elements can show. */
+  media?: MediaItem[];
   /** Short hook for custom episodes, per language. */
   hooks?: Partial<Record<Lang, Hook>>;
   /** Bibliography of a custom episode (MKUltra uses data/sources.ts). */

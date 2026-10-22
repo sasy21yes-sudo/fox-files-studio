@@ -796,3 +796,134 @@ textarea.itext {
 .ai-result p {
   margin: 0 0 6px;
 }
+
+/* ---------------------------------------------------------------- images */
+.image-bin {
+  display: grid;
+  gap: 8px;
+}
+.img-gen {
+  display: grid;
+  gap: 6px;
+}
+.img-opts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.img-opts .isel {
+  width: auto;
+  flex: 0 1 auto;
+}
+.img-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+}
+.image-bin.compact .img-grid {
+  grid-template-columns: 1fr;
+}
+.img-card {
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-2);
+  overflow: hidden;
+}
+.img-card.open {
+  border-color: var(--brass);
+}
+.img-pick {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 0 0 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.img-pick figcaption {
+  padding: 0 8px;
+  font-size: 12.5px;
+  line-height: 1.3;
+}
+.img-thumb {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #2a1d12;
+}
+.img-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 0 8px 8px;
+}
+
+/* ---------------------------------------------------------------- preview handles */
+.stage-overlay {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+.ov-handle {
+  fill: rgba(217, 180, 101, 0.35);
+  stroke: #f4e3b8;
+  pointer-events: all;
+  cursor: grab;
+}
+.ov-handle:active {
+  cursor: grabbing;
+}
+.ov-el.on .ov-handle {
+  fill: var(--brass-hi);
+  stroke: #1a1210;
+}
+.ov-box {
+  fill: none;
+  stroke: var(--brass-hi);
+  stroke-dasharray: 6 4;
+}
+.ov-label {
+  fill: #f4e3b8;
+  stroke: #1a1210;
+  paint-order: stroke;
+  font-family: var(--font-mono, monospace);
+  pointer-events: none;
+}
+.transport .btn.on {
+  color: var(--brass-hi);
+  border-color: var(--brass);
+}
+
+/* ---------------------------------------------------------------- shortcuts */
+.keys-modal {
+  max-width: 620px;
+}
+.keys-list {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.keys-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  align-items: baseline;
+}
+.keys-row dd {
+  margin: 0;
+}
+.keys-list kbd {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  white-space: nowrap;
+}

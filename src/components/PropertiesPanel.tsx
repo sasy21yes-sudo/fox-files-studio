@@ -116,6 +116,12 @@ export function PropertiesPanel(p: Props) {
             ))}
           </select>
         </label>
+        {p.project.settings.chapterCards !== false && (
+          <label className="check">
+            <input type="checkbox" checked={scene.chapterCard !== false} onChange={(e) => p.onSceneChange(selected, { chapterCard: e.target.checked ? undefined : false })} />
+            Chapter card on this scene
+          </label>
+        )}
         <div className="scene-sources">
           <span className="field-label">Supported by</span>
           <ul>

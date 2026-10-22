@@ -5,7 +5,7 @@ import { cueViseme } from './lipSync';
 import { CHAPTER_LEN, drawChapterCard, drawGate, gateWeave } from '../effects/cartoon';
 import { TRANSITION_IN, TRANSITION_OUT, applyTransition } from '../effects/transitions';
 import { lerp } from './math';
-import { FONT_SANS, type SceneRenderer, type Stage } from './stage';
+import { FONT_SANS, type RenderProbe, type SceneRenderer, type Stage } from './stage';
 import { choreoTime, cueAt, locate, type Timeline } from './timeline';
 import { sceneFile } from './scenes/sceneFile';
 import { sceneQuestion } from './scenes/sceneQuestion';
@@ -36,6 +36,8 @@ export interface RenderOptions {
   burnSubtitles: boolean;
   /** Preview-only overlay showing the subtitle safe area. Never exported. */
   showSafeArea?: boolean;
+  /** Editor only: filled with where the data scene's elements were drawn. */
+  probe?: RenderProbe;
 }
 
 /** Final iris-out length at the very end of the episode. */
@@ -60,6 +62,12 @@ export function renderFrame(
   setLabelLang(tl.lang);
   localizeContext(g);
 
+  if (opts.probe) {
+    opts.probe.scene = -1;
+    opts.probe.matrix = null;
+    opts.probe.screen = null;
+    opts.probe.anchors = [];
+  }
   // The Short's cold-open hook has its own kinetic captions.
   if (tl.hook && time < tl.hook.end) {
     const u0 = Math.min(w, h) / 1080;
@@ -99,7 +107,9 @@ export function renderFrame(
     // Hold each mouth shape for at least two film frames (12 changes per second max).
     viseme: cueViseme(tl, cue, time),
     project,
+    probe: opts.probe,
   };
+  if (opts.probe) opts.probe.scene = span.index;
 
   g.save();
   g.setTransform(1, 0, 0, 1, 0, 0);
@@ -121,7 +131,7 @@ export function renderFrame(
   renderBeats(g, w, h, tl, span.index, time);
 
   // Chapter intertitle (or a plain transition) at the start of each scene.
-  const chapters = project.settings.chapterCards !== false;
+  const chapters = project.settings.chapterCards !== false && span.scene.chapterCard !== false;
   if (chapters && local < CHAPTER_LEN) {
     drawChapterCard(g, w, h, u, local, time, span.index + 1, span.scene.title, span.index === 0);
   } else if (!chapters && local < TRANSITION_IN) {

@@ -1,7 +1,8 @@
-import type { Project, Scene } from '../types';
+import type { MediaItem, Project, Scene } from '../types';
 import type { SceneSpan } from '../animation/timeline';
 import type { FoxElement, Key, SceneElement, SceneSpec, ShotSpec } from '../scene/spec';
-import { renumber } from '../data/project';
+import { newScene, renumber } from '../data/project';
+import { pictureSpec } from '../data/specs';
 
 /** What the inspector is showing. Scene-level items are addressed by scene index. */
 export type Selection =
@@ -95,4 +96,31 @@ export function uniqueId(spec: SceneSpec, base: string): string {
   const ids = new Set(spec.elements.map((e) => e.id));
   if (!ids.has(base)) return base;
   for (let i = 2; ; i++) if (!ids.has(`${base}-${i}`)) return `${base}-${i}`;
+}
+
+/** A cutaway scene made of one library image (inserted after `after`). */
+export function insertPictureScene(p: Project, after: number, item: MediaItem): Project {
+  const scene = { ...newScene(item.name), duration: 6, authoredDuration: 6, transition: 'fade' as const, chapterCard: false, spec: pictureSpec(item.id) };
+  return insertScene(p, after + 1, scene);
+}
+
+/** A full-frame picture inside a data scene, from authored time `k` for 3 s, fading in, in front of everything. */
+export function addPictureElement(p: Project, scene: number, k: number, item: MediaItem): { project: Project; id: string } {
+  const spec = p.scenes[scene]?.spec;
+  if (!spec) return { project: p, id: '' };
+  const id = uniqueId(spec, 'picture');
+  const len = p.scenes[scene].authoredDuration;
+  const from = Math.max(0, Math.min(len - 0.5, Math.round(k * 100) / 100));
+  const el: SceneElement = {
+    id,
+    type: 'picture',
+    label: item.name,
+    x: 0.5,
+    y: 0.5,
+    from: from || undefined,
+    to: Math.min(len, from + 3) >= len ? undefined : Math.min(len, from + 3),
+    enter: { kind: 'fade', at: from, dur: 0.4 },
+    params: { media: item.id, zoomFrom: 1, zoomTo: 1.1, layer: 'screen' },
+  };
+  return { project: updateSpec(p, scene, (sp) => ({ ...sp, elements: [...sp.elements, el] })), id };
 }

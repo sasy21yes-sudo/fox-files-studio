@@ -4,6 +4,8 @@ import { createMkultraProject } from '../data/mkultraProject';
 import { createBlankProject } from '../data/project';
 import { deleteProject, duplicateProject, exportProjectFile, importProjectFile, listProjects, loadProject, type LibraryEntry } from '../data/library';
 import { ARM_MODES, ELEMENTS, FACE_KEYS } from '../scene/elements';
+import { ImageBin } from './ImageBin';
+import { insertPictureScene } from './model';
 
 interface Props {
   project: Project;
@@ -11,6 +13,7 @@ interface Props {
   onOpen(p: Project): void;
   /** Bumped by the caller after every save, so the list refreshes. */
   savedTick: number;
+  onChange(fn: (p: Project) => Project, key?: string): void;
 }
 
 function download(blob: Blob, name: string) {
@@ -25,7 +28,7 @@ function download(blob: Blob, name: string) {
 const when = (ms: number) => new Date(ms).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
 
 /** Media page: the episode library, plus what scenes can be built from. */
-export function MediaPage({ project, onOpen, savedTick }: Props) {
+export function MediaPage({ project, onOpen, savedTick, onChange }: Props) {
   const [entries, setEntries] = useState<LibraryEntry[]>(() => listProjects());
   const [confirm, setConfirm] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -94,7 +97,7 @@ export function MediaPage({ project, onOpen, savedTick }: Props) {
                   className="btn small ghost"
                   onClick={() => {
                     const p = e.id === project.id ? project : loadProject(e.id);
-                    if (p) download(exportProjectFile(p), `${e.title.replace(/[^\w-]+/g, '_').slice(0, 40)}.foxproj.json`);
+                    if (p) void exportProjectFile(p).then((b) => download(b, `${e.title.replace(/[^\w-]+/g, '_').slice(0, 40)}.foxproj.json`));
                   }}
                 >
                   Export file
@@ -134,6 +137,12 @@ export function MediaPage({ project, onOpen, savedTick }: Props) {
           ))}
         </div>
         <p className="help">Episodes are saved in this browser. Export a project file to keep a copy, move it to another computer or put it in git.</p>
+      </section>
+
+      <section className="media-section">
+        <h2>Images</h2>
+        <p className="help">Pictures for this episode: generate them with the local model or import files, then use them as a cutaway scene or inside a scene.</p>
+        <ImageBin project={project} onChange={onChange} onPictureScene={(item) => onChange((p) => insertPictureScene(p, p.scenes.length - 1, item))} />
       </section>
 
       <section className="media-section">

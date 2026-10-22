@@ -17,6 +17,8 @@ import {
   drawVial,
 } from '../animation/props';
 import { drawMotes, drawMug, drawWallClock } from '../effects/cartoon';
+import { mediaImage } from '../media/store';
+import { FONT_SANS } from '../animation/stage';
 import type { ElementType, Num } from './spec';
 import { num } from './tracks';
 
@@ -39,6 +41,9 @@ export interface ElCtx {
   scale: number;
   rot: number;
   params: Record<string, unknown>;
+  /** The element's visible stretch (authored s): from its "from" (or 0) to its "to" (or the scene end). */
+  from: number;
+  to: number;
 }
 
 /** Numeric parameter (plain or per format). */
@@ -48,6 +53,10 @@ const ps = (c: ElCtx, name: string, fallback: string): string => (typeof c.param
 export interface ParamInfo {
   desc: string;
   default: unknown;
+  /** Allowed values of a text parameter (the inspector shows a menu). */
+  options?: readonly string[];
+  /** 'media' = the id of an image in the project library. */
+  kind?: 'media';
 }
 
 export interface ElementDef {
@@ -60,6 +69,8 @@ export interface ElementDef {
   base?(c: ElCtx): { x: number; y: number };
   /** Point shots and looks aim at. */
   focus?(c: ElCtx): { x: number; y: number };
+  /** Size of the drawing around x,y (editor outline), when it is a simple box. */
+  bounds?(c: ElCtx): { w: number; h: number; rot: number };
   draw(c: ElCtx): void;
 }
 
@@ -300,7 +311,99 @@ export const ELEMENTS: Record<Exclude<ElementType, 'fox'>, ElementDef> = {
       drawStamp(c.g, ps(c, 'text', 'CLASSIFIED'), c.x, c.y, pn(c, 'size', 90) * c.u * c.scale, c.rot || -0.12, p, ps(c, 'color', '#9b2f1f'));
     },
   },
+  picture: {
+    label: 'Picture',
+    category: 'prop',
+    description:
+      'An image from the episode library (generated or imported), centred on x,y, with a slow Ken Burns zoom/pan over its visible time. Full-frame by default; with frame "photo" it is a print with a white border. Images never carry text: add words with stamps, papers or pop-ups.',
+    params: {
+      media: { desc: 'image id from the library', default: '', kind: 'media' },
+      fit: { desc: 'cover = fill the box, contain = show all of it', default: 'cover', options: ['cover', 'contain'] },
+      frame: { desc: 'none, or photo (white border and shadow)', default: 'none', options: ['none', 'photo'] },
+      layer: { desc: 'world = part of the set (the camera frames it); screen = fixed on screen above the scene, ignoring the camera (cutaways)', default: 'world', options: ['world', 'screen'] },
+      w: { desc: `box width ${FRAC}; 1 = full frame`, default: 1 },
+      h: { desc: `box height ${FRAC}; 0 = from the image ratio`, default: 0 },
+      zoomFrom: { desc: 'zoom at the start', default: 1 },
+      zoomTo: { desc: 'zoom at the end', default: 1.12 },
+      panX: { desc: 'horizontal drift, fraction of the box (-0.1..0.1)', default: 0 },
+      panY: { desc: 'vertical drift, fraction of the box', default: 0 },
+    },
+    bounds: (c) => {
+      const b = pictureBox(c);
+      return { w: b.bw, h: b.bh, rot: c.rot };
+    },
+    draw: drawPicture,
+  },
 };
+
+const smooth = (p: number) => p * p * (3 - 2 * p);
+
+/**
+ * A library image. 'cover' fills a box of width w (frame fraction; 1 = the
+ * whole frame, and then the box is the frame) cropping what overflows;
+ * 'contain' shows all of it. The image slowly zooms from zoomFrom to zoomTo
+ * and drifts by panX/panY (fractions of the box) over the element's visible
+ * stretch (Ken Burns). frame 'photo' = white border, shadow, a slight tilt.
+ */
+function pictureBox(c: ElCtx) {
+  const img = mediaImage(ps(c, 'media', ''));
+  const bw = pn(c, 'w', 1) * c.w * c.scale;
+  const full = ps(c, 'fit', 'cover') === 'cover' && pn(c, 'w', 1) >= 0.999 && ps(c, 'frame', 'none') === 'none';
+  const bh = full ? c.h * c.scale : pn(c, 'h', 0) > 0 ? pn(c, 'h', 0) * c.h * c.scale : bw * (img ? img.height / img.width : 9 / 16);
+  return { img, bw, bh };
+}
+
+function drawPicture(c: ElCtx) {
+  const { g, u } = c;
+  const fit = ps(c, 'fit', 'cover');
+  const frame = ps(c, 'frame', 'none');
+  const { img, bw, bh } = pictureBox(c);
+  const p = smooth(Math.min(1, Math.max(0, (c.k - c.from) / Math.max(0.001, c.to - c.from))));
+  const zoom = pn(c, 'zoomFrom', 1) + (pn(c, 'zoomTo', 1.12) - pn(c, 'zoomFrom', 1)) * p;
+
+  g.save();
+  g.translate(c.x, c.y);
+  if (c.rot) g.rotate(c.rot);
+  if (frame === 'photo') {
+    const b = 14 * u * c.scale;
+    g.shadowColor = 'rgba(0,0,0,0.45)';
+    g.shadowBlur = 24 * u;
+    g.shadowOffsetY = 10 * u;
+    g.fillStyle = '#f3ead6';
+    g.fillRect(-bw / 2 - b, -bh / 2 - b, bw + 2 * b, bh + 2 * b);
+    g.shadowColor = 'transparent';
+  }
+  g.beginPath();
+  g.rect(-bw / 2, -bh / 2, bw, bh);
+  g.clip();
+  if (img) {
+    // Size the image to cover (or fit) the box, then zoom and pan inside it.
+    const s = (fit === 'contain' ? Math.min(bw / img.width, bh / img.height) : Math.max(bw / img.width, bh / img.height)) * zoom;
+    const iw = img.width * s;
+    const ih = img.height * s;
+    const px = pn(c, 'panX', 0) * bw * p;
+    const py = pn(c, 'panY', 0) * bh * p;
+    if (fit === 'contain') {
+      g.fillStyle = '#120c07';
+      g.fillRect(-bw / 2, -bh / 2, bw, bh);
+    }
+    g.drawImage(img, -iw / 2 + px, -ih / 2 + py, iw, ih);
+  } else {
+    g.fillStyle = '#2a1d12';
+    g.fillRect(-bw / 2, -bh / 2, bw, bh);
+    g.strokeStyle = '#8a6a3a';
+    g.lineWidth = 3 * u;
+    g.setLineDash([14 * u, 10 * u]);
+    g.strokeRect(-bw / 2 + 8 * u, -bh / 2 + 8 * u, bw - 16 * u, bh - 16 * u);
+    g.setLineDash([]);
+    g.fillStyle = '#c9a66b';
+    g.font = `600 ${Math.round(30 * u)}px ${FONT_SANS}`;
+    g.textAlign = 'center';
+    g.textBaseline = 'middle';
+    g.fillText(ps(c, 'media', '') ? 'Image loading…' : 'Choose an image', 0, 0);
+  }
+  g.restore();
+}
 
 export const FOX_DEF = {
   label: 'Agent Fox',
@@ -335,4 +438,5 @@ export const ELEMENT_PLACE: Record<keyof typeof ELEMENTS, { x: Num; y: Num }> = 
   capitolSketch: { x: { h: 0.2, v: 0.3 }, y: { h: 0.3, v: 0.3 } },
   puff: { x: 0.5, y: { h: 0.79, v: 0.58 } },
   stamp: { x: 0.5, y: 0.45 },
+  picture: { x: 0.5, y: 0.5 },
 };

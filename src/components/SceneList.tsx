@@ -2,6 +2,7 @@ import { memo, useEffect, useRef } from 'react';
 import type { Project } from '../types';
 import { renderFrame } from '../animation/renderScene';
 import { formatTime, type Timeline } from '../animation/timeline';
+import { useMediaVersion } from '../media/useMedia';
 
 interface Props {
   project: Project;
@@ -18,7 +19,9 @@ function Thumb({ project, timeline, index }: { project: Project; timeline: Timel
   const w = vertical ? 81 : 192;
   const h = vertical ? 144 : 108;
   const span = timeline.spans[index];
-  const key = `${project.settings.aspect}|${span.start}|${span.duration}|${project.settings.filmGrain}|${span.scene.transition}`;
+  const media = useMediaVersion();
+  // Redraw when the scene's document changes or an image arrives.
+  const key = `${project.settings.aspect}|${span.start}|${span.duration}|${project.settings.filmGrain}|${span.scene.transition}|${JSON.stringify(span.scene.spec ?? null).length}|${media}`;
 
   useEffect(() => {
     const id = window.setTimeout(() => {

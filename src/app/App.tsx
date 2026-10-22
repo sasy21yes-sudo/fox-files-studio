@@ -26,6 +26,10 @@ import { MediaPage } from '../editor/MediaPage';
 import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
+import { useProjectMedia } from '../media/useMedia';
+import { ShortcutsDialog } from '../editor/ShortcutsDialog';
+import { uniqueId } from '../editor/model';
+import type { SceneElement } from '../scene/spec';
 
 const FRAME = 1 / 30;
 
@@ -50,6 +54,11 @@ export function App() {
   const selected = Math.min(selection.scene, project.scenes.length - 1);
   const sel: Selection = selected === selection.scene ? selection : { kind: 'scene', scene: selected };
   const setSelection = useCallback((s: Selection) => setSelectionRaw(s), []);
+
+  const [showKeys, setShowKeys] = useState(false);
+  /** Copied element (Ctrl+C), pasted into the selected data scene with Ctrl+V. */
+  const clipboard = useRef<SceneElement | null>(null);
+  useProjectMedia(project);
 
   const engine = useRef(new AudioEngine()).current;
   const narrator = useRef(new SpeechNarrator()).current;
@@ -293,6 +302,25 @@ export function App() {
     setSelectionRaw({ kind: 'scene', scene: s.scene });
   }, [sel, setProject, project.scenes]);
 
+  /** Paste (or duplicate) an element into a data scene: new id, in front of everything but Agent Fox. */
+  const pasteElement = useCallback(
+    (el: SceneElement, scene: number) => {
+      const spec = project.scenes[scene]?.spec;
+      if (!spec || el.type === 'fox') return;
+      const id = uniqueId(spec, el.id.replace(/-\d+$/, ''));
+      setProject((p) =>
+        updateSpec(p, scene, (sp) => {
+          const els = [...sp.elements];
+          const fox = els.findIndex((e) => e.type === 'fox');
+          els.splice(fox >= 0 ? fox : els.length, 0, { ...structuredClone(el), id });
+          return { ...sp, elements: els };
+        }),
+      );
+      setSelectionRaw({ kind: 'element', scene, id });
+    },
+    [project.scenes, setProject],
+  );
+
   // ---- Keyboard (outside text fields): Resolve-style transport and editing.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -312,6 +340,18 @@ export function App() {
         return;
       }
       if (el.closest('input, textarea, select, [contenteditable]')) return;
+      if (mod && ['c', 'v', 'd'].includes(e.key.toLowerCase())) {
+        const s = sel;
+        const spec = project.scenes[s.scene]?.spec;
+        const cur = s.kind === 'element' ? spec?.elements.find((x) => x.id === s.id) : undefined;
+        const k = e.key.toLowerCase();
+        if (k === 'c' && cur && cur.type !== 'fox') clipboard.current = structuredClone(cur);
+        else if (k === 'v' && clipboard.current) pasteElement(clipboard.current, s.scene);
+        else if (k === 'd' && cur) pasteElement(cur, s.scene);
+        else return;
+        e.preventDefault();
+        return;
+      }
       const t = playback.time;
       switch (e.key) {
         case ' ':
@@ -350,12 +390,16 @@ export function App() {
           break;
         case 'Escape':
           setTheater(false);
+          setShowKeys(false);
+          break;
+        case '?':
+          setShowKeys((v) => !v);
           break;
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [playback, hist, timeline.total, deleteSelected]);
+  }, [playback, hist, timeline.total, deleteSelected, sel, project.scenes, pasteElement]);
 
   const s = project.settings;
   const audioLabel = [
@@ -421,7 +465,7 @@ export function App() {
         }}
       />
 
-      {page === 'media' && <MediaPage project={project} onOpen={openProject} savedTick={savedTick} />}
+      {page === 'media' && <MediaPage project={project} onOpen={openProject} savedTick={savedTick} onChange={change} />}
 
       {page === 'deliver' && (
         <main className="deliver-page">
@@ -442,10 +486,16 @@ export function App() {
             onChange={change}
           />
           <main className="center">
-            <PreviewPlayer project={project} timeline={timeline} playback={playback} audioLabel={audioLabel} />
+            <PreviewPlayer
+              project={project}
+              timeline={timeline}
+              playback={playback}
+              audioLabel={audioLabel}
+              editing={{ selection: sel, onSelect: setSelection, onChange: change }}
+            />
           </main>
           <div className="right-col">
-          <AiPanel project={project} scene={selected} onChange={change} onUndo={hist.undo} />
+          <AiPanel project={project} timeline={timeline} scene={selected} onChange={change} onUndo={hist.undo} />
           {sel.kind === 'scene' ? (
             <PropertiesPanel
               project={project}
@@ -497,6 +547,7 @@ export function App() {
 
       {showSources && <SourcesPanel project={project} onClose={() => setShowSources(false)} />}
       {showSheet && <ModelSheetDialog onClose={() => setShowSheet(false)} />}
+      {showKeys && <ShortcutsDialog onClose={() => setShowKeys(false)} />}
     </div>
   );
 }
