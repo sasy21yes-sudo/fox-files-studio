@@ -307,7 +307,38 @@ export function drawFace(g: G, f: Face) {
     g.clip();
   }
   (['near', 'far'] as const).forEach((side, i) => drawEye(g, side, i, f));
+  drawUnderline(g, f);
   g.restore();
+}
+
+/** The line under the far eye (traced from the master): a tapered ink stroke that moves with the eye. */
+let UNDERLINE: V2[] | null = null;
+function drawUnderline(g: G, f: Face) {
+  UNDERLINE ??= ((MASTER_FACE as unknown as { underline?: [number, number][] }).underline ?? []).map((p): V2 => {
+    const q = unroll(p);
+    return [q[0] - EYES.far.centre[0], q[1] - EYES.far.centre[1]];
+  });
+  if (UNDERLINE.length < 2) return;
+  const k = FACE_UNIT * f.eyeScale;
+  const [ex, ey] = eyeCentre('far', k);
+  const P = UNDERLINE.map(([x, y]): V2 => [ex + x * k, ey + y * k]);
+  const w = 0.05 * k;
+  const L: V2[] = [];
+  const R: V2[] = [];
+  P.forEach((p, i) => {
+    const a = P[Math.max(0, i - 1)];
+    const b = P[Math.min(P.length - 1, i + 1)];
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    const l = Math.hypot(dx, dy) || 1;
+    const t = i / (P.length - 1);
+    const half = (w / 2) * Math.max(0.15, Math.sin(Math.PI * Math.min(1, 0.08 + t * 0.92)) ** 0.6);
+    L.push([p[0] - (dy / l) * half, p[1] + (dx / l) * half]);
+    R.push([p[0] + (dy / l) * half, p[1] - (dx / l) * half]);
+  });
+  g.fillStyle = EYE_INK;
+  poly(g, [...L, ...R.reverse()]);
+  g.fill();
 }
 
 /** Brows, drawn after the hat so the brim never hides them (as in the master drawing). */
