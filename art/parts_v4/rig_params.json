@@ -1,0 +1,10 @@
+{
+ "tail": {
+  "anchor": [
+   955,
+   150
+  ],
+  "rot": 40,
+  "why": "restyled tail (rig_legs9/p4 v6, fitted 1.15:right): base measured at (962,150), tip direction -160.5 deg vs -179.5 originally; rot 40 so the tip rises up-left beside the back (as in the master) instead of straight up behind it"
+ }
+}

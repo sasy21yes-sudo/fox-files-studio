@@ -14,6 +14,8 @@ Pipeline
 Output: src/character/rig/<part>.webp + rig.json + assets.ts
 
 Usage: python3 tools/bake_rig.py
+Env: FOX_PARTS = a folder of restyled sheets (e.g. art/parts_v4, with up/ inside) used
+     instead of art/parts sheet by sheet where present; FOX_RIG_OUT = output folder.
 """
 import json, math, os
 import numpy as np, cv2
@@ -22,7 +24,14 @@ from scipy import ndimage as ndi
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ART = os.path.join(ROOT, 'art', 'parts')
 UP = os.path.join(ART, 'up')
-OUT = os.path.join(ROOT, 'src', 'character', 'rig')
+ALT = os.environ.get('FOX_PARTS')  # restyled sheets override the originals one by one
+OUT = os.environ.get('FOX_RIG_OUT') or os.path.join(ROOT, 'src', 'character', 'rig')
+
+
+def sheet_paths(name):
+    if ALT and os.path.exists(os.path.join(ALT, name + '.jpg')):
+        return os.path.join(ALT, name + '.jpg'), os.path.join(ALT, 'up', name + '.png')
+    return os.path.join(ART, name + '.jpg'), os.path.join(UP, name + '.png')
 os.makedirs(OUT, exist_ok=True)
 
 K = 3.364            # rig px per reference px (figure ~1800 px tall)
@@ -46,8 +55,10 @@ _cache = {}
 
 def sheet(name):
     if name not in _cache:
-        s1 = cv2.imread(os.path.join(ART, name + '.jpg'))
-        s4 = cv2.imread(os.path.join(UP, name + '.png'))
+        p1, p4 = sheet_paths(name)
+        s1, s4 = cv2.imread(p1), cv2.imread(p4)
+        if s4 is None:
+            raise SystemExit(f'missing 4x sheet {p4}: run tools/upscale.py on {p1}')
         b1, a1 = key(s1)
         m = ndi.binary_closing(a1 > 0.5, iterations=2)
         lab, n = ndi.label(m)
@@ -187,9 +198,14 @@ def blob(img, reg, thr=55):
 
 headB, oB = cut('head', 790, 200)    # blank head without hat
 headA, oA = cut('head', 260, 190)    # head with hat (for the hat and alignment)
-fits = json.load(open(os.path.join(ART, 'fits.json')))
+FITS = os.path.join(ALT, 'fits.json') if ALT and os.path.exists(os.path.join(ALT, 'fits.json')) else os.path.join(ART, 'fits.json')
+fits = json.load(open(FITS))
 A_to_B = np.array(fits['a_to_b'])     # headA crop px -> headB crop px (1x)
 MOUTH_FITS = {int(k): np.array(v) for k, v in fits['mouths'].items()}  # mouth crop px -> headB crop px
+# A restyled blank head can have a different crop origin (taller ears...). The head frame stays the
+# original one: SHIFT = new crop origin - original crop origin (1x px), written by tools/comfy/rig_mouths.py.
+SHIFT = np.array(fits.get('b_shift', [0, 0]), float)
+RESTYLED_HEAD = 'b_shift' in fits
 # headA crop px -> reference px (landmarks: nose, crown, brim).
 A_to_ref = sim(0.628, 0.0, (310.0, 225.0), (616.7, 151.7))
 B_to_ref = compose(A_to_ref, inv(A_to_B))
@@ -201,11 +217,13 @@ h4, w4 = hb.shape[:2]
 hsv = cv2.cvtColor(hb[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
 orange = (hsv[:, :, 0] >= 4) & (hsv[:, :, 0] <= 24) & (hsv[:, :, 1] > 120)
 yy = np.mgrid[0:h4, 0:w4][0]
-stub = orange & (yy > 268 * 4)  # below the ruff in headB 1x crop px
+# Below the ruff (headB 1x px, original frame); the restyled head's neck also has a cream stripe.
+cream_neck = (hsv[:, :, 2] > 170) & (hsv[:, :, 1] < 110) if RESTYLED_HEAD else np.zeros_like(orange)
+stub = (orange | cream_neck) & (yy > (268 - SHIFT[1]) * 4)
 stub = ndi.binary_opening(stub, iterations=3)
 keep = 1 - cv2.GaussianBlur(ndi.binary_dilation(stub, iterations=2).astype(np.float32), (0, 0), 2)
 hb[:, :, 3] = (hb[:, :, 3] * keep).astype(np.uint8)
-img, o = warp(hb, at4(B_to_rig, (0, 0)))
+img, o = warp(hb, at4(B_to_rig, SHIFT))
 save('head', img, o)
 
 # Neck pivot (where the head turns): centre of the collar, in rig px.
@@ -297,7 +315,7 @@ META['eyes'] = eyes_meta
 hsvB = cv2.cvtColor(headB[:, :, :3], cv2.COLOR_BGR2HSV)
 ring = np.zeros(headB.shape[:2], bool)
 for e in EYES.values():
-    cv2.circle(ring.view(np.uint8), (int(e['x'] * 4), int(e['y'] * 4)), int(e['w'] * 4 * 0.85), 1, -1)
+    cv2.circle(ring.view(np.uint8), (int((e['x'] - SHIFT[0]) * 4), int((e['y'] - SHIFT[1]) * 4)), int(e['w'] * 4 * 0.85), 1, -1)
 furm = ring & (hsvB[:, :, 1] > 140) & (hsvB[:, :, 2] > 150)
 fur = np.median(headB[:, :, :3][furm], 0)
 META['furColor'] = [int(fur[2]), int(fur[1]), int(fur[0])]
@@ -308,18 +326,29 @@ MOUTHS = {  # id on the 1x mouth sheet -> a point inside it
     6: (150, 290), 8: (400, 290), 7: (640, 290), 5: (870, 290),
     9: (140, 460), 10: (360, 460), 11: (590, 460), 12: (820, 460),
 }
+# Restyled mouths (tools/comfy/rig_mouths.py) were cut from renders of the blank head itself:
+# their points come with the fits and they are used as they are.
+EXACT = bool(fits.get('exact'))
+if 'points' in fits:
+    MOUTHS = {int(k): tuple(v) for k, v in fits['points'].items()}
 for mid, pt in MOUTHS.items():
     piece, o1 = cut('mouths', *pt)
-    # The piece's upper outline duplicates the head's own muzzle outline: drop it.
-    a = piece[:, :, 3].astype(np.float32) / 255
-    k = 28
-    sh = np.zeros_like(a)
-    sh[k:] = a[:-k]
-    a = a * sh
-    w = a.shape[1]
-    ramp = np.clip((np.arange(w) / w - 0.12) / 0.22, 0, 1)
-    a = cv2.GaussianBlur(a * ramp[None, :], (0, 0), 1.6)
-    piece[:, :, 3] = (a * 255).astype(np.uint8)
+    if EXACT:
+        # Hard-edged sprite cut from the head render: feather it inwards so it melts into the head.
+        a = piece[:, :, 3].astype(np.float32) / 255
+        a = cv2.GaussianBlur(cv2.erode(a, np.ones((13, 13), np.uint8)), (0, 0), 7)
+        piece[:, :, 3] = (np.minimum(a, piece[:, :, 3] / 255) * 255).astype(np.uint8)
+    else:
+        # The piece's upper outline duplicates the head's own muzzle outline: drop it.
+        a = piece[:, :, 3].astype(np.float32) / 255
+        k = 28
+        sh = np.zeros_like(a)
+        sh[k:] = a[:-k]
+        a = a * sh
+        w = a.shape[1]
+        ramp = np.clip((np.arange(w) / w - 0.12) / 0.22, 0, 1)
+        a = cv2.GaussianBlur(a * ramp[None, :], (0, 0), 1.6)
+        piece[:, :, 3] = (a * 255).astype(np.uint8)
     A = compose(B_to_rig, MOUTH_FITS[mid])
     img, o = warp(piece, at4(A, (0, 0)))
     save(f'mouth_{mid}', img, o)
@@ -474,7 +503,10 @@ for nm, (pt, wrist, axis) in HANDS.items():
     save('hand_' + nm + '_back', img, o)
 
 # Tail: base on the right end of the piece; turned so it rises behind the back as in the reference.
-img, o = part_at('legs9', (820, 200), 0.48, anchor_px=(955, 115), rot=92)
+# Restyled sheets can move the tail's base and turn: art/parts_v4/rig_params.json overrides them.
+PARAMS = json.load(open(os.path.join(ALT, 'rig_params.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_params.json')) else {}
+TAIL = PARAMS.get('tail', {})
+img, o = part_at('legs9', (820, 200), 0.48 * TAIL.get('scale', 1.0), anchor_px=tuple(TAIL.get('anchor', (955, 115))), rot=TAIL.get('rot', 92))
 save('tail', img, o)
 
 img, o = part_at('legs9', (660, 400), 0.42, anchor_px=(608, 505))

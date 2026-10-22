@@ -90,6 +90,36 @@ FRONT = ('Show exactly the same hand gesture as image 1, but seen from the PALM 
 JOBS['hands_new_front'] = {n: dict(image=f'approved:hands_new_back/{n}', refs=[MS_HANDS], prompt=FRONT)
                            for n in JOBS['hands_new_back']}
 
+# Round 1 (FRONT prompt from the approved back views) kept only stop, chin and fist_tremble: the model opens
+# the hand when asked to turn it. Round 2 builds the rest by small edits of approved palm-side pieces.
+KEEP_PALM = 'Keep this glove exactly as it is (same palm-side view, same cuff, same size, same line), but '
+JOBS['hands_new_front'].update({
+    'one': dict(image='approved:hands_new_front/stop', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'curl the two right fingers down onto the palm and fold the thumb across them, so only the INDEX finger at the '
+        'left edge stays straight up, counting one. Exactly three fingers and one thumb.')),
+    'knock': dict(image='approved:hands_new_front/fist_tremble', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'loosen the fist a little and tilt it so the curled fingers point to the right, as if about to knock on a door; '
+        'the thumb rests along the curled index finger, nothing sticks out. No door, no motion lines.')),
+    'pencil': dict(image='approved:hands_new_front/chin', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'the loose fist now holds a yellow wooden pencil with a pink eraser, gripped between the thumb and the index '
+        'finger, the sharpened tip pointing down to the lower right. The pencil is fully inside the image.')),
+    'magnifier': dict(image='approved:hands_new_front/chin', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'the fist now holds the handle of a round magnifying glass with a brass rim, the lens above the hand at the upper '
+        'right, clear glass with a light reflection. The whole lens is inside the image.')),
+    'relaxed': dict(image='approved:hands_new_front/stop', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'let the hand hang down relaxed: the cuff at the upper left, the fingers pointing down to the lower right and '
+        'softly curled, the palm still facing us. Exactly three fingers and one thumb.')),
+    'pinch_paper': dict(image='approved:hands_new_front/stop', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'bring the tips of the thumb and the index finger together to pinch the corner of a small plain white sheet of '
+        'paper (no writing), the other two fingers softly curled. Exactly three fingers and one thumb.')),
+    'two': dict(image='approved:hands_new_front/one', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'ALSO straighten the finger next to the index, so two fingers are raised side by side in a slight V, counting '
+        'two. The thumb and the last finger stay folded exactly as they are.')),
+    'three': dict(image='approved:hands_new_front/two', refs=[MS_HANDS], prompt=KEEP_PALM + (
+        'ALSO straighten the last folded finger, so all three fingers are raised, counting three. The thumb stays '
+        'folded across the palm exactly as it is. Exactly three fingers and one thumb.')),
+})
+
 # Mouths: each emotion starts from the closest of Salvatore's 12 mouth drawings and only the mouth may change,
 # so every piece keeps the muzzle silhouette, nose and cut-off edge and still swaps onto the same head.
 MOUTH = 'art/parts/mouths.jpg'
@@ -147,8 +177,13 @@ def pose(p):
 
 
 JOBS['poses_key'] = {
-    'take': pose('a startled "take": the body stretched up tall, eyes huge, the fedora popping up off the head.'),
-    'crouch': pose('an anticipation crouch before running: knees bent, body leaning back, arms pulled back.'),
+    # v1-v3 of take stayed a mild standing pose, crouch became a running stride: push the extremes.
+    'take': pose('an EXTREME startled cartoon "take": the whole body stretched up very tall and thin, both feet off the '
+                 'ground, arms flung up and out, eyes huge, mouth open, the fedora flying up well above the head. '
+                 'No ground shadow.'),
+    'crouch': pose('an anticipation crouch, the moment BEFORE running: squashed down low with a deep knee bend, BOTH feet '
+                   'flat on the ground, body compressed and leaning back to the left, both arms pulled back behind him, '
+                   'eyes on the right. Not running yet. No ground shadow.'),
     'run': pose('running, in side view facing right, legs in a wide stride drawn clean, arms pumping, coat and tail trailing.'),
     'point': pose('pointing dramatically at something off-screen right with the right arm fully extended, body leaning forward.'),
     'magnifier': pose('leaning in suspiciously, peering through a round brass magnifying glass held in the right hand.'),
@@ -156,3 +191,100 @@ JOBS['poses_key'] = {
     'triumph': pose('triumphant, both arms raised high above the head, big smile, chest out.'),
     'tiphat': pose('tipping the fedora with the right hand and winking, a friendly smile.'),
 }
+
+
+# ------------------------------------------------------------------ rig restyle toward the master look
+# Salvatore chose poses_key/magnifier_v4 (art/reference/agent-fox-master.png) as THE Agent Fox.
+# Each rig part is redrawn in that style but keeps its place, size and angle on its sheet, so
+# tools/bake_rig.py (which measures the original sheets) keeps working. Sheet = 'rig_<art/parts name>',
+# piece = 'p<k>' (k-th piece of the sheet, row-major).
+MASTER = 'art/reference/agent-fox-master.png'
+MASTER_HEAD = MASTER + '@590,25,290,280'
+KEEP_PLACE = ('Keep exactly the same angle, size and position as image 1 so it still fits the rest of the cut-out puppet. '
+              'Plain green background, no shadow, nothing else in the picture.')
+JOBS['rig_head'] = {
+    'p1': dict(image='art/parts/head.jpg#1', refs=[MASTER_HEAD], prompt=(
+        'Redraw this blank fox head (image 1) as the head of the fox in image 2: the same slimmer skull, the same longer '
+        'pointed muzzle with the black nose at its tip, the same tall ears, the same orange fur with soft cel shading and '
+        'the same jagged cream cheek ruff, the same clean dark outline. 3/4 view facing right. The face stays BLANK: no '
+        'eyes, no eyebrows, no mouth line, just smooth fur where they go. Neck cut off cleanly under the ruff. ' + KEEP_PLACE)),
+}
+JOBS['rig_eyes'] = {
+    'p0': dict(image='art/parts/eyes.jpg#0', refs=[MASTER_HEAD], prompt=(
+        'Redraw this eye white (image 1) like the eyes of the fox in image 2: an upright oval white with a thin dark '
+        'outline, no pupil. ' + KEEP_PLACE)),
+    'p1': dict(image='art/parts/eyes.jpg#1', refs=[MASTER_HEAD], prompt=(
+        'Redraw this pupil (image 1) like the pupils of the fox in image 2: a solid near-black oval with one small white '
+        'highlight. ' + KEEP_PLACE)),
+}
+JOBS['rig_legs9'] = {
+    'p4': dict(image='art/parts/legs9.jpg#4', refs=[MASTER], prompt=(
+        'Redraw this fox tail (image 1) like the tail of the fox in image 2: fuller and fluffier, orange with soft '
+        'shading, a large white tip with jagged fur tufts, clean dark outline. The base stays at the same place and the '
+        'length is about the same. ' + KEEP_PLACE)),
+}
+JOBS['rig_arms'] = {
+    'p0': dict(image='art/parts/arms.jpg#0', refs=[MASTER], prompt=(
+        'Redraw this trench-coat sleeve (image 1) like the coat sleeves of the fox in image 2: the same brown gabardine, '
+        'soft cel shading, a few fabric folds, clean dark outline. Keep the same straight tube shape, length and width, '
+        'no hand and no cuff strap. ' + KEEP_PLACE)),
+}
+
+# The 12 lip-sync mouths, redrawn ON the restyled head: each is the approved blank head with the mouth
+# shape of the old mouth drawing k (image 2). The mouth sprite is then cut from where the render differs
+# from the blank head (tools/comfy/rig_mouths.py), so it fits the new muzzle without hand alignment.
+MOUTH_SHAPES = [
+    'REST: mouth closed, a short gently curved lip line, no teeth',
+    'M/B/P: lips pressed firmly together, a closed straight lip line, no teeth',
+    'consonant: mouth just slightly open, the upper and lower front teeth visible close together',
+    'A: jaw dropped wide open, dark mouth, pink tongue, small fangs top and bottom',
+    'E/I: mouth half open in a small wide oval, dark inside, a little tongue',
+    'O: a round tall open mouth, dark inside',
+    'U/W: lips pushed forward into a small round pucker, like a kiss, tiny dark opening',
+    'F/V: upper teeth resting on the lower lip, mouth barely open',
+    'L/T/D/N: mouth open, both rows of teeth visible, the tongue tip touching behind the upper teeth',
+    'TH/tongue: mouth open with the pink tongue visible and slightly out between the teeth',
+    'SMILE: mouth closed in a happy upward curve, no teeth',
+    'NEUTRAL-SERIOUS: mouth closed, a short straight lip line turning slightly down at the corner',
+]
+JOBS['rig_mouthheads'] = {
+    f'm{k}': dict(image='approved:rig_head/p1', refs=[f'art/parts/mouths.jpg#{k}'], prompt=(
+        f'Give the fox head in image 1 this mouth: {MOUTH_SHAPES[k]} (as drawn in image 2), fitted to the long muzzle of '
+        'image 1 under its black nose. Change NOTHING else: the same head, nose, ears, fur, cheek ruff, outline, size and '
+        'position as image 1, and still no eyes and no eyebrows. Plain green background, no shadow.'))
+    for k in range(12)
+}
+
+# Round 2 of tail and sleeves: a full-body reference made the model redraw the whole fox, so the reference
+# is now just the matching part of the master.
+MASTER_TAIL = MASTER + '@400,250,180,265'
+MASTER_FOREARM = MASTER + '@720,265,160,165'
+JOBS['rig_legs9']['p4'] = dict(image='art/parts/legs9.jpg#4', refs=[MASTER_TAIL], prompt=(
+    'Redraw ONLY this fox tail (image 1) in the style of the tail in image 2: fuller and fluffier, orange with soft '
+    'shading, a large cream-white tip with jagged fur tufts, clean dark outline. Keep the curve of image 1: the base at '
+    'the same end, the white tip at the other end, the same length. ' + KEEP_PLACE))
+for k in (1, 3):
+    JOBS['rig_arms'][f'p{k}'] = dict(image=f'art/parts/arms.jpg#{k}', refs=[MASTER_FOREARM], prompt=(
+        'Redraw ONLY this trench-coat forearm sleeve (image 1) in the style of the sleeve in image 2: the same brown '
+        'gabardine with soft shading, and at the lower end, instead of the buckled strap, a wide turned-back cuff with a '
+        'small brass button and a thin white shirt cuff peeking out below it, as in image 2. No hand, no glove. Keep '
+        'the same straight tube shape, length and width. ' + KEEP_PLACE))
+
+# Tail round 3: v3-v4 kept the small white tip; ask for the master's proportions explicitly.
+JOBS['rig_legs9']['p4'] = dict(image='art/parts/legs9.jpg#4', refs=[MASTER_TAIL], prompt=(
+    'Make this fox tail (image 1) look like the tail in image 2: much FLUFFIER and wider, with soft jagged fur tufts '
+    'along its edges, and a LARGE cream-white tip that covers the last third of the tail (the end at the upper left), '
+    'separated from the orange by a jagged line. Same curve, same base end on the right, same overall length, clean dark '
+    'outline, soft cel shading. ' + KEEP_PLACE))
+
+# Round 3 (palm side): the "one" edit raised two fingers, kept as "two". One and three are built from it.
+JOBS['hands_new_front']['one'] = dict(image='approved:hands_new_front/two', refs=[MS_HANDS], prompt=KEEP_PALM + (
+    'fold the MIDDLE finger down onto the palm like the curled fingers next to it, so only the index finger stays '
+    'straight up, counting one. Exactly three fingers and one thumb.'))
+JOBS['hands_new_front']['three'] = dict(image='approved:hands_new_front/two', refs=[MS_HANDS], prompt=KEEP_PALM + (
+    'ALSO straighten the curled ring finger next to the two raised fingers, so three fingers are raised side by side, '
+    'counting three; the thumb stays folded across the palm. Exactly three fingers and one thumb.'))
+# Round 4 of the palm-side "one": folding a finger of "two" did not work; raise one finger from the fist instead.
+JOBS['hands_new_front']['one'] = dict(image='approved:hands_new_front/fist_tremble', refs=[MS_HANDS], prompt=KEEP_PALM + (
+    'raise ONLY the index finger (the one at the top of the fist) straight up, pointing up, counting one; the other two '
+    'fingers stay curled and the thumb stays folded over them. Exactly three fingers and one thumb.'))

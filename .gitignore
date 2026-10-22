@@ -10,3 +10,5 @@ __pycache__/
 qa-out/
 .env
 .env.*
+art/parts_v4/up/
+art/parts_v4/compare_*.jpg

@@ -130,8 +130,9 @@ def workflow(images, prompt, seed, steps, mp):
     return g
 
 
-def run(graph):
-    pid = api('/prompt', json.dumps({'prompt': graph, 'client_id': uuid.uuid4().hex}).encode())['prompt_id']
+def run(graph, front=False):
+    """Queue a graph (front=True: ahead of everything already waiting) and return the PNG."""
+    pid = api('/prompt', json.dumps({'prompt': graph, 'client_id': uuid.uuid4().hex, 'front': front}).encode())['prompt_id']
     while True:
         time.sleep(2)
         h = api(f'/history/{pid}')
@@ -172,6 +173,7 @@ def main():
     ap.add_argument('--seed', type=int, help='first seed (consecutive with --count); random if omitted')
     ap.add_argument('--count', type=int, default=1, help='variants to render with different seeds')
     ap.add_argument('--mp', type=float, default=1.0)
+    ap.add_argument('--front', action='store_true', help='queue ahead of renders already waiting in ComfyUI')
     ap.add_argument('--mark', action='store_true')
     ap.add_argument('--note')
     a = ap.parse_args()
@@ -208,7 +210,7 @@ def main():
     for n in range(a.count):
         seed = a.seed + n if a.seed is not None else random.randrange(2**31)
         t0 = time.time()
-        png = run(workflow(names, text, seed, a.steps, a.mp))
+        png = run(workflow(names, text, seed, a.steps, a.mp), a.front)
         # a render takes minutes: re-read so reviews marked meanwhile are not overwritten
         man = load_manifest()
         versions = man['sheets'].setdefault(key, {'versions': []})['versions']

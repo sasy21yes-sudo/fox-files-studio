@@ -35,6 +35,7 @@ def main():
     ap.add_argument('--pieces', help='comma-separated subset')
     ap.add_argument('--count', type=int, default=3)
     ap.add_argument('--correction', action='append', default=[])
+    ap.add_argument('--front', action='store_true', help='queue ahead of other ComfyUI work')
     a = ap.parse_args()
     jobs = JOBS[a.sheet]
     names = a.pieces.split(',') if a.pieces else list(jobs)
@@ -61,6 +62,8 @@ def main():
             cmd += ['--ref', r]
         for c in a.correction:
             cmd += ['--correction', c]
+        if a.front:
+            cmd.append('--front')
         print(f'== {a.sheet}/{n}', flush=True)
         subprocess.run(cmd, check=True)
 

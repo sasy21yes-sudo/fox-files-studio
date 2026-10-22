@@ -16,13 +16,14 @@ import cv2, numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MANIFEST = os.path.join(ROOT, 'art', 'incoming', 'manifest.json')
 
-HANDS = ['one', 'two', 'three', 'pinch_paper', 'pencil', 'magnifier', 'stop', 'chin', 'fist_tremble', 'relaxed', 'snap', 'knock']
+# 'snap' (finger snap) and the 'blow' mouth were dropped by Salvatore on 2026-10-22.
+HANDS = ['one', 'two', 'three', 'pinch_paper', 'pencil', 'magnifier', 'stop', 'chin', 'fist_tremble', 'relaxed', 'knock']
 SHEETS = {
     # pieces in reading order, columns, median piece size / sheet width (from the reference sheets, see check.py)
     'heads_turnaround': (['hat_front', 'hat_34', 'hat_side', 'bare_front', 'bare_34', 'bare_side'], 3, 0.24),
     'hands_new_back': (HANDS, 4, 0.19),
     'hands_new_front': (HANDS, 4, 0.19),
-    'mouths_emotions': (['scream', 'gasp', 'whisper', 'smirk', 'gritted', 'laugh', 'frown', 'disgust', 'nervous', 'grin', 'blow', 'jawdrop'], 4, 0.21),
+    'mouths_emotions': (['scream', 'gasp', 'whisper', 'smirk', 'gritted', 'laugh', 'frown', 'disgust', 'nervous', 'grin', 'jawdrop'], 4, 0.21),
     'poses_key': (['take', 'crouch', 'run', 'point', 'magnifier', 'slumped', 'triumph', 'tiphat'], 4, 0.2),
 }
 GREEN = np.array([0, 255, 0], np.float32)  # BGR
