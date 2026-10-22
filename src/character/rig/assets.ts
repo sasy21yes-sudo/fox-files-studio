@@ -82,32 +82,33 @@ import a79 from './mouth_1.webp';
 import a80 from './mouth_10.webp';
 import a81 from './mouth_11.webp';
 import a82 from './mouth_12.webp';
-import a83 from './mouth_14.webp';
-import a84 from './mouth_15.webp';
-import a85 from './mouth_16.webp';
-import a86 from './mouth_19.webp';
-import a87 from './mouth_2.webp';
-import a88 from './mouth_20.webp';
-import a89 from './mouth_21.webp';
-import a90 from './mouth_22.webp';
-import a91 from './mouth_23.webp';
-import a92 from './mouth_3.webp';
-import a93 from './mouth_4.webp';
-import a94 from './mouth_5.webp';
-import a95 from './mouth_6.webp';
-import a96 from './mouth_7.webp';
-import a97 from './mouth_8.webp';
-import a98 from './mouth_9.webp';
-import a99 from './neck.webp';
-import a100 from './prop_magnifier.webp';
-import a101 from './prop_notebook.webp';
-import a102 from './prop_pencil.webp';
-import a103 from './shoe_far.webp';
-import a104 from './shoe_near.webp';
-import a105 from './sleeve_back.webp';
-import a106 from './sleeve_front.webp';
-import a107 from './tail.webp';
-import a108 from './torso.webp';
+import a83 from './mouth_13.webp';
+import a84 from './mouth_14.webp';
+import a85 from './mouth_15.webp';
+import a86 from './mouth_16.webp';
+import a87 from './mouth_19.webp';
+import a88 from './mouth_2.webp';
+import a89 from './mouth_20.webp';
+import a90 from './mouth_21.webp';
+import a91 from './mouth_22.webp';
+import a92 from './mouth_23.webp';
+import a93 from './mouth_3.webp';
+import a94 from './mouth_4.webp';
+import a95 from './mouth_5.webp';
+import a96 from './mouth_6.webp';
+import a97 from './mouth_7.webp';
+import a98 from './mouth_8.webp';
+import a99 from './mouth_9.webp';
+import a100 from './neck.webp';
+import a101 from './prop_magnifier.webp';
+import a102 from './prop_notebook.webp';
+import a103 from './prop_pencil.webp';
+import a104 from './shoe_far.webp';
+import a105 from './shoe_near.webp';
+import a106 from './sleeve_back.webp';
+import a107 from './sleeve_front.webp';
+import a108 from './tail.webp';
+import a109 from './torso.webp';
 
 export const RIG_ASSETS: Record<string, string> = {
   'arm_back_lower': a0,
@@ -193,30 +194,31 @@ export const RIG_ASSETS: Record<string, string> = {
   'mouth_10': a80,
   'mouth_11': a81,
   'mouth_12': a82,
-  'mouth_14': a83,
-  'mouth_15': a84,
-  'mouth_16': a85,
-  'mouth_19': a86,
-  'mouth_2': a87,
-  'mouth_20': a88,
-  'mouth_21': a89,
-  'mouth_22': a90,
-  'mouth_23': a91,
-  'mouth_3': a92,
-  'mouth_4': a93,
-  'mouth_5': a94,
-  'mouth_6': a95,
-  'mouth_7': a96,
-  'mouth_8': a97,
-  'mouth_9': a98,
-  'neck': a99,
-  'prop_magnifier': a100,
-  'prop_notebook': a101,
-  'prop_pencil': a102,
-  'shoe_far': a103,
-  'shoe_near': a104,
-  'sleeve_back': a105,
-  'sleeve_front': a106,
-  'tail': a107,
-  'torso': a108,
+  'mouth_13': a83,
+  'mouth_14': a84,
+  'mouth_15': a85,
+  'mouth_16': a86,
+  'mouth_19': a87,
+  'mouth_2': a88,
+  'mouth_20': a89,
+  'mouth_21': a90,
+  'mouth_22': a91,
+  'mouth_23': a92,
+  'mouth_3': a93,
+  'mouth_4': a94,
+  'mouth_5': a95,
+  'mouth_6': a96,
+  'mouth_7': a97,
+  'mouth_8': a98,
+  'mouth_9': a99,
+  'neck': a100,
+  'prop_magnifier': a101,
+  'prop_notebook': a102,
+  'prop_pencil': a103,
+  'shoe_far': a104,
+  'shoe_near': a105,
+  'sleeve_back': a106,
+  'sleeve_front': a107,
+  'tail': a108,
+  'torso': a109,
 };

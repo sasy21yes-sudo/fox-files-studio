@@ -1,6 +1,6 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
 import { face as faceTweak, motion, tweaks } from './rig/tweaks';
-import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
+import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 export { loadRig as loadPuppet } from './rig/rigPuppet';
 
 /**
@@ -1622,6 +1622,8 @@ const NEAR_T: Partial<Record<ArmMode, ArmDef>> = {
 };
 const SHOULDER: Record<Phys, V2> = { near: J.shoulderBack, far: J.shoulderFront };
 const SLEEVE: Record<Phys, string> = { near: 'sleeve_front', far: 'sleeve_back' };
+const UPPER: Record<Phys, string> = { near: 'arm_front_upper', far: 'arm_back_upper' };
+const LOWER: Record<Phys, string> = { near: 'arm_front_lower', far: 'arm_back_lower' };
 const GLOVE_SUFFIX: Record<Phys, string> = { near: '', far: '_back' };
 const CAP: Record<Phys, string> = { near: 'cap_back', far: 'cap_front' };
 
@@ -1726,8 +1728,20 @@ function hoseHand(A: RigArm) {
   const d = Math.hypot(dx, dy) || 1;
   const out = A.phys === 'far' ? 1 : -1;
   const side = (-dy / d) * out * 0.6 + (dx / d) * 1 >= 0 ? 1 : -1;
-  // Arms hang straight (master look): the sleeve shortens up to 22% before the elbow bows.
-  const { c } = hoseControl(S, A.hand, L, side, 0.22);
+  void side;
+  void hoseControl;
+  // Master look: a real elbow. Upper arm and forearm are separate sleeve pieces; the elbow bends
+  // outward and down (the solution further from the body and lower wins), straight when the arm
+  // is fully reached.
+  const L1 = rigPart(UPPER[A.phys]).len!;
+  const L2 = rigPart(LOWER[A.phys]).len!;
+  // Hanging arms stay straight: the sleeves give up to 20% before the elbow starts to bend.
+  void L;
+  const scale = Math.min(1, Math.max(0.8, (d * 1.002) / Math.max(1, L1 + L2)));
+  const e1 = ik(S, A.hand, L1 * scale, L2 * scale, 1).e;
+  const e2 = ik(S, A.hand, L1 * scale, L2 * scale, -1).e;
+  const score = (e: V2) => out * (e[0] - S[0]) * 1.0 + (e[1] - S[1]) * 0.6;
+  const c: V2 = score(e1) >= score(e2) ? e1 : e2;
   const ang = Math.atan2(A.hand[1] - c[1], A.hand[0] - c[0]);
   const hx = A.hand[0] + Math.cos(ang) * 10;
   const hy = A.hand[1] + Math.sin(ang) * 10;
@@ -1751,7 +1765,10 @@ function drawRigArm(g: G, A: RigArm) {
   if (A.prop === 'hold' && A.phys === 'near') drawHeldPaper(g, h.hx + 60, h.hy - 120);
   drawGloveRig(g, A);
   // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
-  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, (t) => 1 + 0.24 * Math.pow(Math.max(0, 1 - t / 0.45), 1.6));
+  // Upper arm (fuller at the shoulder), then the forearm over it so the elbow's round end covers the joint.
+  const mid = (a: V2, b: V2): V2 => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  noodle(g, UPPER[A.phys], h.S, mid(h.S, h.c), h.c, 0, 1, (t) => 1.12 + 0.16 * Math.pow(Math.max(0, 1 - t / 0.5), 1.6));
+  noodle(g, LOWER[A.phys], h.c, mid(h.c, A.hand), A.hand, 0, 1, () => 1.06);
   // The far arm comes out from under the coat's shoulder; the near arm's rounded top IS the shoulder (master).
   if (A.phys === 'far' && A.layer !== 'behind') placed(g, CAP.far);
   if (A.prop === 'notebook' && A.phys === 'near') anchored(g, 'prop_notebook', h.hx + 95, h.hy - 75, -0.12);
@@ -1794,7 +1811,8 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   const bounceAmt = (pose.bounce ?? 1) * motion('bounce') * (1 - walk);
   const lift = beatLift(time);
   const landing = Math.pow(1 - lift, 6);
-  const walkBob = Math.abs(Math.cos(phase)) * 12 * walk;
+  // Up at passing (one foot under the hips), down at heel strike: twice per cycle.
+  const walkBob = Math.abs(Math.sin(phase)) * 12 * walk;
   const bob = -(lift * 12 * bounceAmt + walkBob) + landing * 4 * bounceAmt - surprise * 8;
   const squash = (pose.squash ?? 0) + landing * 0.045 * bounceAmt - lift * 0.02 * bounceAmt - surprise * 0.05 - Math.sin(time * 1.9) * 0.006 * (1 - walk);
   const lean = (pose.lean ?? 0) * 0.7 + walk * 0.05;
@@ -1887,11 +1905,22 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     const hip0 = name === 'near' ? J.hipNear : J.hipFar;
     const L = rigPart(`leg_${name}`).len!;
     const hip: V2 = [hip0[0], hip0[1] + B];
-    const liftAmt = Math.max(0, Math.cos(ph)) * walk;
-    const ankle: V2 = [hip0[0] + Math.sin(ph) * stride, hip0[1] + L - liftAmt * 26 * RK];
-    const { c } = hoseControl(hip, ankle, L, -1);
+    // Walk cycle (ph 0 = heel strike in front): stance 0..PI the foot slides back flat on the ground,
+    // swing PI..2PI it lifts (peak at passing), knee forward, and reaches out heel-first.
+    const p = ((ph % TAU) + TAU) % TAU;
+    const stance = p < Math.PI;
+    const u = stance ? p / Math.PI : (p - Math.PI) / Math.PI;
+    const ease = (x: number) => x * x * (3 - 2 * x);
+    const footX = stance ? lerp(1, -1, u) : lerp(-1, 1, ease(u));
+    const liftAmt = stance ? 0 : Math.sin(u * Math.PI) * walk;
+    const ankle: V2 = [hip0[0] + footX * stride, hip0[1] + L - liftAmt * 34 * RK];
+    // Toe: up at heel strike, flat in stance, down at toe-off, level through the swing.
+    const footRot = walk * (stance ? (u < 0.15 ? -0.22 * (1 - u / 0.15) : u > 0.8 ? 0.35 * ((u - 0.8) / 0.2) : 0) : lerp(0.35, -0.2, ease(u)));
+    // The knee always bows forward (+x): pick the bow side that puts the control point in front.
+    const side = ankle[1] - hip[1] >= 0 ? -1 : 1;
+    const { c } = hoseControl(hip, ankle, L, side);
     // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
-    anchored(g, `shoe_${name}`, ankle[0], ankle[1], -liftAmt * 0.35 + (walk ? Math.sin(ph) * 0.08 : 0));
+    anchored(g, `shoe_${name}`, ankle[0], ankle[1], footRot);
     noodle(g, `leg_${name}`, hip, c, ankle);
     mark(g, `hip_${name}`, hip);
     mark(g, `knee_${name}`, [(hip[0] + 2 * c[0] + ankle[0]) / 4, (hip[1] + 2 * c[1] + ankle[1]) / 4]);
