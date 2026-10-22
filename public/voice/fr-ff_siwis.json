@@ -1,0 +1,280 @@
+{
+"version": 1,
+"lang": "fr",
+"voice": "ff_siwis",
+"engine": "Kokoro-82M v1.0 (kokoro-onnx)",
+"sampleRate": 24000,
+"audio": "fr-ff_siwis.mp3",
+"duration": 190.83,
+"sentences": {
+"La CIA a drogué des gens qui n'en savaient rien.": [
+0.35,
+2.42,
+[]
+],
+"C'est dans les archives du Sénat.": [
+3.12,
+1.53,
+[]
+],
+"En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA.": [
+5.0,
+6.44,
+[
+3.5
+]
+],
+"La plupart de ses archives avaient été détruites des années plus tôt.": [
+11.79,
+3.74,
+[]
+],
+"Mais pas toutes.": [
+15.88,
+0.94,
+[]
+],
+"Le programme s'appelait MKUltra.": [
+17.17,
+1.95,
+[]
+],
+"Alors, qu'est-ce que c'était ?": [
+19.47,
+1.27,
+[]
+],
+"Et comment le sait-on ?": [
+21.09,
+1.17,
+[]
+],
+"Commençons par ce que la CIA elle-même a dit au Sénat.": [
+22.61,
+2.64,
+[]
+],
+"Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964.": [
+25.6,
+7.43,
+[
+3.875
+]
+],
+"Soit onze ans.": [
+33.38,
+0.86,
+[]
+],
+"Les archives qui ont survécu recensent 149 sous-projets.": [
+34.59,
+3.7,
+[]
+],
+"Elles citent 80 institutions, dont 44 universités et établissements d'enseignement supérieur.": [
+38.64,
+5.99,
+[]
+],
+"Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.": [
+44.98,
+4.79,
+[]
+],
+"Alors, que faisaient concrètement tous ces sous-projets ?": [
+50.12,
+2.46,
+[]
+],
+"Le directeur les a classés par catégories.": [
+52.93,
+2.23,
+[]
+],
+"Drogues et alcool.": [
+55.51,
+1.08,
+[]
+],
+"Hypnose.": [
+56.94,
+0.79,
+[]
+],
+"Recherche sur le sommeil.": [
+58.08,
+1.4,
+[]
+],
+"Détecteurs de mensonge.": [
+59.83,
+1.44,
+[]
+],
+"Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires.": [
+61.62,
+4.55,
+[]
+],
+"Le LSD faisait partie des drogues testées.": [
+66.52,
+2.21,
+[]
+],
+"Et voici le plus important.": [
+69.08,
+1.43,
+[]
+],
+"Certaines des personnes testées étaient volontaires.": [
+70.86,
+2.36,
+[]
+],
+"D'autres n'ont jamais été prévenues.": [
+73.57,
+1.62,
+[]
+],
+"Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu.": [
+75.54,
+4.79,
+[
+2.75
+]
+],
+"À leur insu, ça veut dire sans le savoir.": [
+80.68,
+2.14,
+[]
+],
+"Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York.": [
+83.17,
+5.04,
+[
+2.56
+]
+],
+"Il n'y avait aucun consentement éclairé.": [
+88.56,
+1.98,
+[]
+],
+"Un cas montre ce que cela voulait dire.": [
+90.89,
+1.95,
+[]
+],
+"Le docteur Frank Olson était un employé civil de l'armée.": [
+93.19,
+4.02,
+[]
+],
+"En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.": [
+97.56,
+6.51,
+[
+4.12
+]
+],
+"Environ une semaine plus tard, il était mort.": [
+104.42,
+2.25,
+[]
+],
+"Alors, comment tout cela a-t-il été découvert ?": [
+107.02,
+2.28,
+[]
+],
+"En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church.": [
+109.65,
+7.62,
+[
+4.69
+]
+],
+"Sa mission était de découvrir si les agences de renseignement américaines avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.": [
+117.62,
+8.54,
+[
+6.395
+]
+],
+"Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un centre d'archives pour dossiers inactifs.": [
+126.51,
+9.02,
+[
+3.825
+]
+],
+"En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.": [
+135.88,
+6.18,
+[
+1.415
+]
+],
+"Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.": [
+142.41,
+7.82,
+[
+3.34
+]
+],
+"Mais ces cartons n'ont jamais été toute l'histoire.": [
+150.58,
+2.49,
+[]
+],
+"Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.": [
+153.42,
+8.67,
+[
+4.335
+]
+],
+"Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.": [
+162.44,
+7.39,
+[
+3.935
+]
+],
+"Le sénateur Kennedy l'a nommé : Richard Helms.": [
+170.18,
+3.45,
+[]
+],
+"Ce qui a survécu, ce sont surtout des dossiers financiers.": [
+173.98,
+2.96,
+[]
+],
+"Des avances, des pièces justificatives, des comptes.": [
+177.29,
+2.77,
+[]
+],
+"Alors, que sait-on vraiment ?": [
+180.41,
+1.32,
+[]
+],
+"Assez pour montrer que c'est arrivé.": [
+182.08,
+1.7,
+[]
+],
+"Pas assez pour savoir tout ce qui est arrivé.": [
+184.13,
+2.2,
+[]
+],
+"Une grande partie de l'histoire complète ne sera peut-être jamais connue.": [
+186.68,
+3.8,
+[]
+]
+}
+}

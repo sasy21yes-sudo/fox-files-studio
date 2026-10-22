@@ -1,0 +1,272 @@
+{
+"version": 1,
+"lang": "pt",
+"voice": "pf_dora",
+"engine": "Kokoro-82M v1.0 (kokoro-onnx)",
+"sampleRate": 24000,
+"audio": "pt-pf_dora.mp3",
+"duration": 194.1,
+"sentences": {
+"A CIA drogou pessoas que nunca souberam.": [
+0.35,
+2.42,
+[]
+],
+"Está nos registros do Senado.": [
+3.12,
+1.86,
+[]
+],
+"Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA.": [
+5.33,
+6.91,
+[
+3.18
+]
+],
+"A maioria dos seus arquivos tinha sido destruída anos antes.": [
+12.59,
+3.55,
+[]
+],
+"Mas não todos.": [
+16.49,
+1.11,
+[]
+],
+"O programa se chamava MKUltra.": [
+17.95,
+2.13,
+[]
+],
+"Então, o que era?": [
+20.43,
+1.18,
+[]
+],
+"E como a gente sabe?": [
+21.96,
+1.51,
+[]
+],
+"Vamos começar pelo que a própria CIA contou ao Senado.": [
+23.82,
+3.01,
+[]
+],
+"Segundo o depoimento do diretor da CIA, o MKUltra funcionou de 1953 a 1964.": [
+27.18,
+7.55,
+[
+3.465
+]
+],
+"São onze anos.": [
+35.08,
+1.1,
+[]
+],
+"Os registros que sobreviveram listam 149 subprojetos.": [
+36.53,
+4.08,
+[]
+],
+"Eles citam 80 instituições, e 44 delas eram faculdades e universidades.": [
+40.96,
+5.58,
+[]
+],
+"Também citam 185 pesquisadores e assistentes de fora do governo.": [
+46.89,
+4.92,
+[]
+],
+"Então, o que todos esses subprojetos faziam de verdade?": [
+52.16,
+3.27,
+[]
+],
+"O diretor os dividiu em categorias.": [
+55.78,
+2.36,
+[]
+],
+"Drogas e álcool.": [
+58.49,
+1.19,
+[]
+],
+"Hipnose.": [
+60.03,
+0.86,
+[]
+],
+"Pesquisa sobre o sono.": [
+61.24,
+1.46,
+[]
+],
+"Polígrafos.": [
+63.05,
+0.9,
+[]
+],
+"O registro também fala de drogas pensadas para ajudar em interrogatórios.": [
+64.3,
+4.4,
+[]
+],
+"O LSD estava entre as drogas testadas.": [
+69.05,
+2.79,
+[]
+],
+"E aqui está a parte que mais importa.": [
+72.19,
+2.23,
+[]
+],
+"Algumas das pessoas testadas eram voluntárias.": [
+74.77,
+2.88,
+[]
+],
+"Outras nunca foram avisadas.": [
+78.0,
+1.83,
+[]
+],
+"Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas.": [
+80.18,
+4.73,
+[]
+],
+"Desavisadas quer dizer que elas não sabiam.": [
+85.26,
+2.57,
+[]
+],
+"Alguns desses testes aconteceram em casas seguras em São Francisco e Nova York.": [
+88.18,
+4.64,
+[]
+],
+"Não houve consentimento informado.": [
+93.17,
+2.12,
+[]
+],
+"Um caso mostra o que isso significava.": [
+95.64,
+2.4,
+[]
+],
+"O doutor Frank Olson era um funcionário civil do Exército.": [
+98.39,
+3.32,
+[]
+],
+"Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber.": [
+102.06,
+5.88,
+[]
+],
+"Cerca de uma semana depois, estava morto.": [
+108.29,
+2.61,
+[]
+],
+"Então, como tudo isso veio à tona?": [
+111.25,
+2.04,
+[]
+],
+"Em janeiro de 1975, o Senado criou um comitê especial, presidido pelo senador Frank Church.": [
+113.64,
+6.95,
+[
+4.165
+]
+],
+"A missão dele era descobrir se as agências de inteligência dos Estados Unidos tinham feito algo ilegal, impróprio ou antiético.": [
+120.94,
+7.5,
+[
+3.355
+]
+],
+"Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do MKUltra num centro de arquivos inativos.": [
+128.79,
+9.11,
+[
+4.385
+]
+],
+"Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.": [
+138.25,
+4.87,
+[]
+],
+"O senador Edward Kennedy disse que a CIA tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.": [
+143.47,
+7.41,
+[
+2.985
+]
+],
+"Mas essas caixas nunca foram a história toda.": [
+151.23,
+2.67,
+[]
+],
+"Um relatório de 1963 do Inspetor-Geral da CIA levou ao fim dos testes em pessoas desavisadas em 1964.": [
+154.25,
+8.93,
+[
+4.455
+]
+],
+"E em 1973, arquivos do MKUltra foram destruídos com a autorização do então diretor da CIA.": [
+163.53,
+7.03,
+[
+3.785
+]
+],
+"O senador Kennedy disse o nome dele: Richard Helms.": [
+170.91,
+3.05,
+[]
+],
+"O que sobreviveu foram, principalmente, pastas financeiras.": [
+174.31,
+3.56,
+[]
+],
+"Adiantamentos, comprovantes, prestações de contas.": [
+178.22,
+3.11,
+[]
+],
+"Então, o que a gente sabe de verdade?": [
+181.68,
+2.31,
+[]
+],
+"O suficiente para mostrar que aconteceu.": [
+184.34,
+2.39,
+[]
+],
+"Não o suficiente para saber tudo o que aconteceu.": [
+187.08,
+2.8,
+[]
+],
+"Boa parte da história completa talvez nunca seja conhecida.": [
+190.23,
+3.52,
+[]
+]
+}
+}

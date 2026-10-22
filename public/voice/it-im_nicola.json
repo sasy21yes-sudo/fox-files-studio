@@ -1,0 +1,276 @@
+{
+"version": 1,
+"lang": "it",
+"voice": "im_nicola",
+"engine": "Kokoro-82M v1.0 (kokoro-onnx)",
+"sampleRate": 24000,
+"audio": "it-im_nicola.mp3",
+"duration": 210.69,
+"sentences": {
+"La CIA ha drogato persone che non ne sapevano nulla.": [
+0.35,
+3.02,
+[]
+],
+"È scritto negli atti del Senato.": [
+3.72,
+2.03,
+[]
+],
+"Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA.": [
+6.1,
+7.59,
+[
+3.62
+]
+],
+"La maggior parte dei suoi documenti era stata distrutta anni prima.": [
+14.04,
+4.1,
+[]
+],
+"Ma non tutti.": [
+18.49,
+1.0,
+[]
+],
+"Il programma si chiamava MKUltra.": [
+19.84,
+2.62,
+[]
+],
+"Quindi, che cos'era?": [
+22.81,
+1.4,
+[]
+],
+"E come facciamo a saperlo?": [
+24.56,
+1.79,
+[]
+],
+"Partiamo da ciò che la CIA stessa disse al Senato.": [
+26.7,
+2.99,
+[]
+],
+"Secondo la testimonianza del direttore della CIA, MKUltra andò avanti dal 1953 al 1964.": [
+30.04,
+9.71,
+[
+4.885
+]
+],
+"Sono undici anni.": [
+40.1,
+1.45,
+[]
+],
+"I documenti sopravvissuti elencano 149 sottoprogetti.": [
+41.9,
+4.48,
+[]
+],
+"Citano 80 istituzioni, e 44 di queste erano college e università.": [
+46.73,
+5.04,
+[]
+],
+"Citano anche 185 ricercatori e assistenti esterni al governo.": [
+52.12,
+4.99,
+[]
+],
+"Ma cosa facevano, in concreto, tutti questi sottoprogetti?": [
+57.46,
+3.62,
+[]
+],
+"Il direttore li divise in categorie.": [
+61.43,
+2.37,
+[]
+],
+"Droghe e alcol.": [
+64.15,
+1.14,
+[]
+],
+"Ipnosi.": [
+65.64,
+0.81,
+[]
+],
+"Ricerca sul sonno.": [
+66.8,
+1.51,
+[]
+],
+"Macchina della verità.": [
+68.66,
+1.47,
+[]
+],
+"Gli atti parlano anche di droghe pensate come aiuto negli interrogatori.": [
+70.48,
+4.18,
+[]
+],
+"Tra le droghe testate c'era l'LSD.": [
+75.01,
+2.32,
+[]
+],
+"E qui arriva la parte più importante.": [
+77.68,
+2.32,
+[]
+],
+"Alcune delle persone testate erano volontari.": [
+80.35,
+2.93,
+[]
+],
+"Ad altre non fu mai detto nulla.": [
+83.63,
+2.12,
+[]
+],
+"Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare.": [
+86.1,
+5.11,
+[]
+],
+"Ignare significa che non lo sapevano.": [
+91.56,
+2.34,
+[]
+],
+"Alcuni di quei test avvennero in case sicure a San Francisco e a New York.": [
+94.25,
+4.72,
+[
+2.845
+]
+],
+"Non c'era alcun consenso informato.": [
+99.32,
+2.41,
+[]
+],
+"Un caso mostra cosa significasse.": [
+102.08,
+2.42,
+[]
+],
+"Il dottor Frank Olson era un dipendente civile dell'Esercito.": [
+104.85,
+3.81,
+[]
+],
+"Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa.": [
+109.01,
+7.5,
+[
+5.21
+]
+],
+"Circa una settimana dopo, era morto.": [
+116.86,
+2.43,
+[]
+],
+"Quindi, come venne fuori tutto questo?": [
+119.64,
+2.42,
+[]
+],
+"Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Church.": [
+122.41,
+8.04,
+[
+4.925
+]
+],
+"Il suo compito era scoprire se le agenzie di intelligence americane avessero fatto qualcosa di illegale, scorretto o immorale.": [
+130.8,
+7.88,
+[
+3.41
+]
+],
+"Poi, nel 1977, un dipendente della CIA trovò sette scatole di documenti di MKUltra in un archivio di documenti dismessi.": [
+139.03,
+10.07,
+[
+4.76
+]
+],
+"Quell'agosto, i senatori interrogarono il direttore della CIA in un'audizione congiunta.": [
+149.45,
+5.27,
+[]
+],
+"Il senatore Edward Kennedy disse che la CIA aveva drogato cittadini americani senza che lo sapessero e senza il loro consenso.": [
+155.07,
+8.31,
+[
+4.78
+]
+],
+"Ma quelle scatole non erano mai state tutta la storia.": [
+163.73,
+3.18,
+[]
+],
+"Un rapporto del 1963 dell'Ispettore generale della CIA portò alla fine dei test su persone ignare nel 1964.": [
+167.26,
+10.23,
+[
+6.395
+]
+],
+"E nel 1973, i file di MKUltra furono distrutti su autorizzazione dell'allora direttore della CIA.": [
+177.84,
+8.24,
+[
+3.545
+]
+],
+"Il senatore Kennedy fece il suo nome: Richard Helms.": [
+186.43,
+3.22,
+[]
+],
+"Ciò che sopravvisse erano soprattutto fascicoli finanziari.": [
+190.0,
+3.62,
+[]
+],
+"Anticipi, giustificativi, rendiconti.": [
+193.97,
+2.62,
+[]
+],
+"Quindi, cosa sappiamo davvero?": [
+196.94,
+2.06,
+[]
+],
+"Abbastanza per dimostrare che è successo.": [
+199.35,
+2.92,
+[]
+],
+"Non abbastanza per sapere tutto ciò che è successo.": [
+202.62,
+3.25,
+[]
+],
+"Gran parte della storia completa potrebbe non venire mai alla luce.": [
+206.22,
+4.12,
+[]
+]
+}
+}

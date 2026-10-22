@@ -1,0 +1,274 @@
+{
+"version": 1,
+"lang": "en",
+"voice": "bm_george",
+"engine": "Kokoro-82M v1.0 (kokoro-onnx)",
+"sampleRate": 24000,
+"audio": "en-bm_george.mp3",
+"duration": 204.9,
+"sentences": {
+"The CIA drugged people who never knew.": [
+0.35,
+2.74,
+[]
+],
+"It's in the Senate record.": [
+3.44,
+1.76,
+[]
+],
+"In 1977, the United States Senate held a hearing about a secret CIA program.": [
+5.55,
+7.12,
+[
+3.805
+]
+],
+"Most of its files had been destroyed years earlier.": [
+13.02,
+3.56,
+[]
+],
+"But not all of them.": [
+16.93,
+1.36,
+[]
+],
+"The program was called MKUltra.": [
+18.64,
+2.69,
+[]
+],
+"So what was it?": [
+21.68,
+1.36,
+[]
+],
+"And how do we know?": [
+23.39,
+1.35,
+[]
+],
+"Let's start with what the CIA itself told the Senate.": [
+25.09,
+3.44,
+[]
+],
+"According to the CIA director's testimony, MKUltra ran from 1953 to 1964.": [
+28.88,
+9.25,
+[]
+],
+"That's eleven years.": [
+38.48,
+1.54,
+[]
+],
+"The surviving records list 149 subprojects.": [
+40.37,
+4.38,
+[]
+],
+"They name 80 institutions, and 44 of them were colleges and universities.": [
+45.1,
+5.6,
+[]
+],
+"They also name 185 researchers and assistants from outside the government.": [
+51.05,
+6.22,
+[]
+],
+"So what were all these subprojects actually doing?": [
+57.62,
+2.92,
+[]
+],
+"The director sorted them into categories.": [
+60.89,
+2.81,
+[]
+],
+"Drugs and alcohol.": [
+64.05,
+1.72,
+[]
+],
+"Hypnosis.": [
+66.12,
+1.08,
+[]
+],
+"Sleep research.": [
+67.55,
+1.3,
+[]
+],
+"Polygraphs.": [
+69.2,
+1.04,
+[]
+],
+"The record also covers drugs meant as aids to interrogation.": [
+70.59,
+4.59,
+[]
+],
+"LSD was among the drugs tested.": [
+75.53,
+2.64,
+[]
+],
+"And here is the part that matters most.": [
+78.52,
+2.71,
+[]
+],
+"Some of the people tested were volunteers.": [
+81.58,
+2.81,
+[]
+],
+"Some were never told.": [
+84.74,
+1.5,
+[]
+],
+"The testimony counted six subprojects that tested drugs on unwitting people.": [
+86.59,
+5.39,
+[]
+],
+"Unwitting means they didn't know.": [
+92.33,
+2.32,
+[]
+],
+"Some of those tests happened in safe houses in San Francisco and New York City.": [
+95.0,
+5.55,
+[
+3.075
+]
+],
+"There was no informed consent.": [
+100.9,
+2.13,
+[]
+],
+"One case shows what that meant.": [
+103.38,
+2.16,
+[]
+],
+"Dr. Frank Olson was an Army civilian employee.": [
+105.89,
+3.79,
+[]
+],
+"In 1953, at a meeting called by the CIA, he was given LSD without knowing it.": [
+110.03,
+7.11,
+[
+4.4
+]
+],
+"About a week later, he was dead.": [
+117.49,
+2.16,
+[]
+],
+"So how did any of this come out?": [
+120.0,
+1.99,
+[]
+],
+"In January 1975, the Senate created a special committee, chaired by Senator Frank Church.": [
+122.34,
+7.55,
+[
+5.265
+]
+],
+"Its job was to find out whether America's intelligence agencies had done anything illegal, improper or unethical.": [
+130.24,
+8.14,
+[
+4.155
+]
+],
+"Then, in 1977, a CIA employee found seven boxes of MKUltra records at a retired records center.": [
+138.73,
+9.8,
+[
+4.385
+]
+],
+"That August, senators questioned the CIA director at a joint hearing.": [
+148.88,
+4.99,
+[]
+],
+"Senator Edward Kennedy said the CIA had drugged American citizens without their knowledge or consent.": [
+154.22,
+7.06,
+[
+3.395
+]
+],
+"But those boxes were never the full story.": [
+161.63,
+2.89,
+[]
+],
+"A 1963 report by the CIA's Inspector General led to the end of unwitting testing in 1964.": [
+164.87,
+10.02,
+[
+5.275
+]
+],
+"And in 1973, MKUltra files were destroyed on the authority of the CIA director at the time.": [
+175.24,
+9.24,
+[
+4.43
+]
+],
+"Senator Kennedy named him: Richard Helms.": [
+184.83,
+3.09,
+[]
+],
+"What survived was mostly finance folders.": [
+188.27,
+3.04,
+[]
+],
+"Advances, vouchers, accountings.": [
+191.66,
+2.62,
+[]
+],
+"So what do we actually know?": [
+194.63,
+1.81,
+[]
+],
+"Enough to show it happened.": [
+196.79,
+1.68,
+[]
+],
+"Not enough to know everything that happened.": [
+198.82,
+2.54,
+[]
+],
+"Much of the full story may never be known.": [
+201.71,
+2.84,
+[]
+]
+}
+}

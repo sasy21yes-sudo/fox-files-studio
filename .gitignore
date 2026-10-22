@@ -1,0 +1,9 @@
+node_modules/
+dist/
+voice/models
+voice/.cues-*.mjs
+tools/weights/
+art/parts/up/
+__pycache__/
+*.pyc
+.DS_Store

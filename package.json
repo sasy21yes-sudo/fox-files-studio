@@ -1,0 +1,25 @@
+{
+  "name": "fox-files-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "The Fox Files Studio — a browser-only animated documentary editor for one MKUltra episode.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "mp4-muxer": "^5.2.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.3",
+    "vite": "^7.0.0"
+  }
+}
