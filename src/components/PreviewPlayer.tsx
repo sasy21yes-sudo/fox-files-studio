@@ -111,7 +111,7 @@ export function PreviewPlayer({ project, timeline, playback, audioLabel, editing
       subtitles,
       burnSubtitles: true,
       showSafeArea,
-      probe: editing ? probe.current : undefined,
+      probe: editing ? Object.assign(probe.current, { measure: showHandles }) : undefined,
     });
     if (!editing) return;
     // While playing, report at most 4 times a second (the inspector re-renders on each report).

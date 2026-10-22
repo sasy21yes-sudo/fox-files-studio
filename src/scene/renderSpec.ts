@@ -106,12 +106,48 @@ function toShot(spec: SceneSpec, s: Stage, light: number, shot: ShotSpec, fox: F
   };
 }
 
+let measureCanvas: HTMLCanvasElement | OffscreenCanvas | null = null;
+/** Draw something alone on a transparent copy of the frame and return its pixel bbox (canvas px). */
+function measureDraw(g: CanvasRenderingContext2D, draw: (o: CanvasRenderingContext2D) => void): [number, number, number, number] | undefined {
+  const W = g.canvas.width;
+  const H = g.canvas.height;
+  if (!measureCanvas || measureCanvas.width !== W || measureCanvas.height !== H) {
+    measureCanvas = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(W, H) : Object.assign(document.createElement('canvas'), { width: W, height: H });
+  }
+  const o = measureCanvas.getContext('2d', { willReadFrequently: true }) as CanvasRenderingContext2D | null;
+  if (!o) return undefined;
+  o.setTransform(1, 0, 0, 1, 0, 0);
+  o.clearRect(0, 0, W, H);
+  o.setTransform(g.getTransform());
+  draw(o);
+  const d = o.getImageData(0, 0, W, H).data;
+  let x0 = W;
+  let y0 = H;
+  let x1 = -1;
+  let y1 = -1;
+  for (let y = 0; y < H; y += 2) {
+    const row = y * W * 4;
+    for (let x = 0; x < W; x += 2) {
+      if (d[row + x * 4 + 3] > 24) {
+        if (x < x0) x0 = x;
+        if (x > x1) x1 = x;
+        if (y < y0) y0 = y;
+        if (y > y1) y1 = y;
+      }
+    }
+  }
+  return x1 < 0 ? undefined : [x0, y0, x1 + 2, y1 + 2];
+}
+
 function drawElement(s: Stage, light: number, el: ElementBase) {
   const def = ELEMENTS[el.type as keyof typeof ELEMENTS];
   if (!def) return;
   const { g, w, h, k } = s;
   const c = placeElement(el, s, light);
-  s.probe?.anchors.push({ id: el.id, x: c.x, y: c.y, box: def.bounds?.(c) });
+  if (s.probe) {
+    const bbox = s.probe.measure ? measureDraw(s.g, (o) => drawElement({ ...s, g: o, probe: undefined }, light, el)) : undefined;
+    s.probe.anchors.push({ id: el.id, x: c.x, y: c.y, box: def.bounds?.(c), bbox });
+  }
   const base = def.base ? def.base(c) : { x: c.x, y: c.y };
   const enter = el.enter && el.enter.kind !== 'none' ? el.enter : null;
   const p = enter ? seg(k, enter.at, enter.dur) : 1;
@@ -157,9 +193,18 @@ function drawElement(s: Stage, light: number, el: ElementBase) {
   } else if (el.bounce) {
     beatBounce(g, base.x, base.y, s.time, el.bounce.amt, el.bounce.phase);
   }
-  def.draw(c);
+  if (c.rot && !NATIVE_ROT.has(el.type)) {
+    // Elements whose drawing ignores rotation turn around their base point here.
+    g.translate(base.x, base.y);
+    g.rotate(c.rot);
+    g.translate(-base.x, -base.y);
+    def.draw({ ...c, rot: 0 });
+  } else def.draw(c);
   g.restore();
 }
+
+/** Element types that apply `rot` themselves (folder, paper, stamp, picture). */
+const NATIVE_ROT = new Set(['folder', 'paper', 'stamp', 'picture']);
 
 function foxPose(spec: SceneSpec, s: Stage, light: number, fox: FoxElement, place: FoxPlace): FoxPose {
   const { k, vertical: V } = s;
@@ -283,8 +328,9 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
       if (!visible(el) || onScreen(el)) continue;
       if (isFox(el)) {
         const p = el === fox && place ? place : foxPlace(el, s);
-        s.probe?.anchors.push({ id: el.id, x: p.x, y: p.y });
-        drawFox(g, foxPose(spec, s, light, el, p));
+        const pose = foxPose(spec, s, light, el, p);
+        if (s.probe) s.probe.anchors.push({ id: el.id, x: p.x, y: p.y, bbox: s.probe.measure ? measureDraw(g, (o) => drawFox(o, pose)) : undefined });
+        drawFox(g, pose);
       } else drawElement(s, light, el);
     }
   });

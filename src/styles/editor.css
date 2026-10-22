@@ -1066,3 +1066,26 @@ textarea.itext {
   display: inline-flex;
   flex-wrap: wrap;
 }
+.ov-sel {
+  fill: rgba(217, 180, 101, 0.06);
+  stroke: var(--brass-hi);
+  pointer-events: all;
+}
+.ov-hover .ov-box {
+  stroke: #9fd0ff;
+  stroke-dasharray: none;
+}
+.ov-corner {
+  fill: #fff;
+  stroke: #1a1210;
+  pointer-events: all;
+}
+.ov-rotate {
+  fill: var(--brass-hi);
+  stroke: #1a1210;
+  pointer-events: all;
+}
+.ov-pivot {
+  fill: none;
+  stroke: #fff;
+}

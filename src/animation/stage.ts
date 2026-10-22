@@ -16,7 +16,9 @@ export interface RenderProbe {
   matrix: DOMMatrix | null;
   /** Transform of screen-layer elements (no camera). */
   screen?: DOMMatrix | null;
-  anchors: { id: string; x: number; y: number; box?: { w: number; h: number; rot: number }; screen?: boolean }[];
+  anchors: { id: string; x: number; y: number; box?: { w: number; h: number; rot: number }; screen?: boolean; bbox?: [number, number, number, number] }[];
+  /** Also measure each element's drawn extent (canvas px bbox); costly, only while paused in the editor. */
+  measure?: boolean;
   /** Agent Fox as drawn in this frame: pose, face, arms and joints on the canvas (any scene). */
   fox?: import('../character/AgentFox').FoxDebug | null;
 }

@@ -30,7 +30,8 @@ import { useProjectMedia } from '../media/useMedia';
 import { ShortcutsDialog } from '../editor/ShortcutsDialog';
 import { FoxMonitor } from '../editor/FoxMonitor';
 import type { FoxDebug } from '../character/AgentFox';
-import { uniqueId } from '../editor/model';
+import { uniqueId, updateElement } from '../editor/model';
+import { setNumFor } from '../editor/StageOverlay';
 import type { SceneElement } from '../scene/spec';
 
 const FRAME = 1 / 30;
@@ -355,6 +356,24 @@ export function App() {
         e.preventDefault();
         return;
       }
+      // Alt + arrows: nudge the selected element (Shift = bigger steps), in the format on screen.
+      if (e.altKey && e.key.startsWith('Arrow') && sel.kind === 'element') {
+        e.preventDefault();
+        const st = e.shiftKey ? 0.02 : 0.004;
+        const dx = e.key === 'ArrowLeft' ? -st : e.key === 'ArrowRight' ? st : 0;
+        const dy = e.key === 'ArrowUp' ? -st : e.key === 'ArrowDown' ? st : 0;
+        const V = project.settings.aspect === '9:16';
+        const s0 = sel;
+        setProject(
+          (p) =>
+            updateElement(p, s0.scene, s0.id, (el) => {
+              const cur = (n: unknown) => (typeof n === 'number' ? n : n && typeof n === 'object' ? (V ? (n as { v: number }).v : (n as { h: number }).h) : 0);
+              return { ...el, x: setNumFor(el.x, V, cur(el.x) + dx), y: setNumFor(el.y, V, cur(el.y) + dy) };
+            }),
+          `nudge:${s0.id}`,
+        );
+        return;
+      }
       const t = playback.time;
       switch (e.key) {
         case ' ':
@@ -402,7 +421,7 @@ export function App() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [playback, hist, timeline.total, deleteSelected, sel, project.scenes, pasteElement]);
+  }, [playback, hist, timeline.total, deleteSelected, sel, project.scenes, project.settings.aspect, pasteElement, setProject]);
 
   const s = project.settings;
   const audioLabel = [
