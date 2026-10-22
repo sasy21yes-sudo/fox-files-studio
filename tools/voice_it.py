@@ -34,6 +34,9 @@ SAY_IT = {
     'San Francisco': 'San Francisco',
     'New York': 'Niu Iòrk',
     'Agent Fox': 'Agent Fox',
+    # Short fragments the model swallows: stressed spelling.
+    'Ricerca': 'Ricèrca',
+    'ricerca': 'ricèrca',
 }
 _SAY_RE = re.compile(r'\b(' + '|'.join(re.escape(k) for k in sorted(SAY_IT, key=len, reverse=True)) + r')\b')
 
