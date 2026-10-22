@@ -1,7 +1,9 @@
 """
 Contact sheet for one generated sheet: the chosen version large on top, the
 discarded attempts below, each captioned with version, size, status and the
-review note from art/incoming/manifest.json.
+review note from art/incoming/manifest.json. Sheets built from single pieces
+(tools/comfy) also get one row per piece: the chosen render first, then every
+discarded attempt with the reason.
 
 Usage: python tools/gemini/review.py <sheet> [--manifest path] [--out path]
 Output: art/incoming/review_<sheet>.jpg
@@ -43,6 +45,43 @@ def tile(v, width):
     return out
 
 
+def grid(tiles, cols):
+    """Lay tiles (same width) out in rows of `cols`."""
+    tw = tiles[0].shape[1]
+    rows = []
+    for i in range(0, len(tiles), cols):
+        part = tiles[i:i + cols]
+        rh = max(t.shape[0] for t in part)
+        row = np.full((rh, W, 3), PAPER, np.uint8)
+        for j, t in enumerate(part):
+            row[:t.shape[0], j * (tw + PAD):j * (tw + PAD) + tw] = t
+        rows.append(row)
+    return rows
+
+
+def label(text):
+    out = np.full((40, W, 3), PAPER, np.uint8)
+    cv2.line(out, (0, 4), (W - 1, 4), INK, 1)
+    cv2.putText(out, text, (6, 32), cv2.FONT_HERSHEY_SIMPLEX, 0.8, INK, 2, cv2.LINE_AA)
+    return out
+
+
+def piece_rows(man, sheet):
+    """One block per piece: chosen render first, then the discarded attempts."""
+    cols = 6
+    tw = (W - PAD * (cols - 1)) // cols
+    rows = []
+    for key, entry in man['sheets'].items():
+        if not key.startswith(sheet + '/'):
+            continue
+        vs = [v for v in entry['versions'] if v.get('file') and os.path.exists(os.path.join(ROOT, v['file']))]
+        vs.sort(key=lambda v: v['status'] not in ('approved', 'final'))
+        ok = sum(v['status'] in ('approved', 'final') for v in vs)
+        rows.append(label(f"{key.split('/', 1)[1]}  -  {len(vs)} attempt(s), {'chosen ' + vs[0]['version'] if ok else 'NONE APPROVED'}"))
+        rows += grid([tile(v, tw) for v in vs], cols)
+    return rows
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('sheet')
@@ -56,16 +95,9 @@ def main():
         raise SystemExit(f'{a.sheet}: no final/approved version')
     top = tile(chosen[-1], W)
     rest = [v for v in vs if v is not chosen[-1]]
-    rows = [top]
     cols = 3
     tw = (W - PAD * (cols - 1)) // cols
-    for i in range(0, len(rest), cols):
-        tiles = [tile(v, tw) for v in rest[i:i + cols]]
-        rh = max(t.shape[0] for t in tiles)
-        row = np.full((rh, W, 3), PAPER, np.uint8)
-        for j, t in enumerate(tiles):
-            row[:t.shape[0], j * (tw + PAD):j * (tw + PAD) + tw] = t
-        rows.append(row)
+    rows = [top] + (grid([tile(v, tw) for v in rest], cols) if rest else []) + piece_rows(man, a.sheet)
     sep = np.full((PAD, W, 3), PAPER, np.uint8)
     sheet = np.vstack([x for r in rows for x in (r, sep)][:-1])
     out = a.out or os.path.join(ROOT, 'art', 'incoming', f'review_{a.sheet}.jpg')
