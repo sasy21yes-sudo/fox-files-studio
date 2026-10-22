@@ -9,6 +9,7 @@
 import rigJson from './rig.json';
 import { RIG_ASSETS } from './assets';
 import { MASTER_FACE } from './masterFace';
+import { face as faceTweak } from './tweaks';
 
 type G = CanvasRenderingContext2D;
 export type V2 = [number, number];
@@ -576,7 +577,7 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   // The traced heavy lid is the rest pose: the animated lid starts beyond the rig's resting value.
   const lid = Math.min(1, Math.max(0, (f.lid[i] - 0.1) / 0.9));
   const n = E.whiteTop.length;
-  const tilt = f.lidTilt * 0.22; // inner corner lower when angry, higher when worried
+  const tilt = f.lidTilt * faceTweak('lidTilt'); // inner corner lower when angry, higher when worried
   // 3/4 view: the inner corner (toward the nose bridge) is +x on the near eye, -x on the far eye.
   const inward = side === 'near' ? 1 : -1;
   const edge: V2[] = [];
@@ -586,7 +587,7 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   const c0 = mix(E.whiteTop[0], E.whiteBot[0], 0.5);
   const c1 = mix(E.whiteTop[n - 1], E.whiteBot[n - 1], 0.5);
   const sag = E.height * 0.16;
-  const lowLid = Math.pow(lid, 1.6) * 0.75 + f.squint * 0.45;
+  const lowLid = Math.pow(lid, 1.6) * 0.75 + f.squint * faceTweak('squint');
   for (let j = 0; j < n; j++) {
     const top = E.whiteTop[j];
     const bot = E.whiteBot[j];
@@ -702,9 +703,10 @@ function drawBrows(g: G, f: Face) {
     const xs = pts.map((p) => p[0]);
     const xMin = Math.min(...xs);
     const xMax = Math.max(...xs);
-    const sk = i === 1 ? -skeptic * 0.16 : skeptic * 0.06;
-    const lift = -raise * 0.12 + sk;
-    const inner = angry * 0.32 - worry * 0.18;
+    const skw = faceTweak('browSkeptic');
+    const sk = i === 1 ? -skeptic * skw : skeptic * skw * 0.4;
+    const lift = -raise * faceTweak('browRaise') + sk;
+    const inner = angry * faceTweak('browAngry') - worry * faceTweak('browWorry');
     const outer = -angry * 0.05 + worry * 0.06;
     const cx = xs.reduce((a, b) => a + b, 0) / xs.length;
     const cy = pts.reduce((a, p) => a + p[1], 0) / pts.length;

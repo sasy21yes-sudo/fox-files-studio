@@ -1,4 +1,5 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
+import { face as faceTweak, motion, tweaks } from './rig/tweaks';
 import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 export { loadRig as loadPuppet } from './rig/rigPuppet';
 
@@ -154,12 +155,13 @@ const IN = 3.5;
 // ------------------------------------------------------------------ timing helpers
 
 export function blinkAmount(time: number, seed = 1): number {
-  const period = 3.2;
+  const period = motion('blinkPeriod');
   const cycle = Math.floor(time / period);
   const offset = 0.3 + hash(cycle * 31 + seed) * 2.5;
   const p = time - cycle * period - offset;
-  if (p < 0 || p > 0.16) return 0;
-  return 1 - Math.abs(p / 0.08 - 1);
+  const len = motion('blinkLength');
+  if (p < 0 || p > len) return 0;
+  return 1 - Math.abs(p / (len / 2) - 1);
 }
 
 /** Fallback lip-sync when no narration text is available. */
@@ -1654,9 +1656,18 @@ function physStates(arms: { front: ArmState; back: ArmState }): Record<Phys, Arm
   return { far, near };
 }
 
+/** The built-in pose of an arm (before tweaks), for the tuner. phys: 'near' = left arm, 'far' = right arm. */
+export function builtInArm(phys: 'near' | 'far', mode: ArmMode): { t: [number, number]; rot?: number; hand: string; layer: string } {
+  const T = phys === 'far' ? FAR_T : NEAR_T;
+  const d = T[mode] ?? T.rest!;
+  return { t: [d.t[0], d.t[1]], rot: d.rot, hand: d.hand, layer: d.layer };
+}
+
 function armDef(phys: Phys, mode: ArmMode): ArmDef {
   const T = phys === 'far' ? FAR_T : NEAR_T;
-  return T[mode] ?? T.rest!;
+  const base = T[mode] ?? T.rest!;
+  const tw = tweaks().arms[phys]?.[mode];
+  return tw ? ({ ...base, ...tw, rot: tw.rot === null ? undefined : (tw.rot ?? base.rot) } as ArmDef) : base;
 }
 
 function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
@@ -1673,7 +1684,7 @@ function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
     let p: V2 = [D.t[0] * RK, D.t[1] * RK];
     if (mode === 'rest' || (phys === 'far' && mode === 'notebook')) {
       // Arms swing opposite to the legs while walking, sway a little on the beat otherwise.
-      const swing = Math.sin(phase + (phys === 'far' ? 0 : Math.PI)) * 34 * walk + Math.sin((t * Math.PI) / BEAT) * 3 * (1 - walk);
+      const swing = Math.sin(phase + (phys === 'far' ? 0 : Math.PI)) * motion('armSwing') * walk + Math.sin((t * Math.PI) / BEAT) * 3 * (1 - walk);
       // Overlapping action: hanging hands lag the body's bounce and follow its bend.
       const bounce = (pose.bounce ?? 1) * (1 - walk);
       const lagY = (beatLift(t) - beatLift(t - 0.12)) * 12 * bounce;
@@ -1778,7 +1789,7 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   const walk = clamp(pose.walk ?? 0);
   const phase = pose.walkPhase ?? time * TAU * 1.6;
   const surprise = clamp(pose.surprise ?? 0);
-  const bounceAmt = (pose.bounce ?? 1) * (1 - walk);
+  const bounceAmt = (pose.bounce ?? 1) * motion('bounce') * (1 - walk);
   const lift = beatLift(time);
   const landing = Math.pow(1 - lift, 6);
   const walkBob = Math.abs(Math.cos(phase)) * 12 * walk;
@@ -1814,15 +1825,15 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     squint: angry * 0.22 + skeptic * 0.18,
     happy,
     wink: !!pose.wink,
-    eyeScale: 1 + surprise * 0.12,
-    pupil: 1 - surprise * 0.25,
+    eyeScale: (1 + surprise * 0.12) * faceTweak('eyeScale'),
+    pupil: (1 - surprise * 0.25) * faceTweak('pupil'),
     brows: { raise: (pose.brows ?? 0) + surprise * 1.2, worry, angry, skeptic },
     mouth: happy && !speaking ? 11 : VISEME_MOUTH[shape],
   };
 
   // Head motion: beat lag, talking nods, idle sway, mood, gaze.
-  const talkNod = speaking ? Math.sin(time * 6.3) * 0.025 + Math.sin(time * 2.7) * 0.018 : 0;
-  const idle = (Math.sin(time * 1.1) * 0.02 + Math.sin(time * 0.53 + 1) * 0.012) * (1 - walk);
+  const talkNod = speaking ? (Math.sin(time * 6.3) * 0.025 + Math.sin(time * 2.7) * 0.018) * motion('talkNod') : 0;
+  const idle = (Math.sin(time * 1.1) * 0.02 + Math.sin(time * 0.53 + 1) * 0.012) * (1 - walk) * motion('headSway');
   const headRot = (pose.headTilt ?? 0) + clamp(pose.lookY ?? 0, -1, 1) * 0.05 + talkNod + idle - surprise * 0.06 + angry * 0.03 + beatLift(time - 0.08) * 0.03 * bounceAmt;
 
   // Arms.
@@ -1869,7 +1880,7 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
 
   // Rubber-hose legs: hips ride the body, feet stay planted (or step), knees bow forward.
   const B = bob * RK;
-  const stride = 30 * RK * walk;
+  const stride = motion('walkStride') * RK * walk;
   const leg = (name: 'near' | 'far', ph: number) => {
     const hip0 = name === 'near' ? J.hipNear : J.hipFar;
     const L = rigPart(`leg_${name}`).len!;
@@ -1886,12 +1897,12 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   };
   // Spine: idle sway, talking emphasis, recoil on a take, lean toward a reach; the coat hem trails.
   const reach = ['point', 'magnify', 'wave'].includes(far.prop) ? 1 : 0;
-  spine.top = (Math.sin(time * 1.1) * 9 + Math.sin(time * 0.47 + 2) * 5) * (1 - walk) + (speaking ? Math.sin(time * 3.3) * 7 : 0) - surprise * 34 + reach * 16 + walk * 10;
+  spine.top = ((Math.sin(time * 1.1) * 9 + Math.sin(time * 0.47 + 2) * 5) * (1 - walk) + (speaking ? Math.sin(time * 3.3) * 7 : 0)) * motion('spineSway') - surprise * 34 + reach * 16 + walk * 10;
   spine.hem = Math.sin(phase - 0.7) * 18 * walk + (beatLift(time - 0.12) - 0.5) * 8 * bounceAmt - (pose.lean ?? 0) * 60;
   g.save();
   g.translate(0, B);
   // Tail: a travelling wave from the base to the tip (the drawing bends, it doesn't just pivot).
-  const wagAmp = 46 + walk * 30 + surprise * 50;
+  const wagAmp = motion('tailWag') + walk * 30 + surprise * 50;
   mark(g, 'tail', J.tailBase);
   if (debugSink) {
     for (const A of [near, far]) {
@@ -1903,7 +1914,7 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   }
   anchoredWarp(g, 'tail', J.tailBase[0], J.tailBase[1], tailRot * 0.35, (v) => {
     const d = Math.max(0, Math.min(1, -v / 470));
-    return wagAmp * Math.sin(time * 2.6 - d * 2.4) * Math.pow(d, 1.4) + Math.sin(time * 18) * 14 * surprise * d;
+    return wagAmp * Math.sin(time * motion('tailSpeed') - d * 2.4) * Math.pow(d, 1.4) + Math.sin(time * 18) * 14 * surprise * d;
   }, 3);
   if (near.layer === 'behind') drawRigArm(g, near);
   g.restore();

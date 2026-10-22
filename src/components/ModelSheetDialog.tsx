@@ -1,12 +1,16 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { RigTuner } from '../editor/RigTuner';
+import { MouthLab } from '../editor/MouthLab';
 import { SHEET_H, SHEET_W, drawModelSheet } from '../character/modelSheet';
 import { loadCanvasFonts } from '../app/fonts';
 
 /** Agent Fox model sheet, drawn live by the same rig the episode uses. */
 export function ModelSheetDialog({ onClose }: { onClose(): void }) {
   const ref = useRef<HTMLCanvasElement>(null);
+  const [tab, setTab] = useState<'sheet' | 'tune' | 'mouths'>('sheet');
 
   useEffect(() => {
+    if (tab !== 'sheet') return;
     let raf = 0;
     let alive = true;
     const t0 = performance.now();
@@ -21,7 +25,7 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
       alive = false;
       cancelAnimationFrame(raf);
     };
-  }, []);
+  }, [tab]);
 
   const save = () => {
     const c = ref.current;
@@ -44,19 +48,34 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
       <div className="modal sheet-modal">
         <header className="modal-head">
           <h2 id="sheet-title">Agent Fox · model sheet</h2>
+          <div className="segmented compact sheet-tabs">
+            {(['sheet', 'tune', 'mouths'] as const).map((k) => (
+              <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>
+                {k === 'sheet' ? 'Sheet' : k === 'tune' ? 'Tune poses & motion' : 'Mouths'}
+              </button>
+            ))}
+          </div>
           <div className="row gap">
-            <button className="btn small" onClick={save}>
-              Save PNG
-            </button>
+            {tab === 'sheet' && (
+              <button className="btn small" onClick={save}>
+                Save PNG
+              </button>
+            )}
             <button className="btn icon ghost" onClick={onClose} aria-label="Close">
               ✕
             </button>
           </div>
         </header>
-        <canvas ref={ref} width={SHEET_W} height={SHEET_H} className="sheet-canvas" aria-label="Agent Fox model sheet: proportions, expressions, mouth chart, hands and key poses" />
-        <p className="help">
-          Everything on this sheet is drawn live by the episode’s character rig (painted puppet or vector rig, per Format &amp; look), so the animation always matches the model.
-        </p>
+        {tab === 'sheet' && (
+          <>
+            <canvas ref={ref} width={SHEET_W} height={SHEET_H} className="sheet-canvas" aria-label="Agent Fox model sheet: proportions, expressions, mouth chart, hands and key poses" />
+            <p className="help">
+              Everything on this sheet is drawn live by the episode’s character rig (painted puppet or vector rig, per Format &amp; look), so the animation always matches the model.
+            </p>
+          </>
+        )}
+        {tab === 'tune' && <RigTuner />}
+        {tab === 'mouths' && <MouthLab />}
       </div>
     </div>
   );
