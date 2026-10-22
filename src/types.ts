@@ -1,6 +1,7 @@
 // Shared domain types for The Fox Files Studio.
 import type { Lang } from './i18n/languages';
 import type { SceneSpec } from './scene/spec';
+import type { Beat } from './data/mkultraScript';
 
 export type AspectRatio = '9:16' | '16:9';
 
@@ -8,7 +9,11 @@ export type NarrationMode = 'studio' | 'speech' | 'file' | 'off';
 
 export type TransitionType = 'iris' | 'fade' | 'flash' | 'ink';
 
-export type SceneId = 'file' | 'question' | 'experiments' | 'cost' | 'revelation' | 'known';
+/** The six hand-coded scenes of the MKUltra episode. */
+export type MkSceneId = 'file' | 'question' | 'experiments' | 'cost' | 'revelation' | 'known';
+
+/** Any scene id: the MKUltra ones or a generated one ("scene-xxxx") in other episodes. */
+export type SceneId = string;
 
 /** One animated scene of the episode. Durations are in seconds. */
 export interface Scene {
@@ -32,6 +37,12 @@ export interface Scene {
   sourceIds: string[];
   /** Data-driven choreography (scene/spec.ts). When absent the hand-coded renderer for `id` is used. */
   spec?: SceneSpec;
+  /** Explainer pop-ups in the current language. MKUltra scenes fall back to i18n/scripts.ts. */
+  beats?: Beat[];
+  /** Pop-ups kept per language, like `narrations`. */
+  beatsByLang?: Partial<Record<Lang, Beat[]>>;
+  /** Titles kept per language (episodes other than MKUltra). */
+  titles?: Partial<Record<Lang, string>>;
 }
 
 export interface SubtitleStyle {
@@ -68,9 +79,23 @@ export interface ProjectSettings {
   characterStyle: 'painted' | 'vector';
 }
 
+/** Cold-open line of the vertical Short. */
+export interface Hook {
+  text: string;
+  keywords: string[];
+}
+
 export interface Project {
   id: string;
   schemaVersion: number;
+  /** 'mkultra' = the original episode (texts and translations from i18n/scripts.ts); 'custom' = everything lives in the project. */
+  template: 'mkultra' | 'custom';
+  /** Last edit (ms since epoch), for the project library. */
+  updated?: number;
+  /** Short hook for custom episodes, per language. */
+  hooks?: Partial<Record<Lang, Hook>>;
+  /** Bibliography of a custom episode (MKUltra uses data/sources.ts). */
+  sources?: Source[];
   title: string;
   episodeTitle: string;
   episodeSubtitle: string;

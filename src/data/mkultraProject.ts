@@ -1,21 +1,23 @@
 import type { Project, Scene, TransitionType } from '../types';
 import { MKULTRA_SCRIPT } from './mkultraScript';
 import { SPECS } from './specs';
-import { isSceneSpec } from '../scene/validate';
 import { scriptFor } from '../i18n/scripts';
-import { isLang, type Lang } from '../i18n/languages';
+import type { Lang } from '../i18n/languages';
+import { PROJECT_SCHEMA_VERSION, defaultSettings } from './project';
 
-export const PROJECT_SCHEMA_VERSION = 7;
+export { MIN_SCENE_DURATION, MAX_SCENE_DURATION, restoreProject, switchLanguage } from './project';
 
 /** Length the scene choreography (scenes/*.ts) was keyed for; it time-stretches to the real duration. */
 const CHOREOGRAPHY_LENGTH: Record<string, number> = { file: 9, question: 14, experiments: 14, cost: 18, revelation: 18, known: 17 };
+/** Where schema v7 kept the single project (migrated into the library on first load). */
 export const STORAGE_KEY = 'fox-files-studio:mkultra-project';
+export const MKULTRA_PROJECT_ID = 'mkultra-secret-experiments';
 
 const TRANSITIONS: TransitionType[] = ['iris', 'ink', 'flash', 'fade', 'ink', 'iris'];
 
-export function createMkultraProject(lang: Lang = 'en'): Project {
+export function createMkultraScenes(lang: Lang): Scene[] {
   const script = scriptFor(lang);
-  const scenes: Scene[] = MKULTRA_SCRIPT.map((entry, i) => ({
+  return MKULTRA_SCRIPT.map((entry, i) => ({
     id: entry.id,
     number: i + 1,
     title: script.scenes[entry.id].title,
@@ -28,97 +30,18 @@ export function createMkultraProject(lang: Lang = 'en'): Project {
     sourceIds: [...entry.sourceIds],
     ...(SPECS[entry.id] ? { spec: structuredClone(SPECS[entry.id]) } : {}),
   }));
+}
 
+export function createMkultraProject(lang: Lang = 'en'): Project {
+  const script = scriptFor(lang);
   return {
-    id: 'mkultra-secret-experiments',
+    id: MKULTRA_PROJECT_ID,
     schemaVersion: PROJECT_SCHEMA_VERSION,
+    template: 'mkultra',
     title: 'The Fox Files',
     episodeTitle: script.episodeTitle,
     episodeSubtitle: script.episodeSubtitle,
-    scenes,
-    settings: {
-      aspect: '16:9',
-      filmGrain: true,
-      previewSpeed: 1,
-      subtitles: { enabled: true, fontScale: 1, position: 0.15, highlightKeywords: true },
-      music: true,
-      musicVolume: 0.55,
-      language: lang,
-      studioVoice: {},
-      voiceURI: null,
-      speechRate: 0.9,
-      narrationMode: 'studio',
-      showSafeArea: false,
-      chapterCards: true,
-      shortHook: true,
-      characterStyle: 'painted',
-    },
+    scenes: createMkultraScenes(lang),
+    settings: defaultSettings(lang),
   };
-}
-
-export const MIN_SCENE_DURATION = 5;
-export const MAX_SCENE_DURATION = 60;
-
-/** Validate and merge a stored project onto the defaults. Returns null if unusable. */
-export function restoreProject(raw: unknown): Project | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const stored = raw as Partial<Project>;
-  if (stored.schemaVersion !== PROJECT_SCHEMA_VERSION || !Array.isArray(stored.scenes)) return null;
-  const lang = isLang(stored.settings?.language) ? stored.settings!.language : 'en';
-  const base = createMkultraProject(lang);
-  const scenes = base.scenes.map((scene) => {
-    const s = stored.scenes!.find((x) => x && x.id === scene.id);
-    if (!s) return scene;
-    return {
-      ...scene,
-      duration: clampNum(s.duration, MIN_SCENE_DURATION, MAX_SCENE_DURATION, scene.duration),
-      transition: (['iris', 'fade', 'flash', 'ink'] as const).includes(s.transition as TransitionType)
-        ? (s.transition as TransitionType)
-        : scene.transition,
-      narration: typeof s.narration === 'string' ? s.narration : scene.narration,
-      keywords: Array.isArray(s.keywords) ? s.keywords.filter((k) => typeof k === 'string') : scene.keywords,
-      narrations: s.narrations && typeof s.narrations === 'object' ? s.narrations : undefined,
-      spec: isSceneSpec(s.spec) ? s.spec : scene.spec,
-    };
-  });
-  return {
-    ...base,
-    scenes,
-    settings: {
-      ...base.settings,
-      ...(stored.settings ?? {}),
-      language: lang,
-      studioVoice: { ...(stored.settings?.studioVoice ?? {}) },
-      subtitles: { ...base.settings.subtitles, ...(stored.settings?.subtitles ?? {}) },
-    },
-  };
-}
-
-/**
- * Switch the narration language. The current text is kept under the old
- * language (so edits survive a round trip) and the new language's text is
- * restored — the user's edit if there is one, otherwise the translation.
- */
-export function switchLanguage(project: Project, lang: Lang): Project {
-  const old = project.settings.language ?? 'en';
-  if (old === lang) return project;
-  const script = scriptFor(lang);
-  const oldScript = scriptFor(old);
-  return {
-    ...project,
-    episodeTitle: script.episodeTitle,
-    episodeSubtitle: script.episodeSubtitle,
-    scenes: project.scenes.map((s) => {
-      const narrations = { ...(s.narrations ?? {}) };
-      if (s.narration !== oldScript.scenes[s.id].narration) narrations[old] = s.narration;
-      else delete narrations[old];
-      const loc = script.scenes[s.id];
-      return { ...s, title: loc.title, narration: narrations[lang] ?? loc.narration, keywords: [...loc.keywords], narrations };
-    }),
-    settings: { ...project.settings, language: lang },
-  };
-}
-
-function clampNum(v: unknown, min: number, max: number, fallback: number): number {
-  return typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(min, v)) : fallback;
 }

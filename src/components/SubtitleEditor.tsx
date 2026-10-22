@@ -1,6 +1,6 @@
 import type { Project, Scene, SubtitleStyle } from '../types';
 import { countWords, formatTime, type Timeline } from '../animation/timeline';
-import { scriptFor } from '../i18n/scripts';
+import { mkScene } from '../data/projectText';
 
 interface Props {
   project: Project;
@@ -20,7 +20,7 @@ export function SubtitleEditor({ project, timeline, sceneIndex, onSceneChange, o
   const span = timeline.spans[sceneIndex];
   const cues = timeline.cues.filter((c) => c.sceneIndex === sceneIndex);
   const style = project.settings.subtitles;
-  const original = scriptFor(project.settings.language).scenes[scene.id];
+  const original = mkScene(scene.id, project.settings.language);
   const edited = original && (original.narration !== scene.narration || original.keywords.join('|') !== scene.keywords.join('|'));
 
   return (

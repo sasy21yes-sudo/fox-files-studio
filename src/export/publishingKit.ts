@@ -1,6 +1,6 @@
 import type { Project } from '../types';
 import { buildTimeline, formatTime, type Timeline, type VoiceTiming } from '../animation/timeline';
-import { scriptFor } from '../i18n/scripts';
+import { projectHook } from '../data/projectText';
 import { SOURCES } from '../data/sources';
 
 /**
@@ -76,7 +76,7 @@ export function buildPublishingKit(project: Project, voice?: VoiceTiming | null)
   L.push(`Length: ${formatTime(short.total)} (hook + episode)`);
   L.push('');
   L.push(`HOOK (first ${short.hook ? short.hook.end.toFixed(1) : '0'} s)`);
-  L.push(`"${scriptFor(project.settings.language).hook.text}"`);
+  L.push(`"${projectHook(project, project.settings.language)?.text ?? ''}"`);
   L.push('');
   L.push('CAPTION');
   L.push('The CIA tested drugs on people who never knew. This is from the 1977 Senate hearing. Full sources in the comments.');

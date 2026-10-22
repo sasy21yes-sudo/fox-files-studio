@@ -1,6 +1,6 @@
 import type { Timeline } from '../animation/timeline';
 import type { Beat } from '../data/mkultraScript';
-import { scriptFor } from '../i18n/scripts';
+import { sceneBeats } from '../data/projectText';
 import { FONT_SANS, FONT_TITLE, FONT_TYPE, wrapText } from '../animation/stage';
 import { TAU, clamp, easeOut, hash } from '../animation/math';
 import { drawSunburst, elastic } from './cartoon';
@@ -35,8 +35,8 @@ const norm = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/\s+
 export function placeBeats(tl: Timeline, sceneIndex: number): Placed[] {
   const span = tl.spans[sceneIndex];
   if (!span) return [];
-  const entry = scriptFor(tl.lang).scenes[span.scene.id];
-  if (!entry) return [];
+  const beats = sceneBeats(span.scene, tl.lang);
+  if (!beats.length) return [];
   const cues = tl.cues.filter((c) => c.sceneIndex === sceneIndex);
   let text = '';
   const offs: number[] = [];
@@ -45,7 +45,7 @@ export function placeBeats(tl: Timeline, sceneIndex: number): Placed[] {
     text += norm(c.text) + ' ';
   }
   const placed: Placed[] = [];
-  for (const beat of entry.beats) {
+  for (const beat of beats) {
     const at = text.indexOf(norm(beat.cue));
     if (at < 0) continue;
     let ci = 0;

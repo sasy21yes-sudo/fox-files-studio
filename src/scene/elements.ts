@@ -313,3 +313,26 @@ export const ARM_MODES = ['rest', 'point', 'magnify', 'notebook', 'pencil', 'hol
 export const FACE_KEYS = ['brows', 'worry', 'skeptic', 'angry', 'headTilt', 'earDroop', 'hatLift', 'lids', 'sweat', 'sparkle'] as const;
 export const MOUTHS = ['', 'closed', 'smile', 'grin', 'frown', 'open', 'wide', 'o'] as const;
 
+
+/** Where a newly added element is placed (frame fractions, landscape / vertical). */
+export const ELEMENT_PLACE: Record<keyof typeof ELEMENTS, { x: Num; y: Num }> = {
+  room: { x: 0, y: 0 },
+  labWall: { x: 0, y: 0 },
+  motes: { x: { h: 0.33, v: 0.26 }, y: { h: 0.08, v: 0.2 } },
+  rain: { x: { h: 0.63, v: 0.56 }, y: { h: 0.08, v: 0.2 } },
+  wallClock: { x: { h: 0.43, v: 0.18 }, y: { h: 0.16, v: 0.23 } },
+  desk: { x: { h: 0.5, v: 0.56 }, y: { h: 0.63, v: 0.53 } },
+  lamp: { x: { h: 0.788, v: 0.96 }, y: { h: 0.63, v: 0.53 } },
+  mug: { x: { h: 0.5468, v: 0.62 }, y: { h: 0.63, v: 0.53 } },
+  chair: { x: { h: 0.72, v: 0.7 }, y: { h: 0.79, v: 0.58 } },
+  hangingBulb: { x: 0.5, y: 0 },
+  folder: { x: { h: 0.644, v: 0.74 }, y: { h: 0.63, v: 0.53 } },
+  paper: { x: 0.5, y: 0.45 },
+  shelf: { x: { h: 0.06, v: 0.06 }, y: { h: 0.32, v: 0.3 } },
+  vial: { x: { h: 0.62, v: 0.7 }, y: { h: 0.63, v: 0.53 } },
+  reelRecorder: { x: { h: 0.6, v: 0.68 }, y: { h: 0.63, v: 0.53 } },
+  corkboard: { x: { h: 0.06, v: 0.08 }, y: { h: 0.1, v: 0.12 } },
+  capitolSketch: { x: { h: 0.2, v: 0.3 }, y: { h: 0.3, v: 0.3 } },
+  puff: { x: 0.5, y: { h: 0.79, v: 0.58 } },
+  stamp: { x: 0.5, y: 0.45 },
+};

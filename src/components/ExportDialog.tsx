@@ -24,6 +24,8 @@ interface Props {
   missingVoice?: number;
   onClose(): void;
   onAspectChange(a: Project['settings']['aspect']): void;
+  /** Render as a page section (Deliver page) instead of a modal. */
+  inline?: boolean;
 }
 
 type Phase = 'setup' | 'running' | 'done' | 'error';
@@ -58,7 +60,8 @@ function download(blob: Blob, name: string) {
 
 const mb = (n: number) => `${(n / 1024 / 1024).toFixed(1)} MB`;
 
-export function ExportDialog({ project, timeline, musicBuffer, customMusic, narrationFile, voice, studioTrackFor, missingVoice = 0, onClose, onAspectChange }: Props) {
+export function ExportDialog({ project, timeline, musicBuffer, customMusic, narrationFile, voice, studioTrackFor, missingVoice = 0, onClose, onAspectChange, inline = false }: Props) {
+  const base = `fox-files-${(project.episodeTitle || 'episode').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40)}`;
   const [caps, setCaps] = useState<Capabilities | null>(null);
   const [capsError, setCapsError] = useState<string | null>(null);
   const [methodKey, setMethodKey] = useState<string>('');
@@ -276,19 +279,27 @@ export function ExportDialog({ project, timeline, musicBuffer, customMusic, narr
       music: musicBuffer && includeMusic ? { buffer: musicBuffer, gain: project.settings.musicVolume } : null,
       narration: fileNarration && narrationFile ? { buffer: narrationFile.buffer, gain: 1 } : null,
     });
-    if (buf) download(audioBufferToWav(buf), 'fox-files-mkultra-soundtrack.wav');
+    if (buf) download(audioBufferToWav(buf), `${base}-soundtrack.wav`);
   };
 
   const script = project.scenes.map((s, i) => `SCENE ${i + 1} — ${s.title.toUpperCase()}\n${s.narration}\n`).join('\n');
 
   return (
-    <div className="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="export-title" onMouseDown={(e) => e.target === e.currentTarget && phase !== 'running' && onClose()}>
+    <div
+      className={inline ? 'deliver-embed' : 'modal-backdrop'}
+      role={inline ? undefined : 'dialog'}
+      aria-modal={inline ? undefined : true}
+      aria-labelledby="export-title"
+      onMouseDown={(e) => !inline && e.target === e.currentTarget && phase !== 'running' && onClose()}
+    >
       <div className="modal export-modal">
         <header className="modal-head">
           <h2 id="export-title">Export video</h2>
-          <button className="btn icon ghost" onClick={onClose} disabled={phase === 'running'} aria-label="Close">
-            ✕
-          </button>
+          {!inline && (
+            <button className="btn icon ghost" onClick={onClose} disabled={phase === 'running'} aria-label="Close">
+              ✕
+            </button>
+          )}
         </header>
 
         <div className="export-grid">
@@ -457,19 +468,19 @@ export function ExportDialog({ project, timeline, musicBuffer, customMusic, narr
         <footer className="modal-foot">
           <div className="extras">
             <span className="muted small">Separate files:</span>
-            <button className="btn small ghost" onClick={() => download(new Blob([toSRT(timeline)], { type: 'application/x-subrip' }), 'fox-files-mkultra.srt')}>
+            <button className="btn small ghost" onClick={() => download(new Blob([toSRT(timeline)], { type: 'application/x-subrip' }), `${base}.srt`)}>
               Subtitles .srt
             </button>
-            <button className="btn small ghost" onClick={() => download(new Blob([toVTT(timeline)], { type: 'text/vtt' }), 'fox-files-mkultra.vtt')}>
+            <button className="btn small ghost" onClick={() => download(new Blob([toVTT(timeline)], { type: 'text/vtt' }), `${base}.vtt`)}>
               .vtt
             </button>
-            <button className="btn small ghost" onClick={() => download(new Blob([script], { type: 'text/plain' }), 'fox-files-mkultra-narration.txt')}>
+            <button className="btn small ghost" onClick={() => download(new Blob([script], { type: 'text/plain' }), `${base}-narration.txt`)}>
               Narration script
             </button>
             <button className="btn small ghost" disabled={!musicBuffer && !fileNarration} onClick={downloadSoundtrack}>
               Soundtrack .wav
             </button>
-            <button className="btn small ghost" onClick={() => download(new Blob([buildPublishingKit(project, mode === 'studio' ? voice : null)], { type: 'text/plain' }), 'fox-files-mkultra-publishing-kit.txt')}>
+            <button className="btn small ghost" onClick={() => download(new Blob([buildPublishingKit(project, mode === 'studio' ? voice : null)], { type: 'text/plain' }), `${base}-publishing-kit.txt`)}>
               Publishing kit
             </button>
           </div>

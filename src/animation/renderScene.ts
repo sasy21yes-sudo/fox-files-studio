@@ -1,4 +1,4 @@
-import type { Project, SceneId, Subtitle, SubtitleStyle } from '../types';
+import type { MkSceneId, Project, Subtitle, SubtitleStyle } from '../types';
 import { applyFilm } from '../effects/filmGrain';
 import { setFoxStyle } from '../character/AgentFox';
 import { cueViseme } from './lipSync';
@@ -16,9 +16,11 @@ import { sceneKnown } from './scenes/sceneKnown';
 import { renderHook } from './scenes/hook';
 import { renderBeats } from '../effects/beats';
 import { renderSpec } from '../scene/renderSpec';
+import { EMPTY_SPEC } from '../data/specs';
+import { isMkScene } from '../data/projectText';
 import { localizeContext, setLabelLang } from '../i18n/labels';
 
-export const SCENE_RENDERERS: Record<SceneId, SceneRenderer> = {
+export const SCENE_RENDERERS: Record<MkSceneId, SceneRenderer> = {
   file: sceneFile,
   question: sceneQuestion,
   experiments: sceneExperiments,
@@ -111,7 +113,8 @@ export function renderFrame(
   const weave = gateWeave(time, u);
   g.save();
   g.translate(weave.x, weave.y);
-  const out = span.scene.spec ? renderSpec(span.scene.spec, stage) : SCENE_RENDERERS[span.scene.id](stage);
+  const id = span.scene.id;
+  const out = span.scene.spec ? renderSpec(span.scene.spec, stage) : isMkScene(id) ? SCENE_RENDERERS[id](stage) : renderSpec(EMPTY_SPEC, stage);
   g.restore();
 
   // Explainer pop-ups synced to the narration.

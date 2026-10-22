@@ -1,5 +1,5 @@
 import type { Project, Scene, Subtitle } from '../types';
-import { scriptFor } from '../i18n/scripts';
+import { projectHook } from '../data/projectText';
 import type { Lang } from '../i18n/languages';
 
 /**
@@ -63,7 +63,7 @@ export interface Timeline {
   /** Voice level (0..1) at a timeline time when the narration is recorded; drives the mouth. */
   level?: (t: number) => number;
   /** Cold-open hook at the start of the 9:16 Short (scene spans start after it). */
-  hook?: { start: 0; end: number; text: string };
+  hook?: { start: 0; end: number; text: string; keywords: string[] };
 }
 
 /** Length of the Short's hook, in seconds. */
@@ -71,7 +71,9 @@ export const HOOK_DURATION = 5.6;
 const HOOK_LEAD_IN = 0.25;
 
 /** True when this project renders as the vertical Short with a hook. */
-export const hasHook = (project: Project) => project.settings.aspect === '9:16' && project.settings.shortHook !== false;
+// The hook scene (scenes/hook.ts) is drawn for the MKUltra episode only, for now.
+export const hasHook = (project: Project) =>
+  project.settings.aspect === '9:16' && project.settings.shortHook !== false && project.template === 'mkultra' && !!projectHook(project, project.settings.language ?? 'en');
 
 export const countWords = (text: string) => (text.trim() ? text.trim().split(/\s+/).length : 0);
 
@@ -163,11 +165,11 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
   let cursor = 0;
   const wps = WORDS_PER_SECOND * Math.max(0.5, speechRate);
   const lang = project.settings.language ?? 'en';
-  const script = scriptFor(lang);
+  const hookText = projectHook(project, lang);
   let hook: Timeline['hook'];
 
-  if (hasHook(project)) {
-    const sentences = splitSentences(script.hook.text);
+  if (hasHook(project) && hookText) {
+    const sentences = splitSentences(hookText.text);
     const voiced = !!voice && sentences.every((x) => voice.sentence(x));
     let laid = laySentences(sentences, HOOK_LEAD_IN, wps, voiced ? 0.18 : 0.12, voiced ? voice : null);
     if (voiced) cursor = Math.max(HOOK_DURATION, laid.end + 0.4);
@@ -178,7 +180,7 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
     }
     laid.cues.forEach((c, i) => cues.push({ id: `hook-${i}`, sceneIndex: -1, start: c.start, end: c.end, text: c.text, timing: c.exact ? 'exact' : 'estimated' }));
     clips.push(...laid.clips);
-    hook = { start: 0, end: cursor, text: script.hook.text };
+    hook = { start: 0, end: cursor, text: hookText.text, keywords: hookText.keywords };
   }
 
   project.scenes.forEach((scene, index) => {

@@ -1,6 +1,5 @@
 import { drawFox } from '../../character/AgentFox';
 import { cueViseme } from '../lipSync';
-import { scriptFor } from '../../i18n/scripts';
 import { drawSunburst, elastic } from '../../effects/cartoon';
 import { applyTransition } from '../../effects/transitions';
 import { clamp, easeOutBack, seg } from '../math';
@@ -59,7 +58,7 @@ export function renderHook(g: CanvasRenderingContext2D, w: number, h: number, tl
   });
 
   // Kinetic captions.
-  if (cue) drawKineticCaption(g, w, h, u, cue, time, scriptFor(tl.lang).hook.keywords);
+  if (cue) drawKineticCaption(g, w, h, u, cue, time, tl.hook?.keywords ?? []);
 
   // Source stamp.
   drawStamp(g, 'U.S. SENATE HEARING · 1977', w * (h > w ? 0.55 : 0.72), h * (h > w ? 0.355 : 0.62), (h > w ? 40 : 34) * u, -0.08, seg(time, 3.5, 0.4), '#f3e6c8');

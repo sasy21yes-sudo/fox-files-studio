@@ -1,53 +1,42 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Project, ProjectSettings, Scene, SubtitleStyle } from '../types';
-import { STORAGE_KEY, createMkultraProject, restoreProject, switchLanguage } from '../data/mkultraProject';
+import { switchLanguage } from '../data/project';
+import { loadInitialProject, saveProject, storage } from '../data/library';
+import { projectHook } from '../data/projectText';
 import { buildTimeline, hasHook, locate, splitSentences } from '../animation/timeline';
 import { fitMusicTrack, renderAmbience } from '../audio/ambience';
 import { AudioEngine, type NarrationFile } from '../audio/narration';
 import { SpeechNarrator, setSpeechLanguage, speechSupported, watchVoices } from '../audio/speechSynthesis';
 import { loadStudioPack, probeVoiceServer, renderSentence, renderStudioTrack, studioTiming, type StudioPack } from '../audio/studioVoice';
 import { studioVoiceFor } from '../audio/studioVoices';
-import { scriptFor } from '../i18n/scripts';
 import type { Lang } from '../i18n/languages';
 import { usePlayback } from './usePlayback';
-import { Header, type SaveStatus } from '../components/Header';
-import { SceneList } from '../components/SceneList';
+import type { SaveStatus } from '../components/Header';
 import { PreviewPlayer } from '../components/PreviewPlayer';
-import { Timeline } from '../components/Timeline';
 import { PropertiesPanel } from '../components/PropertiesPanel';
 import { ExportDialog } from '../components/ExportDialog';
 import { SourcesPanel } from '../components/SourcesPanel';
 import { ModelSheetDialog } from '../components/ModelSheetDialog';
+import { useHistory } from '../editor/useHistory';
+import { TopBar, type Page } from '../editor/TopBar';
+import { LeftPanel } from '../editor/LeftPanel';
+import { TimelineEditor } from '../editor/TimelineEditor';
+import { Inspector, withBeats } from '../editor/Inspector';
+import { MediaPage } from '../editor/MediaPage';
+import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
+import { sceneBeats } from '../data/projectText';
 
-function storage(): Storage | null {
-  try {
-    const s = window.localStorage;
-    const k = '__fox_test__';
-    s.setItem(k, '1');
-    s.removeItem(k);
-    return s;
-  } catch {
-    return null;
-  }
-}
-
-function loadInitial(): Project {
-  const s = storage();
-  if (!s) return createMkultraProject();
-  try {
-    const raw = s.getItem(STORAGE_KEY);
-    return (raw && restoreProject(JSON.parse(raw))) || createMkultraProject();
-  } catch {
-    return createMkultraProject();
-  }
-}
+const FRAME = 1 / 30;
 
 export function App() {
-  const [project, setProject] = useState<Project>(loadInitial);
+  const hist = useHistory<Project>(loadInitialProject);
+  const project = hist.value;
+  const setProject = hist.set;
+  const [page, setPage] = useState<Page>('edit');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>(() => (storage() ? 'saved' : 'unavailable'));
-  const [selected, setSelected] = useState(0);
+  const [savedTick, setSavedTick] = useState(0);
+  const [selection, setSelectionRaw] = useState<Selection>({ kind: 'scene', scene: 0 });
   const [theater, setTheater] = useState(false);
-  const [showExport, setShowExport] = useState(false);
   const [showSources, setShowSources] = useState(false);
   const [showSheet, setShowSheet] = useState(false);
   const [musicBuffer, setMusicBuffer] = useState<AudioBuffer | null>(null);
@@ -55,6 +44,11 @@ export function App() {
   const [customMusic, setCustomMusic] = useState<NarrationFile | null>(null);
   const [narrationError, setNarrationError] = useState<string | null>(null);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+
+  // Keep the selection inside the project (scenes can be deleted, undo can remove items).
+  const selected = Math.min(selection.scene, project.scenes.length - 1);
+  const sel: Selection = selected === selection.scene ? selection : { kind: 'scene', scene: selected };
+  const setSelection = useCallback((s: Selection) => setSelectionRaw(s), []);
 
   const engine = useRef(new AudioEngine()).current;
   const narrator = useRef(new SpeechNarrator()).current;
@@ -100,10 +94,10 @@ export function App() {
   const durationsKey = timeline.spans.map((s) => s.duration.toFixed(2)).join(',') + '|' + timeline.cues.map((c) => c.start.toFixed(2)).join(',');
 
   // Sentences the pack does not have (the user rewrote them).
-  const sentences = useMemo(
-    () => [...(hasHook(project) ? splitSentences(scriptFor(lang).hook.text) : []), ...project.scenes.flatMap((s) => splitSentences(s.narration))],
-    [project, lang],
-  );
+  const sentences = useMemo(() => {
+    const hook = hasHook(project) ? projectHook(project, lang) : null;
+    return [...(hook ? splitSentences(hook.text) : []), ...project.scenes.flatMap((s) => splitSentences(s.narration))];
+  }, [project, lang]);
   const missing = useMemo(() => (timing ? sentences.filter((x) => !timing.clip(x)) : []), [sentences, timing]);
   const studioTrack = useMemo<NarrationFile | null>(() => {
     if (!timing) return null;
@@ -157,29 +151,42 @@ export function App() {
   const playback = usePlayback({ project, timeline, engine, narrator, musicBuffer: activeMusic, narrationFile: narrationTrack });
   const current = locate(timeline, playback.time).span.index;
 
-  // ---- Persistence (debounced autosave).
+  // ---- Persistence (debounced autosave into the project library).
   const firstSave = useRef(true);
+  const persist = useCallback((p: Project) => {
+    try {
+      saveProject(p);
+      setSaveStatus('saved');
+      setSavedTick((n) => n + 1);
+    } catch {
+      setSaveStatus(storage() ? 'error' : 'unavailable');
+    }
+  }, []);
   useEffect(() => {
     if (firstSave.current) {
       firstSave.current = false;
       return;
     }
-    const s = storage();
-    if (!s) {
-      setSaveStatus('unavailable');
-      return;
-    }
+    if (!storage()) return setSaveStatus('unavailable');
     setSaveStatus('saving');
-    const id = window.setTimeout(() => {
-      try {
-        s.setItem(STORAGE_KEY, JSON.stringify(project));
-        setSaveStatus('saved');
-      } catch {
-        setSaveStatus('error');
-      }
-    }, 500);
+    const id = window.setTimeout(() => persist(project), 500);
     return () => window.clearTimeout(id);
-  }, [project]);
+  }, [project, persist]);
+
+  /** Switch to another episode: save this one now, then load the other with a fresh history. */
+  const openProject = useCallback(
+    (p: Project) => {
+      playback.pause();
+      if (storage()) persist(project);
+      hist.reset(p);
+      persist(p);
+      setSelectionRaw({ kind: 'scene', scene: 0 });
+      setNarrationFile(null);
+      playback.seek(0);
+      setPage('edit');
+    },
+    [playback, persist, project, hist],
+  );
 
   // ---- Procedural score, regenerated when scene durations change.
   useEffect(() => {
@@ -203,34 +210,34 @@ export function App() {
   }, [lang]);
 
   // ---- Editing helpers.
-  const updateScene = useCallback((index: number, patch: Partial<Scene>) => {
-    setProject((p) => ({ ...p, scenes: p.scenes.map((s, i) => (i === index ? { ...s, ...patch } : s)) }));
-  }, []);
-  const updateSettings = useCallback((patch: Partial<ProjectSettings>) => {
-    setProject((p) => ({ ...p, settings: { ...p.settings, ...patch } }));
-  }, []);
-  const changeLanguage = useCallback((next: Lang) => {
-    narrator.cancel();
-    setProject((p) => switchLanguage(p, next));
-  }, [narrator]);
-  const updateStyle = useCallback((patch: Partial<SubtitleStyle>) => {
-    setProject((p) => ({ ...p, settings: { ...p.settings, subtitles: { ...p.settings.subtitles, ...patch } } }));
-  }, []);
+  const change = useCallback((fn: (p: Project) => Project, key?: string) => setProject(fn, key), [setProject]);
+  const changeScene = useCallback(
+    (index: number, patch: Partial<Scene>) => setProject((p) => updateScene(p, index, patch), `scene:${index}:${Object.keys(patch).join(',')}`),
+    [setProject],
+  );
+  const updateSettings = useCallback(
+    (patch: Partial<ProjectSettings>) => setProject((p) => ({ ...p, settings: { ...p.settings, ...patch } }), `settings:${Object.keys(patch).join(',')}`),
+    [setProject],
+  );
+  const changeLanguage = useCallback(
+    (next: Lang) => {
+      narrator.cancel();
+      setProject((p) => switchLanguage(p, next));
+    },
+    [narrator, setProject],
+  );
+  const updateStyle = useCallback(
+    (patch: Partial<SubtitleStyle>) => setProject((p) => ({ ...p, settings: { ...p.settings, subtitles: { ...p.settings.subtitles, ...patch } } }), 'subtitles'),
+    [setProject],
+  );
 
   const selectScene = useCallback(
     (i: number) => {
-      setSelected(i);
+      setSelectionRaw({ kind: 'scene', scene: i });
       playback.seek(timeline.spans[i].start + 0.01);
     },
     [playback, timeline],
   );
-
-  const resetProject = () => {
-    playback.pause();
-    setProject(createMkultraProject());
-    setSelected(0);
-    playback.seek(0);
-  };
 
   const loadNarration = async (file: File) => {
     setNarrationError(null);
@@ -265,26 +272,89 @@ export function App() {
   };
 
   const replayScene = (i: number) => {
-    setSelected(i);
+    setSelectionRaw({ kind: 'scene', scene: i });
     playback.seek(timeline.spans[i].start + 0.01);
     playback.play();
   };
 
-  // ---- Keyboard: space toggles playback (outside text fields).
+  /** Delete whatever is selected (never a whole scene from the keyboard). */
+  const deleteSelected = useCallback(() => {
+    const s = sel;
+    if (s.kind === 'element') setProject((p) => updateSpec(p, s.scene, (spec) => ({ ...spec, elements: spec.elements.filter((e) => e.id !== s.id) })));
+    else if (s.kind === 'shot' && s.index > 0) setProject((p) => updateShot(p, s.scene, s.index, null));
+    else if (s.kind === 'action') setProject((p) => updateFox(p, s.scene, (f) => ({ ...f, actions: (f.actions ?? []).filter((_, i) => i !== s.index) })));
+    else if (s.kind === 'key') {
+      const fox = foxOf(project.scenes[s.scene]?.spec);
+      if (fox) setProject((p) => updateFox(p, s.scene, (f) => setFoxTrack(f, s.track, foxTrack(fox, s.track).filter((_, i) => i !== s.index))));
+    } else if (s.kind === 'beat') {
+      setProject((p) => updateScene(p, s.scene, (sc) => withBeats(sc, p.settings.language, sceneBeats(sc, p.settings.language).filter((_, i) => i !== s.index))));
+    } else return;
+    setSelectionRaw({ kind: 'scene', scene: s.scene });
+  }, [sel, setProject, project.scenes]);
+
+  // ---- Keyboard (outside text fields): Resolve-style transport and editing.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement;
-      if (el.closest('input, textarea, select, [contenteditable]')) return;
-      if (e.code === 'Space') {
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && e.key.toLowerCase() === 'z') {
+        if (el.closest('input, textarea, [contenteditable]')) return; // native text undo
         e.preventDefault();
-        playback.toggle();
-      } else if (e.key === 'Escape') {
-        setTheater(false);
+        if (e.shiftKey) hist.redo();
+        else hist.undo();
+        return;
+      }
+      if (mod && e.key.toLowerCase() === 'y') {
+        if (el.closest('input, textarea, [contenteditable]')) return;
+        e.preventDefault();
+        hist.redo();
+        return;
+      }
+      if (el.closest('input, textarea, select, [contenteditable]')) return;
+      const t = playback.time;
+      switch (e.key) {
+        case ' ':
+          e.preventDefault();
+          playback.toggle();
+          break;
+        case 'k':
+        case 'K':
+          playback.pause();
+          break;
+        case 'l':
+        case 'L':
+          playback.play();
+          break;
+        case 'j':
+        case 'J':
+          playback.seek(t - 2);
+          break;
+        case 'ArrowRight':
+          e.preventDefault();
+          playback.seek(t + (e.shiftKey ? 1 : FRAME));
+          break;
+        case 'ArrowLeft':
+          e.preventDefault();
+          playback.seek(t - (e.shiftKey ? 1 : FRAME));
+          break;
+        case 'Home':
+          playback.seek(0);
+          break;
+        case 'End':
+          playback.seek(timeline.total);
+          break;
+        case 'Delete':
+        case 'Backspace':
+          deleteSelected();
+          break;
+        case 'Escape':
+          setTheater(false);
+          break;
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [playback]);
+  }, [playback, hist, timeline.total, deleteSelected]);
 
   const s = project.settings;
   const audioLabel = [
@@ -306,82 +376,121 @@ export function App() {
     s.music ? (customMusic ? 'music: your track' : musicBuffer ? 'score on' : 'score loading…') : 'music off',
   ].join(' · ');
 
+  const exportProps = {
+    project,
+    timeline,
+    musicBuffer: activeMusic,
+    customMusic: customMusic?.buffer ?? null,
+    narrationFile: narrationTrack,
+    voice: timing,
+    studioTrackFor: timing ? (tl: typeof timeline) => renderStudioTrack(tl, timing) : undefined,
+    missingVoice: missing.length,
+    onAspectChange: (aspect: ProjectSettings['aspect']) => updateSettings({ aspect }),
+  };
+
   return (
-    <div className={`studio ${theater ? 'theater' : ''}`}>
-      <Header
+    <div className={`studio editor page-${page} ${theater ? 'theater' : ''}`}>
+      <TopBar
         project={project}
+        page={page}
         saveStatus={saveStatus}
+        canUndo={hist.canUndo}
+        canRedo={hist.canRedo}
         theater={theater}
+        onPage={(pg) => {
+          if (pg !== 'edit') playback.pause();
+          setPage(pg);
+        }}
+        onUndo={hist.undo}
+        onRedo={hist.redo}
+        onRename={(t) => setProject((p) => ({ ...p, episodeTitle: t }), 'rename')}
         onToggleTheater={() => {
           const next = !theater;
           setTheater(next);
+          setPage('edit');
           if (next) {
             playback.seek(0);
             playback.play();
           }
-        }}
-        onExport={() => {
-          playback.pause();
-          setShowExport(true);
         }}
         onSources={() => setShowSources(true)}
         onModelSheet={() => {
           playback.pause();
           setShowSheet(true);
         }}
-        onReset={resetProject}
       />
-      <SceneList project={project} timeline={timeline} selected={selected} current={current} onSelect={selectScene} />
-      <main className="center">
-        <PreviewPlayer project={project} timeline={timeline} playback={playback} audioLabel={audioLabel} />
-      </main>
-      <PropertiesPanel
-        project={project}
-        timeline={timeline}
-        selected={selected}
-        voices={voices}
-        speechAvailable={speechSupported()}
-        narrationFile={narrationFile}
-        narrationError={narrationError}
-        onSceneChange={updateScene}
-        onSettingsChange={updateSettings}
-        onStyleChange={updateStyle}
-        onSeek={playback.seek}
-        onReplayScene={replayScene}
-        onTestVoice={testVoice}
-        onLoadNarration={loadNarration}
-        onClearNarration={() => setNarrationFile(null)}
-        customMusic={customMusic}
-        onLoadMusic={loadMusic}
-        onClearMusic={() => setCustomMusic(null)}
-        onShowSources={() => setShowSources(true)}
-        onLanguageChange={changeLanguage}
-        studio={{
-          voice: studio.id,
-          status: packStatus.state,
-          error: packStatus.error,
-          missing: missing.length,
-          rendering: rendering.length,
-          server,
-        }}
-        onProbeServer={probeServer}
-      />
-      <Timeline timeline={timeline} time={playback.time} selected={selected} onSeek={playback.seek} onSelect={setSelected} />
 
-      {showExport && (
-        <ExportDialog
-          project={project}
-          timeline={timeline}
-          musicBuffer={activeMusic}
-          customMusic={customMusic?.buffer ?? null}
-          narrationFile={narrationTrack}
-          voice={timing}
-          studioTrackFor={timing ? (tl) => renderStudioTrack(tl, timing) : undefined}
-          missingVoice={missing.length}
-          onClose={() => setShowExport(false)}
-          onAspectChange={(aspect) => updateSettings({ aspect })}
-        />
+      {page === 'media' && <MediaPage project={project} onOpen={openProject} savedTick={savedTick} />}
+
+      {page === 'deliver' && (
+        <main className="deliver-page">
+          <ExportDialog {...exportProps} inline onClose={() => setPage('edit')} />
+        </main>
       )}
+
+      {page === 'edit' && (
+        <>
+          <LeftPanel
+            project={project}
+            timeline={timeline}
+            time={playback.time}
+            selection={sel}
+            current={current}
+            onSelect={setSelection}
+            onSelectScene={selectScene}
+            onChange={change}
+          />
+          <main className="center">
+            <PreviewPlayer project={project} timeline={timeline} playback={playback} audioLabel={audioLabel} />
+          </main>
+          {sel.kind === 'scene' ? (
+            <PropertiesPanel
+              project={project}
+              timeline={timeline}
+              selected={selected}
+              voices={voices}
+              speechAvailable={speechSupported()}
+              narrationFile={narrationFile}
+              narrationError={narrationError}
+              onSceneChange={changeScene}
+              onSettingsChange={updateSettings}
+              onStyleChange={updateStyle}
+              onSeek={playback.seek}
+              onReplayScene={replayScene}
+              onTestVoice={testVoice}
+              onLoadNarration={loadNarration}
+              onClearNarration={() => setNarrationFile(null)}
+              customMusic={customMusic}
+              onLoadMusic={loadMusic}
+              onClearMusic={() => setCustomMusic(null)}
+              onShowSources={() => setShowSources(true)}
+              onLanguageChange={changeLanguage}
+              studio={{
+                voice: studio.id,
+                status: packStatus.state,
+                error: packStatus.error,
+                missing: missing.length,
+                rendering: rendering.length,
+                server,
+              }}
+              onProbeServer={probeServer}
+            />
+          ) : (
+            <Inspector project={project} timeline={timeline} time={playback.time} selection={sel} onSelect={setSelection} onChange={change} onSeek={playback.seek} />
+          )}
+          <TimelineEditor
+            project={project}
+            timeline={timeline}
+            time={playback.time}
+            selection={sel}
+            onSeek={playback.seek}
+            onSelect={setSelection}
+            onChange={change}
+            musicOn={s.music}
+          />
+        </>
+      )}
+
       {showSources && <SourcesPanel project={project} onClose={() => setShowSources(false)} />}
       {showSheet && <ModelSheetDialog onClose={() => setShowSheet(false)} />}
     </div>

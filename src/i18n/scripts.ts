@@ -1,4 +1,4 @@
-import type { SceneId } from '../types';
+import type { MkSceneId } from '../types';
 import { MKULTRA_SCRIPT, SHORT_HOOK, type Beat } from '../data/mkultraScript';
 import type { Lang } from './languages';
 
@@ -21,7 +21,7 @@ export interface LocalizedScript {
   episodeTitle: string;
   episodeSubtitle: string;
   hook: { text: string; keywords: string[] };
-  scenes: Record<SceneId, LocalizedScene>;
+  scenes: Record<MkSceneId, LocalizedScene>;
   /**
    * Pronunciation hints for the neural narrator only (subtitles keep the real
    * spelling): [written, spoken] pairs, matched as whole words.
@@ -35,7 +35,7 @@ const english: LocalizedScript = {
   hook: { text: SHORT_HOOK.text, keywords: SHORT_HOOK.keywords },
   scenes: Object.fromEntries(
     MKULTRA_SCRIPT.map((e) => [e.id, { title: e.title, narration: e.narration, keywords: e.keywords, beats: e.beats }]),
-  ) as Record<SceneId, LocalizedScene>,
+  ) as Record<MkSceneId, LocalizedScene>,
   say: [['MKUltra', 'M K Ultra']],
 };
 

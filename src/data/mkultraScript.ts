@@ -1,4 +1,4 @@
-import type { SceneId } from '../types';
+import type { MkSceneId } from '../types';
 
 /**
  * Original English narration for "MKUltra: The Secret Experiments".
@@ -24,7 +24,7 @@ export type Beat =
   | { cue: string; kind: 'statement'; lines: string[] };
 
 export interface ScriptEntry {
-  id: SceneId;
+  id: MkSceneId;
   title: string;
   summary: string;
   narration: string;
