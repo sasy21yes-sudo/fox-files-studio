@@ -277,6 +277,16 @@ type Drag =
   | { kind: 'pull'; i: number; moved: boolean; convert: boolean }
   | { kind: 'shape'; start: Pt; orig: Anchor[] };
 let drag: Drag | null = null;
+/** The last edit the pen's single click made (a double click takes it back first). */
+let penEdit: { at: number; undoLen: number } | null = null;
+let lastDown: { t: number; x: number; y: number } | null = null;
+function takeBackPenClick() {
+  if (tool === 'pen' && penEdit && performance.now() - penEdit.at < 600 && undo.length === penEdit.undoLen) {
+    paths = JSON.parse(undo.pop()!);
+    picked = new Set();
+  }
+  penEdit = null;
+}
 
 function hitAnchor(P: Path, sx: number, sy: number): number {
   let best = -1;
@@ -318,7 +328,17 @@ canvas.addEventListener('pointerdown', (e) => {
     return;
   }
   if (e.button !== 0) return;
+  // The second click of a double click is handled by the dblclick listener
+  // (pointer events carry no click count, so it is measured here).
+  const now = performance.now();
+  const second = lastDown && now - lastDown.t < 450 && Math.hypot(sx - lastDown.x, sy - lastDown.y) < 6;
+  lastDown = second ? null : { t: now, x: sx, y: sy };
+  if (second) return;
   const P = cur();
+  const before = undo.length;
+  queueMicrotask(() => {
+    if (tool === 'pen' && undo.length > before) penEdit = { at: performance.now(), undoLen: undo.length };
+  });
   if (tool === 'move') {
     snapshot();
     drag = { kind: 'shape', start: m, orig: structuredClone(P.a) };
@@ -395,6 +415,77 @@ canvas.addEventListener('pointerdown', (e) => {
   picked = new Set();
   draw();
   drag = { kind: 'pan', sx, sy, x0: view.x, y0: view.y };
+});
+
+/** Smooth handles for anchor i from its neighbours (Catmull-Rom tangent, a third of the way). */
+function autoHandles(P: Path, i: number) {
+  const n = P.a.length;
+  const A = P.a[i];
+  const prev = P.a[P.closed ? (i - 1 + n) % n : Math.max(0, i - 1)].p;
+  const next = P.a[P.closed ? (i + 1) % n : Math.min(n - 1, i + 1)].p;
+  const tx = (next[0] - prev[0]) / 6;
+  const ty = (next[1] - prev[1]) / 6;
+  A.i = pt(A.p[0] - tx, A.p[1] - ty);
+  A.o = pt(A.p[0] + tx, A.p[1] + ty);
+  A.smooth = true;
+}
+
+// Double click: on an anchor, corner <-> smooth; on a segment, straight <-> curved.
+canvas.addEventListener('dblclick', (e) => {
+  const r = canvas.getBoundingClientRect();
+  const sx = e.clientX - r.left;
+  const sy = e.clientY - r.top;
+  takeBackPenClick();
+  drag = null;
+  const Q = cur();
+  const bi = hitAnchor(Q, sx, sy);
+  if (bi >= 0) {
+    snapshot();
+    const A = Q.a[bi];
+    if (A.i || A.o) {
+      A.i = null;
+      A.o = null;
+      A.smooth = false;
+    } else autoHandles(Q, bi);
+    picked = new Set([bi]);
+    return draw();
+  }
+  const hit = onPath(Q, sx, sy);
+  if (hit.k < 0 || hit.d >= 8) return draw();
+  snapshot();
+  const k = hit.k;
+  const A = Q.a[k];
+  const B = Q.a[(k + 1) % Q.a.length];
+  const straight = (!A.o || dist(A.o, A.p) < 0.5) && (!B.i || dist(B.i, B.p) < 0.5);
+  if (straight) {
+    // Curve it: tangents from the neighbours, only on this segment's side of each anchor.
+    const keepA = A.i;
+    const keepB = B.o;
+    autoHandles(Q, k);
+    autoHandles(Q, (k + 1) % Q.a.length);
+    if (keepA === null) A.i = null;
+    if (keepB === null) B.o = null;
+    A.smooth = !!A.i;
+    B.smooth = !!B.o;
+    // With no neighbours bending it (e.g. a two-anchor line) the handles lie on the chord: bend it into
+    // a gentle arc so it visibly curves, ready to be shaped by dragging the handles.
+    const ch = sub(B.p, A.p);
+    const L = Math.hypot(ch[0], ch[1]) || 1;
+    const along = (h: Pt | null, p: Pt) => !h || Math.abs((h[0] - p[0]) * -ch[1] + (h[1] - p[1]) * ch[0]) / L < L * 0.03;
+    if (along(A.o, A.p) && along(B.i, B.p)) {
+      const rot = (v: Pt, a: number): Pt => [v[0] * Math.cos(a) - v[1] * Math.sin(a), v[0] * Math.sin(a) + v[1] * Math.cos(a)];
+      const third: Pt = [ch[0] / 3, ch[1] / 3];
+      A.o = pt(...add(A.p, rot(third, -0.45)));
+      B.i = pt(...sub(B.p, rot(third, 0.45)));
+    }
+  } else {
+    A.o = null;
+    B.i = null;
+    A.smooth = false;
+    B.smooth = false;
+  }
+  picked = new Set([k, (k + 1) % Q.a.length]);
+  draw();
 });
 
 canvas.addEventListener('pointermove', (e) => {
