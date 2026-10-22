@@ -1927,8 +1927,12 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     // Control point at the knee: a gentle, even bend (the curve does not overshoot into a banana).
     const c: V2 = knee;
     // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
-    anchored(g, `shoe_${name}`, ankle[0], ankle[1], footRot);
-    noodle(g, `leg_${name}`, hip, c, ankle);
+    // The shoe sits a little higher and further forward than the hem, so the trouser drapes over its
+    // ankle opening (a slight "break" that flares at the hem) instead of ending on top of it.
+    const sx = ankle[0] + Math.cos(footRot) * 10 * RK;
+    const sy = ankle[1] - 9 * RK + Math.sin(footRot) * 10 * RK;
+    anchored(g, `shoe_${name}`, sx, sy, footRot);
+    noodle(g, `leg_${name}`, hip, c, ankle, 0, 1, (t) => 1 + 0.12 * Math.pow(Math.max(0, (t - 0.8) / 0.2), 2));
     mark(g, `hip_${name}`, hip);
     mark(g, `knee_${name}`, [(hip[0] + 2 * c[0] + ankle[0]) / 4, (hip[1] + 2 * c[1] + ankle[1]) / 4]);
     mark(g, `ankle_${name}`, ankle);
