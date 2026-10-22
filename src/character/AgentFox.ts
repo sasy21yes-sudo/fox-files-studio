@@ -1722,6 +1722,25 @@ function drawMultiples(g: G, st: ArmState, phys: Phys, pose: FoxPose) {
   for (const [lag, al] of [[0.22, 0.18], [0.11, 0.32]] as const) drawGloveRig(g, rigArm({ ...st, b: Math.max(0, st.b - lag) }, phys, pose), al);
 }
 
+/** What the editor shows about the last drawn Agent Fox (only filled while a sink is set). */
+export interface FoxDebug {
+  pose: FoxPose | null;
+  face: Face | null;
+  arms: Record<'near' | 'far', { from: string; to: string; blend: number; mode: string; hand: string; layer: string }> | null;
+  /** Joint positions on the canvas, in canvas px. */
+  joints: Record<string, [number, number]>;
+}
+let debugSink: FoxDebug | null = null;
+/** Ask the next drawFox calls to report into `sink` (null stops). */
+export function captureFox(sink: FoxDebug | null) {
+  debugSink = sink;
+}
+function mark(g: G, name: string, p: V2) {
+  if (!debugSink) return;
+  const q = g.getTransform().transformPoint({ x: p[0], y: p[1] });
+  debugSink.joints[name] = [q.x, q.y];
+}
+
 /** Rig px the hat sits above its baked place (master look: brows clear of the brim). */
 const HAT_RAISE = 34;
 
@@ -1783,6 +1802,12 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   const ps = physStates(arms);
   const far = rigArm(ps.far, 'far', pose);
   const near = rigArm(ps.near, 'near', pose);
+  if (debugSink) {
+    debugSink.pose = { ...pose };
+    debugSink.face = face;
+    const info = (st: ArmState, A: RigArm) => ({ from: st.from, to: st.to, blend: st.b, mode: A.prop, hand: A.handName, layer: A.layer });
+    debugSink.arms = { near: info(ps.near, near), far: info(ps.far, far) };
+  }
   const hatOff = arms.front.hatChest;
 
   // Tail and legs.
@@ -1827,6 +1852,9 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
     anchored(g, `shoe_${name}`, ankle[0], ankle[1], -liftAmt * 0.35 + (walk ? Math.sin(ph) * 0.08 : 0));
     noodle(g, `leg_${name}`, hip, c, ankle);
+    mark(g, `hip_${name}`, hip);
+    mark(g, `knee_${name}`, [(hip[0] + 2 * c[0] + ankle[0]) / 4, (hip[1] + 2 * c[1] + ankle[1]) / 4]);
+    mark(g, `ankle_${name}`, ankle);
   };
   // Spine: idle sway, talking emphasis, recoil on a take, lean toward a reach; the coat hem trails.
   const reach = ['point', 'magnify', 'wave'].includes(far.prop) ? 1 : 0;
@@ -1836,6 +1864,15 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   g.translate(0, B);
   // Tail: a travelling wave from the base to the tip (the drawing bends, it doesn't just pivot).
   const wagAmp = 46 + walk * 30 + surprise * 50;
+  mark(g, 'tail', J.tailBase);
+  if (debugSink) {
+    for (const A of [near, far]) {
+      const h = hoseHand(A);
+      mark(g, `shoulder_${A.phys}`, h.S);
+      mark(g, `elbow_${A.phys}`, [(h.S[0] + 2 * h.c[0] + A.hand[0]) / 4, (h.S[1] + 2 * h.c[1] + A.hand[1]) / 4]);
+      mark(g, `hand_${A.phys}`, A.hand);
+    }
+  }
   anchoredWarp(g, 'tail', J.tailBase[0], J.tailBase[1], tailRot * 0.35, (v) => {
     const d = Math.max(0, Math.min(1, -v / 470));
     return wagAmp * Math.sin(time * 2.6 - d * 2.4) * Math.pow(d, 1.4) + Math.sin(time * 18) * 14 * surprise * d;
@@ -1871,6 +1908,11 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   g.scale(1 + hsq * 0.7, 1 - hsq);
   g.translate(-N[0], -N[1]);
   placed(g, 'head');
+  mark(g, 'neck', RIG.neckPivot);
+  mark(g, 'eye_near', RIG.eyes.near.white);
+  mark(g, 'eye_far', RIG.eyes.far.white);
+  const rn = (RIG as unknown as { nose?: V2 }).nose;
+  if (rn) mark(g, 'nose', rn);
   drawRigFace(g, face);
   const hatLift = (pose.hatLift ?? 0) * RK * 1.6 + surprise * 70;
   if (hatOff <= 0) {

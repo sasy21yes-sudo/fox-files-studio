@@ -28,6 +28,8 @@ import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updat
 import { sceneBeats } from '../data/projectText';
 import { useProjectMedia } from '../media/useMedia';
 import { ShortcutsDialog } from '../editor/ShortcutsDialog';
+import { FoxMonitor } from '../editor/FoxMonitor';
+import type { FoxDebug } from '../character/AgentFox';
 import { uniqueId } from '../editor/model';
 import type { SceneElement } from '../scene/spec';
 
@@ -56,6 +58,7 @@ export function App() {
   const setSelection = useCallback((s: Selection) => setSelectionRaw(s), []);
 
   const [showKeys, setShowKeys] = useState(false);
+  const [foxLive, setFoxLive] = useState<FoxDebug | null>(null);
   /** Copied element (Ctrl+C), pasted into the selected data scene with Ctrl+V. */
   const clipboard = useRef<SceneElement | null>(null);
   useProjectMedia(project);
@@ -491,11 +494,12 @@ export function App() {
               timeline={timeline}
               playback={playback}
               audioLabel={audioLabel}
-              editing={{ selection: sel, onSelect: setSelection, onChange: change }}
+              editing={{ selection: sel, onSelect: setSelection, onChange: change, onFox: setFoxLive }}
             />
           </main>
           <div className="right-col">
           <AiPanel project={project} timeline={timeline} scene={selected} onChange={change} onUndo={hist.undo} />
+          <FoxMonitor fox={foxLive} />
           {sel.kind === 'scene' ? (
             <PropertiesPanel
               project={project}

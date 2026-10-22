@@ -1,6 +1,6 @@
 import type { MkSceneId, Project, Subtitle, SubtitleStyle } from '../types';
 import { applyFilm } from '../effects/filmGrain';
-import { setFoxStyle } from '../character/AgentFox';
+import { captureFox, setFoxStyle, type FoxDebug } from '../character/AgentFox';
 import { cueViseme } from './lipSync';
 import { CHAPTER_LEN, drawChapterCard, drawGate, gateWeave } from '../effects/cartoon';
 import { TRANSITION_IN, TRANSITION_OUT, applyTransition } from '../effects/transitions';
@@ -124,7 +124,11 @@ export function renderFrame(
   g.save();
   g.translate(weave.x, weave.y);
   const id = span.scene.id;
+  const sink: FoxDebug | null = opts.probe ? { pose: null, face: null, arms: null, joints: {} } : null;
+  captureFox(sink);
   const out = span.scene.spec ? renderSpec(span.scene.spec, stage) : isMkScene(id) ? SCENE_RENDERERS[id](stage) : renderSpec(EMPTY_SPEC, stage);
+  captureFox(null);
+  if (opts.probe) opts.probe.fox = sink?.pose ? sink : null;
   g.restore();
 
   // Explainer pop-ups synced to the narration.

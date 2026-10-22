@@ -17,6 +17,8 @@ export interface RenderProbe {
   /** Transform of screen-layer elements (no camera). */
   screen?: DOMMatrix | null;
   anchors: { id: string; x: number; y: number; box?: { w: number; h: number; rot: number }; screen?: boolean }[];
+  /** Agent Fox as drawn in this frame: pose, face, arms and joints on the canvas (any scene). */
+  fox?: import('../character/AgentFox').FoxDebug | null;
 }
 
 /** Everything a scene needs to draw one frame. */

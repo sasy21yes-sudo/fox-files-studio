@@ -9,6 +9,7 @@ import { EXPORT_SIZES } from '../export/capabilities';
 import { loadProjectMedia } from '../media/store';
 import { useMediaVersion } from '../media/useMedia';
 import { StageOverlay } from '../editor/StageOverlay';
+import type { FoxDebug } from '../character/AgentFox';
 import type { Selection } from '../editor/model';
 
 interface Props {
@@ -21,7 +22,38 @@ interface Props {
     selection: Selection;
     onSelect(s: Selection): void;
     onChange(fn: (p: Project) => Project, key?: string): void;
+    /** Agent Fox as drawn at the playhead (pose, arms, face, joints), for the inspector. */
+    onFox?(fox: FoxDebug | null): void;
   };
+}
+
+/** Bones drawn by the Rig overlay: pairs of joint names. */
+const BONES: [string, string][] = [
+  ['shoulder_near', 'elbow_near'], ['elbow_near', 'hand_near'],
+  ['shoulder_far', 'elbow_far'], ['elbow_far', 'hand_far'],
+  ['hip_near', 'knee_near'], ['knee_near', 'ankle_near'],
+  ['hip_far', 'knee_far'], ['knee_far', 'ankle_far'],
+  ['shoulder_near', 'shoulder_far'], ['hip_near', 'hip_far'], ['neck', 'eye_near'], ['eye_near', 'nose'], ['eye_far', 'nose'],
+];
+
+function RigOverlay({ fox, w, h, rect }: { fox: FoxDebug; w: number; h: number; rect: { left: number; top: number; width: number; height: number } }) {
+  const px = w / Math.max(1, rect.width);
+  const J = fox.joints;
+  return (
+    <svg className="stage-overlay rig-overlay" style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+      {BONES.filter(([a, b]) => J[a] && J[b]).map(([a, b]) => (
+        <line key={a + b} x1={J[a][0]} y1={J[a][1]} x2={J[b][0]} y2={J[b][1]} className="rig-bone" style={{ strokeWidth: 2 * px }} />
+      ))}
+      {Object.entries(J).map(([name, [x, y]]) => (
+        <g key={name}>
+          <circle cx={x} cy={y} r={3.5 * px} className="rig-joint" style={{ strokeWidth: 1.5 * px }} />
+          <text x={x + 5 * px} y={y - 4 * px} className="rig-label" style={{ fontSize: 9 * px, strokeWidth: 2.5 * px }}>
+            {name.replace('_', ' ')}
+          </text>
+        </g>
+      ))}
+    </svg>
+  );
 }
 
 /** Internal preview resolution: lower than export, same aspect ratio and composition. */
@@ -64,6 +96,8 @@ export function PreviewPlayer({ project, timeline, playback, audioLabel, editing
   const probe = useRef<RenderProbe>({ scene: -1, matrix: null, anchors: [] });
   const [snap, setSnap] = useState<RenderProbe | null>(null);
   const [handles, setHandles] = useState(true);
+  const [rigView, setRigView] = useState(false);
+  const lastFox = useRef(0);
   const [rect, setRect] = useState({ left: 0, top: 0, width: 1, height: 1 });
   const [stillBusy, setStillBusy] = useState(false);
   const showHandles = !!editing && handles && !playback.playing;
@@ -77,9 +111,15 @@ export function PreviewPlayer({ project, timeline, playback, audioLabel, editing
       subtitles,
       burnSubtitles: true,
       showSafeArea,
-      probe: showHandles ? probe.current : undefined,
+      probe: editing ? probe.current : undefined,
     });
-    if (showHandles) setSnap({ ...probe.current, anchors: [...probe.current.anchors] });
+    if (!editing) return;
+    // While playing, report at most 4 times a second (the inspector re-renders on each report).
+    const now = performance.now();
+    if (playback.playing && now - lastFox.current < 250) return;
+    lastFox.current = now;
+    setSnap({ ...probe.current, anchors: [...probe.current.anchors] });
+    editing.onFox?.(probe.current.fox ?? null);
   }, [project, timeline, playback.time, size.width, size.height, filmGrain, subtitles, showSafeArea, fontTick, media, showHandles]);
 
   // Where the canvas sits inside the frame (CSS sizes it to fit), for the handle overlay.
@@ -121,6 +161,7 @@ export function PreviewPlayer({ project, timeline, playback, audioLabel, editing
           onClick={playback.toggle}
           aria-label={`Preview of scene ${span.index + 1}: ${span.scene.title}`}
         />
+        {rigView && editing && snap?.fox && <RigOverlay fox={snap.fox} w={size.width} h={size.height} rect={rect} />}
         {showHandles && editing && snap && snap.scene >= 0 && (
           <StageOverlay
             project={project}
@@ -180,6 +221,16 @@ export function PreviewPlayer({ project, timeline, playback, audioLabel, editing
             title="Show handles on the elements of data scenes (paused): click to select, drag to move"
           >
             ✥ Handles
+          </button>
+        )}
+        {editing && (
+          <button
+            className={`btn small ghost ${rigView ? 'on' : ''}`}
+            onClick={() => setRigView(!rigView)}
+            aria-pressed={rigView}
+            title="Show Agent Fox's skeleton: shoulders, elbows, hands, hips, knees, ankles, tail, neck, eyes, nose"
+          >
+            ⦿ Rig
           </button>
         )}
         <button
