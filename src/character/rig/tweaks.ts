@@ -17,7 +17,7 @@ export const MOTION_DEFAULTS = {
   /** Hop on the music beat (0 = still). */
   bounce: 1,
   /** Walk: stride length and how much the arms swing. */
-  walkStride: 44,
+  walkStride: 36,
   armSwing: 34,
   /** Tail wag amplitude and speed. */
   tailWag: 46,

@@ -1624,6 +1624,7 @@ const SHOULDER: Record<Phys, V2> = { near: J.shoulderBack, far: J.shoulderFront 
 const SLEEVE: Record<Phys, string> = { near: 'sleeve_front', far: 'sleeve_back' };
 const UPPER: Record<Phys, string> = { near: 'arm_front_upper', far: 'arm_back_upper' };
 const LOWER: Record<Phys, string> = { near: 'arm_front_lower', far: 'arm_back_lower' };
+// (UPPER/LOWER give the elbow's position: upper arm and forearm lengths.)
 const GLOVE_SUFFIX: Record<Phys, string> = { near: '', far: '_back' };
 const CAP: Record<Phys, string> = { near: 'cap_back', far: 'cap_front' };
 
@@ -1741,7 +1742,10 @@ function hoseHand(A: RigArm) {
   const e1 = ik(S, A.hand, L1 * scale, L2 * scale, 1).e;
   const e2 = ik(S, A.hand, L1 * scale, L2 * scale, -1).e;
   const score = (e: V2) => out * (e[0] - S[0]) * 1.0 + (e[1] - S[1]) * 0.6;
-  const c: V2 = score(e1) >= score(e2) ? e1 : e2;
+  const elbow: V2 = score(e1) >= score(e2) ? e1 : e2;
+  // One continuous sleeve that bends smoothly THROUGH the elbow (quadratic control point chosen so the
+  // curve passes the elbow at its middle): no joint seam, the elbow sits where a real one would.
+  const c: V2 = [2 * elbow[0] - (S[0] + A.hand[0]) / 2, 2 * elbow[1] - (S[1] + A.hand[1]) / 2];
   const ang = Math.atan2(A.hand[1] - c[1], A.hand[0] - c[0]);
   const hx = A.hand[0] + Math.cos(ang) * 10;
   const hy = A.hand[1] + Math.sin(ang) * 10;
@@ -1765,10 +1769,8 @@ function drawRigArm(g: G, A: RigArm) {
   if (A.prop === 'hold' && A.phys === 'near') drawHeldPaper(g, h.hx + 60, h.hy - 120);
   drawGloveRig(g, A);
   // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
-  // Upper arm (fuller at the shoulder), then the forearm over it so the elbow's round end covers the joint.
-  const mid = (a: V2, b: V2): V2 => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-  noodle(g, UPPER[A.phys], h.S, mid(h.S, h.c), h.c, 0, 1, (t) => 1.12 + 0.16 * Math.pow(Math.max(0, 1 - t / 0.5), 1.6));
-  noodle(g, LOWER[A.phys], h.c, mid(h.c, A.hand), A.hand, 0, 1, () => 1.06);
+  // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
+  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, (t) => 1 + 0.24 * Math.pow(Math.max(0, 1 - t / 0.45), 1.6));
   // The far arm comes out from under the coat's shoulder; the near arm's rounded top IS the shoulder (master).
   if (A.phys === 'far' && A.layer !== 'behind') placed(g, CAP.far);
   if (A.prop === 'notebook' && A.phys === 'near') anchored(g, 'prop_notebook', h.hx + 95, h.hy - 75, -0.12);
@@ -1913,12 +1915,17 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     const ease = (x: number) => x * x * (3 - 2 * x);
     const footX = stance ? lerp(1, -1, u) : lerp(-1, 1, ease(u));
     const liftAmt = stance ? 0 : Math.sin(u * Math.PI) * walk;
-    const ankle: V2 = [hip0[0] + footX * stride, hip0[1] + L - liftAmt * 34 * RK];
+    const ankle: V2 = [hip0[0] + footX * stride, hip0[1] + L - liftAmt * 22 * RK];
     // Toe: up at heel strike, flat in stance, down at toe-off, level through the swing.
-    const footRot = walk * (stance ? (u < 0.15 ? -0.22 * (1 - u / 0.15) : u > 0.8 ? 0.35 * ((u - 0.8) / 0.2) : 0) : lerp(0.35, -0.2, ease(u)));
-    // The knee always bows forward (+x): pick the bow side that puts the control point in front.
-    const side = ankle[1] - hip[1] >= 0 ? -1 : 1;
-    const { c } = hoseControl(hip, ankle, L, side);
+    // (continuous through the whole cycle, so the foot never snaps)
+    const footRot = walk * (stance ? -0.1 * Math.pow(1 - u, 4) + 0.16 * Math.pow(u, 4) : lerp(0.16, -0.1, ease(u)));
+    // Knee: two equal segments solved by IK, the knee always in front (+x); the trouser is one smooth
+    // curve passing through it, straight when the leg is extended.
+    const kA = ik(hip, ankle, L * 0.5, L * 0.5, 1).e;
+    const kB = ik(hip, ankle, L * 0.5, L * 0.5, -1).e;
+    const knee = kA[0] >= kB[0] ? kA : kB;
+    // Control point at the knee: a gentle, even bend (the curve does not overshoot into a banana).
+    const c: V2 = knee;
     // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
     anchored(g, `shoe_${name}`, ankle[0], ankle[1], footRot);
     noodle(g, `leg_${name}`, hip, c, ankle);
