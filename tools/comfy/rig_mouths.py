@@ -118,6 +118,15 @@ def main():
     # The bake keeps the ORIGINAL head frame: offsets are expressed in it (+ shift of the crop origin).
     o_old = crop_origin(cv2.imread(os.path.join(ROOT, 'art', 'parts', 'head.jpg')), (790, 200))
     shift = (hb_o[0] - o_old[0], hb_o[1] - o_old[1])
+    # Nothing below the ruff: bake_rig.py removes the head's neck there (the cream neck piece shows),
+    # so a mouth sprite must not bring the render's orange neck back.
+    ry_lim = int((262 + o_old[1] - cy0) / sy_h)
+    mask[ry_lim:] = False
+    feather = cv2.GaussianBlur(mask.astype(np.float32), (0, 0), 6)
+    fade = np.clip((ry_lim - np.arange(mask.shape[0])) / 40.0, 0, 1)[:, None]  # soft lower edge, no seam
+    feather = feather * fade
+    ys, xs = np.nonzero(mask)
+    rb = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
 
     # Sprites on a fresh mouth sheet, in a 4x3 grid with room between them; the bake reads the points from fits.json.
     old = cv2.imread(os.path.join(ROOT, 'art', 'parts', 'mouths.jpg'))

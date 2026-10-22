@@ -229,6 +229,17 @@ yy = np.mgrid[0:h4, 0:w4][0]
 # Below the ruff (headB 1x px, original frame); the restyled head's neck also has a cream stripe.
 cream_neck = (hsv[:, :, 2] > 170) & (hsv[:, :, 1] < 110) if RESTYLED_HEAD else np.zeros_like(orange)
 stub = (orange | cream_neck) & (yy > (268 - SHIFT[1]) * 4)
+if RESTYLED_HEAD:
+    # Only the orange fur of the neck goes (the cream ruff stays whole); the cream neck piece shows instead.
+    # Below the ruff line keep only the cream ruff spikes that hang from above it (and their ink edge);
+    # the neck's orange fur and stray lines go, the cream neck piece shows instead.
+    below = yy > (262 - SHIFT[1]) * 4
+    creamy = (hsv[:, :, 2] > 165) & (hsv[:, :, 1] < 110) & (hb[:, :, 3] > 128)
+    lab_c, _ = ndi.label(creamy)
+    line = int((262 - SHIFT[1]) * 4)
+    top_ids = np.unique(lab_c[max(0, line - 6):line + 1][lab_c[max(0, line - 6):line + 1] > 0])
+    ruff = ndi.binary_dilation(np.isin(lab_c, top_ids), iterations=10)
+    stub = below & ~ruff
 stub = ndi.binary_opening(stub, iterations=3)
 keep = 1 - cv2.GaussianBlur(ndi.binary_dilation(stub, iterations=2).astype(np.float32), (0, 0), 2)
 hb[:, :, 3] = (hb[:, :, 3] * keep).astype(np.uint8)
@@ -422,7 +433,17 @@ save('torso', img, o)
 
 neck, o1 = cut('torso', 740, 260)
 nh, nw = neck.shape[0] / 4, neck.shape[1] / 4
-N_ref = sim(0.30, 0, (o1[0] + nw / 2, o1[1] + nh * 0.12), (533.0, 160.0))
+NECK_S = 0.30
+if RESTYLED_HEAD:
+    # Master look: cream fur from under the ruff into the collar (no orange band), a little wider so it
+    # fills the collar's opening.
+    hsvn = cv2.cvtColor(neck[:, :, :3], cv2.COLOR_BGR2HSV).astype(np.float32)
+    org = (hsvn[..., 0] <= 30) & (hsvn[..., 1] > 40) & (hsvn[..., 2] > 60)  # all the fur, light or shaded
+    cream = np.array([196, 228, 244], np.float32)  # BGR of the new ruff
+    shade = np.clip(hsvn[..., 2:3] / 235.0, 0.55, 1.05)
+    neck[:, :, :3] = np.where(org[..., None], np.clip(cream * shade, 0, 255), neck[:, :, :3]).astype(np.uint8)
+    NECK_S = 0.36
+N_ref = sim(NECK_S, 0, (o1[0] + nw / 2, o1[1] + nh * 0.12), (533.0, 160.0))
 img, o = warp(neck, at4(to_rig(N_ref), o1))
 save('neck', img, o)
 
