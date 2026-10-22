@@ -245,6 +245,22 @@ if EXACT_MOUTHS := bool(fits.get('exact')) and os.path.exists(MUZZLE):
 img, o = warp(hb, at4(B_to_rig, SHIFT))
 save('head', img, o)
 
+# Inside of the head outline (alpha eroded past the ink line), in rig px: the eyes are clipped to it,
+# so the far eye tucks behind the bridge of the muzzle as in a 3/4 view.
+_a = (headB[:, :, 3] > 128).astype(np.uint8)
+_a = cv2.erode(_a, np.ones((15, 15), np.uint8))
+_cs, _ = cv2.findContours(_a, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+_c = cv2.approxPolyDP(max(_cs, key=cv2.contourArea), 2.0, True).reshape(-1, 2).astype(np.float64)
+_A = at4(B_to_rig, SHIFT)
+META['headClip'] = [[round(float(v), 1) for v in (_A @ np.array([x, y, 1.0]))] for x, y in _c]
+
+# The nose tip (centre of the black nose blob), in rig px: the face is posed against it.
+_d = ((headB[:, :, :3].max(2) < 60) & (headB[:, :, 3] > 200)).astype(np.uint8)
+_d = cv2.morphologyEx(_d, cv2.MORPH_OPEN, np.ones((9, 9), np.uint8))
+_n, _l, _st, _c = cv2.connectedComponentsWithStats(_d)
+_i = max(range(1, _n), key=lambda i: (_st[i, 0] + _st[i, 2]) if _st[i, 4] > 2000 and _st[i, 2] < _st[i, 3] * 3 else -1)
+META['nose'] = [float(v) for v in (at4(B_to_rig, SHIFT) @ np.array([_c[_i][0], _c[_i][1], 1.0]))]
+
 if 'ear_over' in PARAMS:
     # The far ear stands in front of the hat (master look): the same head pixels inside a polygon,
     # feathered, drawn again after the hat.

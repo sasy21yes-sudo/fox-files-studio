@@ -102,7 +102,8 @@ def main():
         pts = np.vstack([np.column_stack(np.nonzero(blob)[::-1]), ell]).astype(np.int32)
         inside = np.zeros(blob.shape, np.uint8)
         cv2.fillPoly(inside, [cv2.convexHull(pts)], 1)
-        inside = inside.astype(bool) & ndi.binary_erosion(sil, iterations=3)
+        # The ink rim is ~10-12 px thick all round (4x px): keep the white that far inside the silhouette.
+        inside = inside.astype(bool) & ndi.binary_erosion(sil, iterations=10)
         hl = white & ndi.binary_fill_holes(pup) & ~pup
         hl_c = (np.nonzero(hl)[1].mean(), np.nonzero(hl)[0].mean(), np.sqrt(hl.sum() / np.pi)) if hl.any() else None
         ys, xs = np.nonzero(inside)
@@ -134,11 +135,17 @@ def main():
         best = ndi.binary_dilation(best, iterations=4) & (dark | brow_fill)  # its ink outline
         brows[side] = fourier(contour(ndi.binary_fill_holes(best), 0.5), 12)
 
+    # The nose: the dark blob at the tip of the muzzle (bottom right of the crop).
+    nb = ndi.binary_opening(dark[595:700, 480:600], iterations=2)
+    nl, nn = ndi.label(nb)
+    ys_, xs_ = np.nonzero(nl == 1 + int(np.argmax(ndi.sum(nb, nl, range(1, nn + 1)))))
+    nose = (xs_.mean() + 480, ys_.mean() + 595)
     # Normalise: origin = near white centre, unit = near white height.
     ox, oy = eyes['near']['centre']
     unit = eyes['near']['height']
     norm = lambda pts: [[round((x - ox) / unit, 4), round((y - oy) / unit, 4)] for x, y in pts]
-    out = {'source': 'art/reference/agent-fox-master.png (face, upscaled 4x)', 'eyes': {}, 'brows': {}}
+    out = {'source': 'art/reference/agent-fox-master.png (face, upscaled 4x)', 'eyes': {}, 'brows': {},
+           'nose': [round((nose[0] - ox) / unit, 4), round((nose[1] - oy) / unit, 4)]}
     for side, e in eyes.items():
         pcx, pcy, pa, pb, pang = e['pupil']
         out['eyes'][side] = {
@@ -154,13 +161,15 @@ def main():
                           if e['hl'] else None),
         }
     for side, b in brows.items():
-        out['brows'][side] = norm(b[::4])
+        out['brows'][side] = norm(b[::2])
     # Eye profiles for the animated lid: at N columns across the silhouette, the silhouette's and the
     # white's top and bottom (where the white does not reach, its top = bottom = the lid's closing line).
-    N = 33
+    N = 81
     for side, e in eyes.items():
         sil, wh = e['silhouette'], e['white']
-        xs = np.linspace(sil[:, 0].min() + 0.5, sil[:, 0].max() - 0.5, N)
+        # Cosine spacing: columns dense at the two ends, where the outline turns fast.
+        x0, x1 = sil[:, 0].min() + 0.5, sil[:, 0].max() - 0.5
+        xs = (x0 + x1) / 2 - (x1 - x0) / 2 * np.cos(np.linspace(0, np.pi, N))
         st, sb = profile(sil, xs)
         wt, wb = profile(wh, xs)
         ok = ~np.isnan(wt)
