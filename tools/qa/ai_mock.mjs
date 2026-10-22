@@ -39,11 +39,6 @@ await p.waitForSelector('.ai-result', { timeout: 5000 });
 const t = await p.evaluate(() => 4.9 * (26 / 9));
 await p.locator('.tl-clip.k-scene').first().click({ position: { x: 20, y: 10 } });
 await p.locator('.tl-toolbar button', { hasText: 'Scene' }).click();
-await p.evaluate((t) => {
-  const r = document.querySelector('.tl-ruler').getBoundingClientRect();
-  const pps = r.width / (document.querySelectorAll('.tl-tick').length ? parseFloat(getComputedStyle(document.querySelector('.tl-ruler')).width) / r.width : 1);
-  void pps;
-}, t);
 await p.keyboard.press('Home');
 for (let i = 0; i < Math.round(t); i++) await p.keyboard.press('Shift+ArrowRight');
 await p.waitForTimeout(500);
