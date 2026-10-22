@@ -1,5 +1,6 @@
 // Shared domain types for The Fox Files Studio.
 import type { Lang } from './i18n/languages';
+import type { SceneSpec } from './scene/spec';
 
 export type AspectRatio = '9:16' | '16:9';
 
@@ -29,6 +30,8 @@ export interface Scene {
   keywords: string[];
   /** Ids of entries in `SOURCES` that support this scene's claims. */
   sourceIds: string[];
+  /** Data-driven choreography (scene/spec.ts). When absent the hand-coded renderer for `id` is used. */
+  spec?: SceneSpec;
 }
 
 export interface SubtitleStyle {

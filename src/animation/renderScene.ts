@@ -15,6 +15,7 @@ import { sceneRevelation } from './scenes/sceneRevelation';
 import { sceneKnown } from './scenes/sceneKnown';
 import { renderHook } from './scenes/hook';
 import { renderBeats } from '../effects/beats';
+import { renderSpec } from '../scene/renderSpec';
 import { localizeContext, setLabelLang } from '../i18n/labels';
 
 export const SCENE_RENDERERS: Record<SceneId, SceneRenderer> = {
@@ -110,7 +111,7 @@ export function renderFrame(
   const weave = gateWeave(time, u);
   g.save();
   g.translate(weave.x, weave.y);
-  const out = SCENE_RENDERERS[span.scene.id](stage);
+  const out = span.scene.spec ? renderSpec(span.scene.spec, stage) : SCENE_RENDERERS[span.scene.id](stage);
   g.restore();
 
   // Explainer pop-ups synced to the narration.

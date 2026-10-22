@@ -1,5 +1,7 @@
 import type { Project, Scene, TransitionType } from '../types';
 import { MKULTRA_SCRIPT } from './mkultraScript';
+import { SPECS } from './specs';
+import { isSceneSpec } from '../scene/validate';
 import { scriptFor } from '../i18n/scripts';
 import { isLang, type Lang } from '../i18n/languages';
 
@@ -24,6 +26,7 @@ export function createMkultraProject(lang: Lang = 'en'): Project {
     narration: script.scenes[entry.id].narration,
     keywords: [...script.scenes[entry.id].keywords],
     sourceIds: [...entry.sourceIds],
+    ...(SPECS[entry.id] ? { spec: structuredClone(SPECS[entry.id]) } : {}),
   }));
 
   return {
@@ -75,6 +78,7 @@ export function restoreProject(raw: unknown): Project | null {
       narration: typeof s.narration === 'string' ? s.narration : scene.narration,
       keywords: Array.isArray(s.keywords) ? s.keywords.filter((k) => typeof k === 'string') : scene.keywords,
       narrations: s.narrations && typeof s.narrations === 'object' ? s.narrations : undefined,
+      spec: isSceneSpec(s.spec) ? s.spec : scene.spec,
     };
   });
   return {
