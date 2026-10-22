@@ -772,7 +772,14 @@ if RESTYLED_HEAD and 'TORSO_HOLE' in globals():
     paste(torso_a, tor[..., 3].astype(np.float32) / 255, int(tp['x']) - OXr, int(tp['y']) - OYr)
     top_y = np.nonzero(hole_rig.max(1) > 0.5)[0].min() + OYr + 18
     inside = cv2.dilate((hole_rig > 0.5).astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32)
-    covered = (torso_a > 0.5).astype(np.float32) * (1 - inside)
+    # Only the SHIRT collar goes over the fur (the ruff keeps hanging over the coat as in the master):
+    # the white shirt pixels of the torso, grown a little to take their ink outline.
+    tor_hsv = cv2.cvtColor(tor[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
+    shirt_t = ((tor_hsv[..., 2] > 165) & (tor_hsv[..., 1] < 70) & (tor[..., 3] > 128)).astype(np.uint8)
+    shirt_t = cv2.dilate(shirt_t, np.ones((11, 11), np.uint8))
+    shirt = np.zeros_like(hole_rig)
+    paste(shirt, shirt_t.astype(np.float32), int(tp['x']) - OXr, int(tp['y']) - OYr)
+    covered = (torso_a > 0.5).astype(np.float32) * (1 - inside) * shirt
     covered = cv2.GaussianBlur(covered, (0, 0), 2)
     for name in [n for n in META['parts'] if n == 'head' or n.startswith('mouth_')]:
         pp = META['parts'][name]
