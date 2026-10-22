@@ -308,10 +308,12 @@ export function drawFace(g: G, f: Face) {
 function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   const e = RIG.eyes[side];
   const [cx, cy0] = e.white;
-  const rx = e.rx * 1.02 * f.eyeScale;
-  const ry = e.ry * 1.18 * f.eyeScale;
-  const cy = cy0 - e.ry * 0.12;
-  const lw = Math.max(5, e.rx * 0.17);
+  // Master look (art/reference/agent-fox-master.png): smaller upright ovals with a fine rim,
+  // a solid round pupil and a round catch-light (the old pie-cut eye had a heavy ink rim and a wedge).
+  const rx = e.rx * 0.76 * f.eyeScale;
+  const ry = e.ry * 0.98 * f.eyeScale;
+  const cy = cy0 - e.ry * 0.1;
+  const lw = Math.max(4, e.rx * 0.13);
   g.lineCap = 'round';
   g.lineJoin = 'round';
   if (f.happy || (f.wink && i === 0)) {
@@ -344,10 +346,10 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
     g.stroke();
     return;
   }
-  // White with a heavy ink rim.
+  // White with a fine ink rim.
   g.fillStyle = INK;
   g.beginPath();
-  g.ellipse(cx, cy, rx + lw * 0.55, ry + lw * 0.55, 0, 0, Math.PI * 2);
+  g.ellipse(cx, cy, rx + lw * 0.3, ry + lw * 0.3, 0, 0, Math.PI * 2);
   g.fill();
   const sg = g.createLinearGradient(0, cy - ry, 0, cy + ry);
   sg.addColorStop(0, '#ece6dc');
@@ -361,21 +363,21 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   g.beginPath();
   g.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
   g.clip();
-  // Pie-cut pupil: a tall black oval with a wedge of light cut from it.
-  const px = cx + f.lookX * rx * 0.36 + rx * 0.08;
-  const py = cy + f.lookY * ry * 0.26 + ry * 0.1;
-  const pr = rx * 0.6 * f.pupil;
-  const pry = ry * 0.66 * f.pupil;
-  g.fillStyle = '#0d0805';
+  // Solid pupil with a round catch-light (upper right) and a small second one.
+  const px = cx + f.lookX * rx * 0.4 + rx * 0.06;
+  const py = cy + f.lookY * ry * 0.3 + ry * 0.08;
+  const pr = rx * 0.62 * f.pupil;
+  const pry = ry * 0.64 * f.pupil;
+  g.fillStyle = '#120a06';
   g.beginPath();
   g.ellipse(px, py, pr, pry, 0, 0, Math.PI * 2);
   g.fill();
   g.fillStyle = '#ffffff';
   g.beginPath();
-  g.moveTo(px + pr * 0.08, py - pry * 0.08);
-  g.lineTo(px + pr * 0.42, py - pry * 1.15);
-  g.lineTo(px + pr * 0.95, py - pry * 0.62);
-  g.closePath();
+  g.arc(px + pr * 0.32, py - pry * 0.38, pr * 0.3, 0, Math.PI * 2);
+  g.fill();
+  g.beginPath();
+  g.arc(px - pr * 0.3, py + pry * 0.38, pr * 0.12, 0, Math.PI * 2);
   g.fill();
   // Upper lid (fur) with a lash line; tilted for moods. Inner corner is +x.
   const tilt = f.lidTilt * ry * 0.5;
@@ -418,9 +420,9 @@ function drawEye(g: G, side: 'near' | 'far', i: number, f: Face) {
   }
   g.restore();
   g.strokeStyle = INK;
-  g.lineWidth = lw;
+  g.lineWidth = lw * 0.7;
   g.beginPath();
-  g.ellipse(cx, cy, rx + lw * 0.2, ry + lw * 0.2, 0, 0, Math.PI * 2);
+  g.ellipse(cx, cy, rx + lw * 0.15, ry + lw * 0.15, 0, 0, Math.PI * 2);
   g.stroke();
 }
 
