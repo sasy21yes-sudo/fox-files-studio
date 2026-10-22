@@ -81,6 +81,10 @@ load the recording under *Audio file*.
 The MP4 encoder sits behind the `Mp4Encoder` interface, so a different implementation can be passed to
 `runExport({ mp4Encoder })`.
 
+## QA scripts
+
+`npm run qa:frames`, `npm run qa:labels`, `npm run qa:voice` (Playwright, against `npm run dev`) — see CLAUDE.md.
+
 ## Tested
 
 In headless Chromium 141 (no proprietary codecs):

@@ -7,3 +7,4 @@ art/parts/up/
 __pycache__/
 *.pyc
 .DS_Store
+qa-out/
