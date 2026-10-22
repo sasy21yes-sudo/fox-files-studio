@@ -529,7 +529,12 @@ def part_at(name, pt, scale_ref, anchor_frac=None, anchor_px=None, rot=0.0, dark
 SHOE_S = 0.52
 img, o = part_at('legs9', (130, 470), SHOE_S, anchor_px=(103, 432))
 save('shoe_near', img, o)
-img, o = part_at('legs9', (350, 465), SHOE_S, anchor_px=(320, 428), dark=0.85)
+if PARAMS.get('far_shoe_from_near'):
+    # The far shoe drawing reads as pointing backwards (big heel, short toe): use the near shoe, a bit
+    # smaller and darker, so both feet clearly point forward.
+    img, o = part_at('legs9', (130, 470), SHOE_S * 0.94, anchor_px=(103, 432), dark=0.82)
+else:
+    img, o = part_at('legs9', (350, 465), SHOE_S, anchor_px=(320, 428), dark=0.85)
 save('shoe_far', img, o)
 
 HAND_S = 0.37

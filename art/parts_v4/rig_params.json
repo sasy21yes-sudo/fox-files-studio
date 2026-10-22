@@ -55,5 +55,6 @@
   ]
  ],
  "notes": "joints: shoulders lowered ~48 rig px so the sleeve cap starts at the coat shoulder (it stood ~30-40 px above); mirror: the far (right) sleeve texture; ear_over: far ear polygon in restyled head crop px, drawn over the hat; tailBase lowered/inward so the tail comes from the lower back under the coat, not beside the arm",
- "new_gloves": true
+ "new_gloves": true,
+ "far_shoe_from_near": true
 }
