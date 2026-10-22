@@ -412,7 +412,7 @@ export const FOX_DEF = {
     'The narrator-detective. x is his feet (frame fraction), y the ground line; acting is keyed: xTrack (walks), actions (walk, skid, take, pop, sparkle, sweat, hop), armFront/armBack poses, look, face values, mouth, eyes.',
 };
 
-export const ARM_MODES = ['rest', 'point', 'magnify', 'notebook', 'pencil', 'hold', 'hips', 'tiphat', 'hatChest', 'chin', 'shield', 'scratch', 'wave'] as const;
+export const ARM_MODES = ['rest', 'point', 'magnify', 'notebook', 'pencil', 'hold', 'hips', 'tiphat', 'hatChest', 'chin', 'shield', 'scratch', 'wave', 'one', 'two', 'three', 'stop', 'knock', 'pinch', 'shake'] as const;
 export const FACE_KEYS = ['brows', 'worry', 'skeptic', 'angry', 'headTilt', 'earDroop', 'hatLift', 'lids', 'sweat', 'sparkle'] as const;
 export const MOUTHS = ['', 'closed', 'smile', 'grin', 'frown', 'open', 'wide', 'o'] as const;
 

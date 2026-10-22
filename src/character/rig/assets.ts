@@ -20,42 +20,86 @@ import a17 from './hand_flat.webp';
 import a18 from './hand_flat_back.webp';
 import a19 from './hand_grip.webp';
 import a20 from './hand_grip_back.webp';
-import a21 from './hand_open.webp';
-import a22 from './hand_open_back.webp';
-import a23 from './hand_point.webp';
-import a24 from './hand_point_back.webp';
-import a25 from './hand_relaxed.webp';
-import a26 from './hand_relaxed_back.webp';
-import a27 from './hand_thumb.webp';
-import a28 from './hand_thumb_back.webp';
-import a29 from './hand_wave.webp';
-import a30 from './hand_wave_back.webp';
-import a31 from './hat.webp';
-import a32 from './head.webp';
-import a33 from './leg_far.webp';
-import a34 from './leg_near.webp';
-import a35 from './mouth_1.webp';
-import a36 from './mouth_10.webp';
-import a37 from './mouth_11.webp';
-import a38 from './mouth_12.webp';
-import a39 from './mouth_2.webp';
-import a40 from './mouth_3.webp';
-import a41 from './mouth_4.webp';
-import a42 from './mouth_5.webp';
-import a43 from './mouth_6.webp';
-import a44 from './mouth_7.webp';
-import a45 from './mouth_8.webp';
-import a46 from './mouth_9.webp';
-import a47 from './neck.webp';
-import a48 from './prop_magnifier.webp';
-import a49 from './prop_notebook.webp';
-import a50 from './prop_pencil.webp';
-import a51 from './shoe_far.webp';
-import a52 from './shoe_near.webp';
-import a53 from './sleeve_back.webp';
-import a54 from './sleeve_front.webp';
-import a55 from './tail.webp';
-import a56 from './torso.webp';
+import a21 from './hand_n_chin.webp';
+import a22 from './hand_n_chin_back.webp';
+import a23 from './hand_n_chin_palm.webp';
+import a24 from './hand_n_chin_palm_back.webp';
+import a25 from './hand_n_fist_tremble.webp';
+import a26 from './hand_n_fist_tremble_back.webp';
+import a27 from './hand_n_fist_tremble_palm.webp';
+import a28 from './hand_n_fist_tremble_palm_back.webp';
+import a29 from './hand_n_knock.webp';
+import a30 from './hand_n_knock_back.webp';
+import a31 from './hand_n_knock_palm.webp';
+import a32 from './hand_n_knock_palm_back.webp';
+import a33 from './hand_n_magnifier.webp';
+import a34 from './hand_n_magnifier_back.webp';
+import a35 from './hand_n_magnifier_palm.webp';
+import a36 from './hand_n_magnifier_palm_back.webp';
+import a37 from './hand_n_one.webp';
+import a38 from './hand_n_one_back.webp';
+import a39 from './hand_n_one_palm.webp';
+import a40 from './hand_n_one_palm_back.webp';
+import a41 from './hand_n_pencil.webp';
+import a42 from './hand_n_pencil_back.webp';
+import a43 from './hand_n_pencil_palm.webp';
+import a44 from './hand_n_pencil_palm_back.webp';
+import a45 from './hand_n_pinch_paper.webp';
+import a46 from './hand_n_pinch_paper_back.webp';
+import a47 from './hand_n_pinch_paper_palm.webp';
+import a48 from './hand_n_pinch_paper_palm_back.webp';
+import a49 from './hand_n_relaxed.webp';
+import a50 from './hand_n_relaxed_back.webp';
+import a51 from './hand_n_relaxed_palm.webp';
+import a52 from './hand_n_relaxed_palm_back.webp';
+import a53 from './hand_n_stop.webp';
+import a54 from './hand_n_stop_back.webp';
+import a55 from './hand_n_stop_palm.webp';
+import a56 from './hand_n_stop_palm_back.webp';
+import a57 from './hand_n_three.webp';
+import a58 from './hand_n_three_back.webp';
+import a59 from './hand_n_three_palm.webp';
+import a60 from './hand_n_three_palm_back.webp';
+import a61 from './hand_n_two.webp';
+import a62 from './hand_n_two_back.webp';
+import a63 from './hand_n_two_palm.webp';
+import a64 from './hand_n_two_palm_back.webp';
+import a65 from './hand_open.webp';
+import a66 from './hand_open_back.webp';
+import a67 from './hand_point.webp';
+import a68 from './hand_point_back.webp';
+import a69 from './hand_relaxed.webp';
+import a70 from './hand_relaxed_back.webp';
+import a71 from './hand_thumb.webp';
+import a72 from './hand_thumb_back.webp';
+import a73 from './hand_wave.webp';
+import a74 from './hand_wave_back.webp';
+import a75 from './hat.webp';
+import a76 from './head.webp';
+import a77 from './leg_far.webp';
+import a78 from './leg_near.webp';
+import a79 from './mouth_1.webp';
+import a80 from './mouth_10.webp';
+import a81 from './mouth_11.webp';
+import a82 from './mouth_12.webp';
+import a83 from './mouth_2.webp';
+import a84 from './mouth_3.webp';
+import a85 from './mouth_4.webp';
+import a86 from './mouth_5.webp';
+import a87 from './mouth_6.webp';
+import a88 from './mouth_7.webp';
+import a89 from './mouth_8.webp';
+import a90 from './mouth_9.webp';
+import a91 from './neck.webp';
+import a92 from './prop_magnifier.webp';
+import a93 from './prop_notebook.webp';
+import a94 from './prop_pencil.webp';
+import a95 from './shoe_far.webp';
+import a96 from './shoe_near.webp';
+import a97 from './sleeve_back.webp';
+import a98 from './sleeve_front.webp';
+import a99 from './tail.webp';
+import a100 from './torso.webp';
 
 export const RIG_ASSETS: Record<string, string> = {
   'arm_back_lower': a0,
@@ -79,40 +123,84 @@ export const RIG_ASSETS: Record<string, string> = {
   'hand_flat_back': a18,
   'hand_grip': a19,
   'hand_grip_back': a20,
-  'hand_open': a21,
-  'hand_open_back': a22,
-  'hand_point': a23,
-  'hand_point_back': a24,
-  'hand_relaxed': a25,
-  'hand_relaxed_back': a26,
-  'hand_thumb': a27,
-  'hand_thumb_back': a28,
-  'hand_wave': a29,
-  'hand_wave_back': a30,
-  'hat': a31,
-  'head': a32,
-  'leg_far': a33,
-  'leg_near': a34,
-  'mouth_1': a35,
-  'mouth_10': a36,
-  'mouth_11': a37,
-  'mouth_12': a38,
-  'mouth_2': a39,
-  'mouth_3': a40,
-  'mouth_4': a41,
-  'mouth_5': a42,
-  'mouth_6': a43,
-  'mouth_7': a44,
-  'mouth_8': a45,
-  'mouth_9': a46,
-  'neck': a47,
-  'prop_magnifier': a48,
-  'prop_notebook': a49,
-  'prop_pencil': a50,
-  'shoe_far': a51,
-  'shoe_near': a52,
-  'sleeve_back': a53,
-  'sleeve_front': a54,
-  'tail': a55,
-  'torso': a56,
+  'hand_n_chin': a21,
+  'hand_n_chin_back': a22,
+  'hand_n_chin_palm': a23,
+  'hand_n_chin_palm_back': a24,
+  'hand_n_fist_tremble': a25,
+  'hand_n_fist_tremble_back': a26,
+  'hand_n_fist_tremble_palm': a27,
+  'hand_n_fist_tremble_palm_back': a28,
+  'hand_n_knock': a29,
+  'hand_n_knock_back': a30,
+  'hand_n_knock_palm': a31,
+  'hand_n_knock_palm_back': a32,
+  'hand_n_magnifier': a33,
+  'hand_n_magnifier_back': a34,
+  'hand_n_magnifier_palm': a35,
+  'hand_n_magnifier_palm_back': a36,
+  'hand_n_one': a37,
+  'hand_n_one_back': a38,
+  'hand_n_one_palm': a39,
+  'hand_n_one_palm_back': a40,
+  'hand_n_pencil': a41,
+  'hand_n_pencil_back': a42,
+  'hand_n_pencil_palm': a43,
+  'hand_n_pencil_palm_back': a44,
+  'hand_n_pinch_paper': a45,
+  'hand_n_pinch_paper_back': a46,
+  'hand_n_pinch_paper_palm': a47,
+  'hand_n_pinch_paper_palm_back': a48,
+  'hand_n_relaxed': a49,
+  'hand_n_relaxed_back': a50,
+  'hand_n_relaxed_palm': a51,
+  'hand_n_relaxed_palm_back': a52,
+  'hand_n_stop': a53,
+  'hand_n_stop_back': a54,
+  'hand_n_stop_palm': a55,
+  'hand_n_stop_palm_back': a56,
+  'hand_n_three': a57,
+  'hand_n_three_back': a58,
+  'hand_n_three_palm': a59,
+  'hand_n_three_palm_back': a60,
+  'hand_n_two': a61,
+  'hand_n_two_back': a62,
+  'hand_n_two_palm': a63,
+  'hand_n_two_palm_back': a64,
+  'hand_open': a65,
+  'hand_open_back': a66,
+  'hand_point': a67,
+  'hand_point_back': a68,
+  'hand_relaxed': a69,
+  'hand_relaxed_back': a70,
+  'hand_thumb': a71,
+  'hand_thumb_back': a72,
+  'hand_wave': a73,
+  'hand_wave_back': a74,
+  'hat': a75,
+  'head': a76,
+  'leg_far': a77,
+  'leg_near': a78,
+  'mouth_1': a79,
+  'mouth_10': a80,
+  'mouth_11': a81,
+  'mouth_12': a82,
+  'mouth_2': a83,
+  'mouth_3': a84,
+  'mouth_4': a85,
+  'mouth_5': a86,
+  'mouth_6': a87,
+  'mouth_7': a88,
+  'mouth_8': a89,
+  'mouth_9': a90,
+  'neck': a91,
+  'prop_magnifier': a92,
+  'prop_notebook': a93,
+  'prop_pencil': a94,
+  'shoe_far': a95,
+  'shoe_near': a96,
+  'sleeve_back': a97,
+  'sleeve_front': a98,
+  'tail': a99,
+  'torso': a100,
 };

@@ -32,7 +32,15 @@ export type ArmMode =
   | 'chin'
   | 'shield'
   | 'scratch'
-  | 'wave';
+  | 'wave'
+  // Gestures with the new gloves (painted rig; the vector rig falls back to the nearest pose).
+  | 'one'
+  | 'two'
+  | 'three'
+  | 'stop'
+  | 'knock'
+  | 'pinch'
+  | 'shake';
 
 /** Mouth chart. The first group are speech shapes (visemes). */
 export type MouthShape =
@@ -1239,6 +1247,16 @@ function rawTarget(mode: ArmMode, front: boolean, pose: FoxPose, bob: number): R
       return { hx: front ? 40 : -78, hy: -478 + bob + Math.sin(t * 22) * 6, bend: front ? 84 : -84, hand: 'open', handRot: -1.6, layer: front ? 'over' : 'behind' };
     case 'wave':
       return { hx: 150 + Math.sin(t * 9) * 18, hy: -470 + bob, bend: 40, hand: 'open', handRot: -1.4, layer: 'front' };
+    case 'one':
+    case 'two':
+    case 'three':
+    case 'shake':
+      return { hx: 150 + (mode === 'shake' ? Math.sin(t * 40) * 4 : 0), hy: -440 + bob, bend: 40, hand: mode === 'shake' ? 'fist' : 'point', handRot: -1.4, layer: 'front' };
+    case 'stop':
+      return { hx: 160, hy: -380 + bob, bend: 30, hand: 'flat', handRot: -1.5, layer: 'over' };
+    case 'knock':
+    case 'pinch':
+      return { hx: 170 + (mode === 'knock' ? Math.max(0, Math.sin(t * 12)) * 14 : 0), hy: -330 + bob, bend: 30, hand: 'fist', handRot: -0.2, layer: 'front' };
   }
 }
 
@@ -1582,6 +1600,14 @@ const FAR_T: Partial<Record<ArmMode, ArmDef>> = {
   tiphat: { t: [612, 118], hand: 'fist', rot: -1.2, layer: 'over' },
   pencil: { t: [566, 276], hand: 'fist', rot: -2.3, layer: 'front' },
   notebook: { t: [604, 350], hand: 'relaxed', layer: 'behind' },
+  // New gloves (hand_n_*): counting and gestures in front of the chest, master look.
+  one: { t: [700, 178], hand: 'n_one', rot: -1.35, layer: 'over' },
+  two: { t: [700, 178], hand: 'n_two', rot: -1.35, layer: 'over' },
+  three: { t: [700, 178], hand: 'n_three', rot: -1.35, layer: 'over' },
+  stop: { t: [672, 214], hand: 'n_stop_palm', rot: -1.57, layer: 'over' },
+  knock: { t: [676, 236], hand: 'n_knock', rot: -0.15, layer: 'over' },
+  pinch: { t: [650, 238], hand: 'n_pinch_paper_palm', rot: -1.4, layer: 'over' },
+  shake: { t: [700, 190], hand: 'n_fist_tremble', rot: -1.45, layer: 'over' },
 };
 const NEAR_T: Partial<Record<ArmMode, ArmDef>> = {
   rest: { t: [452, 354], hand: 'relaxed', flip: true, layer: 'front' },
@@ -1658,6 +1684,8 @@ function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
     if (mode === 'chin') p = [p[0] + Math.sin(t * 5) * 4, p[1]];
     if (mode === 'scratch') p = [p[0], p[1] + Math.sin(t * 22) * 14];
     if (mode === 'wave') p = [p[0] + Math.sin(t * 9) * 40, p[1]];
+    if (mode === 'shake') p = [p[0] + Math.sin(t * 41) * 9, p[1] + Math.sin(t * 37) * 7];
+    if (mode === 'knock') p = [p[0] + Math.max(0, Math.sin(t * 12)) * 30, p[1]];
     return p;
   };
   const A = target(st.from);

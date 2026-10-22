@@ -78,7 +78,7 @@ export const FILE_SPEC: SceneSpec = {
       },
       mouth: [{ at: 6.3, value: 'grin' }],
       eyes: [{ at: 0, value: 'open' }, { at: 7.9, value: 'happy' }, { at: 8.5, value: 'open' }],
-      armFront: [{ at: 0, value: 'rest' }, { at: 4.9, value: 'magnify' }, { at: 5.8, value: 'point' }, { at: 7.4, value: 'hips' }],
+      armFront: [{ at: 0, value: 'rest' }, { at: 2.9, value: 'stop' }, { at: 4.55, value: 'one' }, { at: 4.95, value: 'magnify' }, { at: 5.8, value: 'point' }, { at: 6.7, value: 'chin' }, { at: 7.6, value: 'hips' }],
       armBack: [{ at: 0, value: 'rest' }, { at: 7.4, value: 'hips' }],
       pointAt: { x: 0.5, y: { h: 0.2, v: 0.15 } },
     },
