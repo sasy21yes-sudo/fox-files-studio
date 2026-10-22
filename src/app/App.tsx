@@ -130,7 +130,7 @@ export function App() {
 
   // Render edited lines with the local server, one at a time, shortly after typing stops.
   useEffect(() => {
-    if (!studioMode || server !== 'online' || packStatus.state === 'loading' || !missing.length) return;
+    if (!studioMode || studio.packOnly || server !== 'online' || packStatus.state === 'loading' || !missing.length) return;
     let alive = true;
     const id = window.setTimeout(async () => {
       const store = liveStore.current.get(voiceKey) ?? new Map();

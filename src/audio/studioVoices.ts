@@ -13,6 +13,8 @@ export interface StudioVoice {
   kokoroLang: string;
   /** Narration speed passed to Kokoro (1 = natural). */
   speed: number;
+  /** Rendered offline by another engine: the local Kokoro server cannot fill in edited lines. */
+  packOnly?: boolean;
 }
 
 export const STUDIO_VOICES: Record<Lang, StudioVoice[]> = {
@@ -22,6 +24,8 @@ export const STUDIO_VOICES: Record<Lang, StudioVoice[]> = {
     { id: 'bm_george', label: 'George — British documentary', kokoroLang: 'en-gb', speed: 1.0 },
   ],
   it: [
+    // Qwen3-TTS (Apache-2.0), rendered by tools/render_voice_qwen.py: no live rendering for edited lines.
+    { id: 'it_qwen_narratore', label: 'Narratore — voce nuova (Qwen3)', kokoroLang: 'it', speed: 1.0, packOnly: true },
     { id: 'im_nicola', label: 'Nicola — narratore', kokoroLang: 'it', speed: 1.0 },
     { id: 'if_sara', label: 'Sara — narratrice', kokoroLang: 'it', speed: 1.0 },
   ],
