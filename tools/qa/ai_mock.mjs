@@ -11,7 +11,7 @@ const p = await b.newPage({ viewport: { width: 1600, height: 1000 } });
 const errs = [];
 p.on('pageerror', (e) => errs.push(String(e)));
 let posted = null;
-await p.route('**/api/claude/status', (r) => r.fulfill({ json: { available: true, model: 'claude-opus-5-5 (mock)' } }));
+await p.route('**/api/claude/status', (r) => r.fulfill({ json: { available: true, backend: 'claude-code', model: 'claude-opus-5-5 (mock)' } }));
 await p.goto(URL);
 await p.evaluate(() => localStorage.clear());
 const spec = await p.evaluate(async () => {
@@ -23,10 +23,10 @@ const spec = await p.evaluate(async () => {
   });
   return s;
 });
-await p.route('**/api/claude/scene', async (r) => {
+await p.route('**/api/claude/edit', async (r) => {
   posted = JSON.parse(r.request().postData() || '{}');
   await new Promise((res) => setTimeout(res, 600));
-  await r.fulfill({ json: { summary: 'Ho aggiunto un timbro CLASSIFIED che cade sulla cartella subito dopo l’atterraggio (4,4 s).', spec, beats: null, duration: null, usage: { input: 1200, output: 3400, cacheRead: 9800, cacheWrite: 0 }, model: 'claude-opus-5-5', attempts: 1 } });
+  await r.fulfill({ json: { summary: 'Ho aggiunto un timbro CLASSIFIED che cade sulla cartella subito dopo l’atterraggio (4,4 s).', scenes: [{ index: 0, spec, beats: null, duration: null }], usage: { input: 1200, output: 3400, cacheRead: 9800, cacheWrite: 0 }, model: 'claude-opus-5-5', attempts: 1 } });
 });
 await p.reload();
 await p.waitForTimeout(2500);
@@ -49,7 +49,7 @@ await p.waitForTimeout(500);
 await p.screenshot({ path: `${OUT}/03_undone.png` });
 const stampLaneAfterUndo = await p.locator('.tl-row', { hasText: 'stamp' }).count();
 console.log({
-  posted: posted && { prompt: posted.prompt, scene: posted.scene?.title, hasSpec: !!posted.scene?.spec, sources: posted.sources?.length, narrationChars: posted.scene?.narration?.length },
+  posted: posted && { prompt: posted.prompt, target: posted.target, scenes: posted.scenes?.length, hasSpec: !!posted.scenes?.[0]?.spec, sources: posted.sources?.length },
   stampLane,
   stampLaneAfterUndo,
 });
