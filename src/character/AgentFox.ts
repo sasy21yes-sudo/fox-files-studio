@@ -1,6 +1,6 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
 import { face as faceTweak, motion, tweaks } from './rig/tweaks';
-import { RIG, anchored, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
+import { RIG, anchored, anchoredFlex, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 export { loadRig as loadPuppet } from './rig/rigPuppet';
 
 /**
@@ -1752,10 +1752,26 @@ function hoseHand(A: RigArm) {
   return { S, c, ang, hx, hy, rot: A.handRot ?? ang };
 }
 
+/** Per-frame wrist motion (set by drawFoxSheetRig): walk drag and idle breathing of the gloves. */
+const wrist = { walk: 0, phase: 0, time: 0 };
+
 function drawGloveRig(g: G, A: RigArm, alpha = 1) {
   const h = hoseHand(A);
   if (alpha < 1) g.globalAlpha = alpha;
-  anchored(g, `hand_${A.handName}${GLOVE_SUFFIX[A.phys]}`, h.hx, h.hy, h.rot, 1, A.flip);
+  // Follow-through: the hand trails the arm's swing (wrist flex) and breathes a little at rest; the
+  // fingers curl softly with it. Gloves are drawn a touch bigger, chunky like the master's.
+  const side = A.phys === 'far' ? 0 : Math.PI;
+  const drag = Math.cos(wrist.phase + side) * 0.32 * wrist.walk;
+  const idle = Math.sin(wrist.time * 1.7 + (A.phys === 'far' ? 0 : 1.3)) * 0.05 * (1 - wrist.walk);
+  const flex = drag + idle;
+  anchoredFlex(g, `hand_${A.handName}${GLOVE_SUFFIX[A.phys]}`, h.hx, h.hy, h.rot + flex * 0.5, {
+    bend: flex * 0.7 * (A.flip ? -1 : 1),
+    pivot: 0.42,
+    scale: 1.12,
+    sx: 1 + Math.abs(drag) * 0.05,
+    sy: 1 - Math.abs(drag) * 0.04,
+    flipY: A.flip,
+  });
   if (alpha < 1) g.globalAlpha = 1;
 }
 
@@ -1860,6 +1876,9 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
 
   // Arms.
   const arms = resolveArms(pose);
+  wrist.walk = walk;
+  wrist.phase = phase;
+  wrist.time = time;
   const ps = physStates(arms);
   const far = rigArm(ps.far, 'far', pose);
   const near = rigArm(ps.near, 'near', pose);
@@ -1929,9 +1948,19 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     // Shoe first: the trouser hem falls over the top of the shoe instead of the shoe sitting on it.
     // The shoe sits a little higher and further forward than the hem, so the trouser drapes over its
     // ankle opening (a slight "break" that flares at the hem) instead of ending on top of it.
-    const sx = ankle[0] + Math.cos(footRot) * 10 * RK;
-    const sy = ankle[1] - 9 * RK + Math.sin(footRot) * 10 * RK;
-    anchored(g, `shoe_${name}`, sx, sy, footRot);
+    const sx = ankle[0] + Math.cos(footRot) * 16 * RK;
+    const sy = ankle[1] + 7 * RK + Math.sin(footRot) * 10 * RK;
+    // Soft shoe: the toe bends up as the heel lifts (toe-off) and the shoe squashes a little when the
+    // heel lands, instead of the whole shoe pivoting like a rigid block.
+    const toeOff = stance ? Math.max(0, (u - 0.6) / 0.4) : Math.max(0, 1 - u / 0.25);
+    const land = stance ? Math.max(0, 1 - u / 0.18) : 0;
+    anchoredFlex(g, `shoe_${name}`, sx, sy, footRot * 0.5, {
+      bend: -0.45 * Math.sin(Math.min(1, toeOff) * Math.PI * 0.5) * walk,
+      pivot: 0.58,
+      scale: 1.1, // chunky shoes, like the master's
+      sx: 1 + 0.06 * land * walk,
+      sy: 1 - 0.08 * land * walk,
+    });
     noodle(g, `leg_${name}`, hip, c, ankle, 0, 1, (t) => 1 + 0.12 * Math.pow(Math.max(0, (t - 0.8) / 0.2), 2));
     mark(g, `hip_${name}`, hip);
     mark(g, `knee_${name}`, [(hip[0] + 2 * c[0] + ankle[0]) / 4, (hip[1] + 2 * c[1] + ankle[1]) / 4]);

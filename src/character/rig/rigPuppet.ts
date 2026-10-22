@@ -101,6 +101,74 @@ export function anchored(g: G, name: string, x: number, y: number, rot = 0, scal
 }
 
 /**
+ * A sprite that bends instead of turning as one rigid block (no "sticker" look): drawn in vertical
+ * strips; strips past `pivot` (fraction of the width, from the anchor side) turn progressively up to
+ * `bend` radians around the pivot line's bottom, and the whole thing squashes (sx, sy) about the
+ * anchor. Used for shoes (toe bend, landing squash) and gloves (wrist flex, grip squash).
+ */
+export function anchoredFlex(
+  g: G,
+  name: string,
+  x: number,
+  y: number,
+  rot: number,
+  o: { bend?: number; pivot?: number; sx?: number; sy?: number; scale?: number; flipY?: boolean } = {},
+) {
+  const p = RIG.parts[name];
+  const img = images[name];
+  if (!img) return;
+  const bend = o.bend ?? 0;
+  const sx = (o.sx ?? 1) * (o.scale ?? 1);
+  const sy = (o.sy ?? 1) * (o.scale ?? 1) * (o.flipY ? -1 : 1);
+  g.save();
+  g.translate(x, y);
+  if (rot) g.rotate(rot);
+  g.scale(sx, sy);
+  if (Math.abs(bend) < 0.004) {
+    g.drawImage(img, p.x, p.y);
+    g.restore();
+    return;
+  }
+  const W = img.width;
+  const H = img.height;
+  const px = p.x + W * (o.pivot ?? 0.5);
+  const py = p.y + H; // bend around the bottom edge (the sole / the palm side)
+  const N = 14;
+  const x0 = px;
+  const step = (p.x + W - x0) / N;
+  // Back part: unchanged.
+  g.save();
+  g.beginPath();
+  g.rect(p.x - 2, p.y - H, x0 - p.x + 2.5, H * 3);
+  g.clip();
+  g.drawImage(img, p.x, p.y);
+  g.restore();
+  // Front strips: each rotated a little more around the running pivot, so the shape curves smoothly.
+  let cx = px;
+  let cy = py;
+  let ang = 0;
+  for (let i = 0; i < N; i++) {
+    const a = (bend * (i + 0.5)) / N;
+    const sxi = x0 + i * step;
+    g.save();
+    g.translate(cx, cy);
+    g.rotate(a);
+    g.translate(-(sxi), -py);
+    g.beginPath();
+    g.rect(sxi - 0.6, p.y - H, step + 1.2, H * 3);
+    g.clip();
+    g.drawImage(img, p.x, p.y);
+    g.restore();
+    // advance the pivot along the bent bottom edge
+    cx += Math.cos(a) * step;
+    cy += Math.sin(a) * step;
+    ang = a;
+  }
+  void ang;
+  g.restore();
+}
+
+/**
  * Draw a sprite as thin horizontal bands, each shifted sideways by dx(row):
  * a smooth bend of the drawing itself (spine sway, coat swing, tail wave)
  * instead of a rigid rotation. Bands overlap by a pixel so nothing tears.
