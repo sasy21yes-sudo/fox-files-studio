@@ -456,6 +456,17 @@ export function drawCheekTuft(g: G) {
   const P = cheekTuft();
   const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
   if (P.length < 3) return;
+  // Behind the muzzle: nothing of the tuft is drawn over the snout (from its top outline down).
+  const S = snoutRegion();
+  g.save();
+  if (S.length > 2) {
+    g.beginPath();
+    g.rect(-1e5, -1e5, 2e5, 2e5);
+    g.moveTo(S[0][0], S[0][1]);
+    for (const q of S) g.lineTo(q[0], q[1]);
+    g.closePath();
+    g.clip('evenodd');
+  }
   const path = () => {
     g.beginPath();
     g.moveTo(P[0][0], P[0][1]);
@@ -479,13 +490,104 @@ export function drawCheekTuft(g: G) {
   g.stroke();
   g.restore();
   const [r, gg, b] = RIG.furColor;
-  g.fillStyle = `rgb(${Math.round(r * TUFT_SHADE)}, ${Math.round(gg * TUFT_SHADE)}, ${Math.round(b * TUFT_SHADE)})`;
+  const tone = (k: number, a = 1) =>
+    `rgba(${Math.min(255, Math.round(r * k))}, ${Math.min(255, Math.round(gg * k))}, ${Math.min(255, Math.round(b * k))}, ${a})`;
+  g.fillStyle = tone(TUFT_SHADE);
   path();
   g.fill();
+  // Shine and shade, whatever shape was drawn: inside the tuft, a light band along the edges that face up
+  // (the light comes from above, as on the head) and a soft shade along the ones that face down.
+  g.save();
+  path();
+  g.clip();
+  g.lineCap = 'round';
+  let area = 0;
+  for (let i = 0; i < P.length; i++) {
+    const [x0, y0] = P[i];
+    const [x1, y1] = P[(i + 1) % P.length];
+    area += x0 * y1 - x1 * y0;
+  }
+  const sgn = area > 0 ? 1 : -1; // outward normal side
+  for (const [width, alpha] of [[TUFT_SHINE * 2, 0.22], [TUFT_SHINE, 0.42]] as const) {
+    for (let i = 0; i < P.length; i++) {
+      const [x0, y0] = P[i];
+      const [x1, y1] = P[(i + 1) % P.length];
+      const l = Math.hypot(x1 - x0, y1 - y0) || 1;
+      const ny = (sgn * (x1 - x0)) / l; // outward normal, y part (canvas y grows down)
+      if (Math.abs(ny) < 0.25) continue;
+      // Only the tuft's own edges, outside the head: its base melts into the face without a mark.
+      if (clip && inside(clip, (x0 + x1) / 2, (y0 + y1) / 2)) continue;
+      g.strokeStyle = ny < 0 ? tone(1.22, alpha) : tone(0.72, alpha * 0.8);
+      g.lineWidth = width;
+      g.beginPath();
+      g.moveTo(x0, y0);
+      g.lineTo(x1, y1);
+      g.stroke();
+    }
+  }
+  g.restore();
+  g.restore();
 }
+
+/**
+ * The snout of the head sprite, as a polygon: from the corner where the muzzle line under the far eye
+ * meets the outline, along the snout's top outline (raised to take its ink) to past the nose, and down.
+ */
+let SNOUT: V2[] | null = null;
+export function snoutRegion(): V2[] {
+  if (SNOUT) return SNOUT;
+  const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
+  const nose = (RIG as unknown as { nose?: V2 }).nose;
+  if (!clip || !nose) return (SNOUT = []);
+  const k = FACE_UNIT;
+  const c = SIDE_FACE.centre('far', k);
+  // The corner where the forehead meets the snout: the leftmost point of the face's right outline
+  // between the far eye and the nose.
+  let C: V2 = [Infinity, 0];
+  for (let y = c[1]; y <= nose[1]; y += 3) {
+    let best = Infinity;
+    for (let i = 0; i < clip.length; i++) {
+      const [x0, y0] = clip[i];
+      const [x1, y1] = clip[(i + 1) % clip.length];
+      if ((y0 - y) * (y1 - y) <= 0 && y0 !== y1) {
+        const x = x0 + ((x1 - x0) * (y - y0)) / (y1 - y0);
+        if (x > c[0] && x < best) best = x;
+      }
+    }
+    if (best < C[0]) C = [best, y];
+  }
+  if (!Number.isFinite(C[0])) return (SNOUT = []);
+  // The outline's upper chain between the corner and the nose: at each x, the topmost crossing below C's line.
+  const top: V2[] = [];
+  for (let x = C[0]; x <= nose[0] + 60; x += 6) {
+    let best = Infinity;
+    for (let i = 0; i < clip.length; i++) {
+      const [x0, y0] = clip[i];
+      const [x1, y1] = clip[(i + 1) % clip.length];
+      if ((x0 - x) * (x1 - x) <= 0 && x0 !== x1) {
+        const y = y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
+        if (y >= C[1] - 0.05 * k && y < best) best = y;
+      }
+    }
+    if (Number.isFinite(best)) top.push([x, best - SNOUT_INK]);
+  }
+  if (top.length < 2) return (SNOUT = []);
+  const last = top[top.length - 1];
+  // Left of the corner the snout's top is the muzzle line under the far eye (raised to take its ink).
+  const ul = underlinePoints()
+    .map(([x, y]): V2 => [c[0] + x * k, c[1] + y * k - 0.04 * k])
+    .filter((p) => p[0] < C[0] - 2)
+    .sort((p, q) => p[0] - q[0]);
+  const left: V2[] = ul.length ? ul : [[C[0] - SNOUT_INK, C[1]]];
+  return (SNOUT = [...left, ...top, [last[0] + 200, last[1]], [last[0] + 200, last[1] + 2000], [left[0][0], last[1] + 2000]]);
+}
+/** How far above the head's inner outline (headClip) its drawn ink reaches (rig px). */
+const SNOUT_INK = 14;
 /** Half the tuft's outline width (rig px, like the head's own outline) and its fur colour vs the base fur. */
 const TUFT_INK = 4.5;
 const TUFT_SHADE = 0.96;
+/** Width (rig px) of the light band along the tuft's upper edges. */
+const TUFT_SHINE = 9;
 /** Default tuft (face units): its height above the muzzle line's end, how far it juts out, its tip's lift. */
 const TUFT_H = 0.5;
 const TUFT_REACH = 0.24;
