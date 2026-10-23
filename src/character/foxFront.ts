@@ -8,7 +8,7 @@
  * element's (x, y) is the bottom centre of the coat; at scale 1 the bust is as tall as the whole
  * side-view fox, so the heads have the same size.
  *
- * Layers: coat → head (neck, face, brows) → coat front (the collar over the neck) → hanging arms →
+ * Layers: hanging arms → coat → head (neck, face, brows) → coat front (the collar over the neck) →
  * arms gesturing in front of the chest.
  */
 import FRONT_JSON from './rig/front/front.json';
@@ -139,7 +139,7 @@ interface ArmPose {
 const ARM: Record<string, ArmPose> = {
   rest: { t: [25, 520], rot: null, hand: 'relaxed', front: false },
   notebook: { t: [25, 520], rot: null, hand: 'relaxed', front: false },
-  hips: { t: [-25, 375], rot: 2.6, hand: 'fist', front: false },
+  hips: { t: [5, 400], rot: 2.6, hand: 'fist', front: true },
   point: { t: [430, 20], rot: null, hand: 'point', front: false },
   wave: { t: [150, -330], rot: -1.6, hand: 'wave', front: false },
   one: { t: [-110, 110], rot: -1.5, hand: 'n_one', front: true },
@@ -189,8 +189,9 @@ function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolea
   if (P.front !== layerFront) return;
   const dir = side === 'right' ? 1 : -1;
   const S0 = side === 'right' ? FRONT.shoulders.right : FRONT.shoulders.left;
-  // The sleeve's round top sits on the coat's shoulder corner (rubber hose: no shoulder joint).
-  const S: V2 = [S0[0] + dir * 36, S0[1] + 25];
+  // Hanging arms come out from under the coat's shoulder (drawn behind it); arms gesturing in front of
+  // the chest start on the shoulder corner, the sleeve's round top over it (rubber hose: no joint).
+  const S: V2 = layerFront ? [S0[0] + dir * 36, S0[1] + 25] : [S0[0] + dir * 22, S0[1] + 60];
   const t: V2 = [P0.t[0] + (P1.t[0] - P0.t[0]) * A.b, P0.t[1] + (P1.t[1] - P0.t[1]) * A.b];
   // Hanging hands sway a little and breathe; gestures keep a small life of their own.
   const sway = Math.sin(time * 1.3 + (side === 'right' ? 0 : 1.7)) * 8;
@@ -237,6 +238,9 @@ export function drawFoxFront(g: G, I: FrontInput): void {
   g.scale(1 + breath * 0.5, 1 + breath);
   g.translate(-CX, -BOTTOM);
   g.translate(0, B * 0.6);
+  // Hanging arms come out from under the coat.
+  drawArm(g, 'left', I.arms.left, time, false);
+  drawArm(g, 'right', I.arms.right, time, false);
   placed(g, 'torso');
   // Head on the neck: talking nods and sway turn it about the top of the neck; it lags the body's bounce.
   const N = FRONT.neckPivot;
@@ -253,9 +257,7 @@ export function drawFoxFront(g: G, I: FrontInput): void {
   FACE.drawBrows(g, I.face);
   g.restore();
   placed(g, 'torso_front');
-  // Arms over the coat: hanging ones first, then the ones gesturing in front of the chest.
-  drawArm(g, 'left', I.arms.left, time, false);
-  drawArm(g, 'right', I.arms.right, time, false);
+  // Arms gesturing in front of the chest.
   drawArm(g, 'left', I.arms.left, time, true);
   drawArm(g, 'right', I.arms.right, time, true);
   g.restore();
