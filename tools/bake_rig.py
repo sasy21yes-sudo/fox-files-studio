@@ -308,7 +308,14 @@ lab, n = ndi.label(m)
 sz = ndi.sum(m, lab, range(1, n + 1))
 m = ndi.binary_fill_holes(lab == int(np.argmax(sz)) + 1)
 m = ndi.binary_opening(m, iterations=3) | core
+# Thin bits hanging off the brim's edge (a pointed flap of green-screen spill under the back of the brim,
+# stray bristles) read as little triangles on screen: open them away, keeping the brim's own shape.
+m = ndi.binary_opening(m, structure=np.ones((3, 3)), iterations=6) | core
 hat = ha.copy()
+# Green spill left on the brim's underside (olive: green as high as red): back to the felt's brown.
+_b, _g, _r = (hat[:, :, i].astype(int) for i in range(3))
+spill = (_g > _b * 1.5) & (_r - _g < 8)
+hat[:, :, 1] = np.where(spill, (_r * 0.77).astype(np.uint8), hat[:, :, 1])
 hat[:, :, 3] = (255 * cv2.GaussianBlur(m.astype(np.float32), (0, 0), 1.6)).astype(np.uint8)
 # The pin: the compact gold blob nearest to where it sits on the 1x sheet.
 labg, ng = ndi.label(ndi.binary_opening(gold & m, iterations=2))
@@ -331,6 +338,11 @@ cv2.fillPoly(hat, [inner], (120, 215, 245, 255), cv2.LINE_AA)
 cv2.polylines(hat, [pts], True, (12, 22, 34, 255), 7, cv2.LINE_AA)
 A_hat = compose(B_to_rig, A_to_B)  # headA crop px -> rig
 img, o = warp(hat, at4(A_hat, (0, 0)))
+for poly in PARAMS.get('hat_erase', []):
+    # Cut, feathered, in the baked sprite's own px (rig_params.json says why).
+    cut_ = np.zeros(img.shape[:2], np.float32)
+    cv2.fillPoly(cut_, [np.array(poly, np.int32)], 1.0, cv2.LINE_AA)
+    img[:, :, 3] = (img[:, :, 3] * (1 - cv2.GaussianBlur(cut_, (0, 0), 0.8))).astype(np.uint8)
 save('hat', img, o)
 
 # Eyes: whites, pupils, closed and happy eyes, sized and placed in head space.

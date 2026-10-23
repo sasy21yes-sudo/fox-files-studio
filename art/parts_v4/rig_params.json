@@ -54,7 +54,27 @@
    140
   ]
  ],
- "notes": "joints: shoulders lowered ~48 rig px so the sleeve cap starts at the coat shoulder (it stood ~30-40 px above); mirror: the far (right) sleeve texture; ear_over: far ear polygon in restyled head crop px, drawn over the hat; tailBase lowered/inward so the tail comes from the lower back under the coat, not beside the arm",
+ "notes": "joints: shoulders lowered ~48 rig px so the sleeve cap starts at the coat shoulder (it stood ~30-40 px above); mirror: the far (right) sleeve texture; ear_over: far ear polygon in restyled head crop px, drawn over the hat; tailBase lowered/inward so the tail comes from the lower back under the coat, not beside the arm; hat_erase: polygons (baked hat sprite px) cut off the hat: the olive lip under the back of the brim ended in a vertical cut that showed as a small triangle",
  "new_gloves": true,
- "far_shoe_from_near": true
+ "far_shoe_from_near": true,
+ "hat_erase": [
+  [
+   [
+    28,
+    305
+   ],
+   [
+    100,
+    309
+   ],
+   [
+    104,
+    330
+   ],
+   [
+    24,
+    330
+   ]
+  ]
+ ]
 }
