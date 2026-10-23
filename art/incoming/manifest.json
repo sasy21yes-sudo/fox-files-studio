@@ -7734,7 +7734,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/front_mouths/m0_v1.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7750,12 +7750,13 @@
           "width": 1040,
           "height": 1008,
           "seconds": 88.3,
-          "created": "2026-10-23T01:55:26"
+          "created": "2026-10-23T01:55:26",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         },
         {
           "version": "v2",
           "file": "art/incoming/pieces/front_mouths/m0_v2.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7771,7 +7772,8 @@
           "width": 1040,
           "height": 1008,
           "seconds": 78.7,
-          "created": "2026-10-23T01:56:45"
+          "created": "2026-10-23T01:56:45",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         }
       ]
     },
@@ -7780,7 +7782,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/front_mouths/m1_v1.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7796,12 +7798,13 @@
           "width": 1040,
           "height": 1008,
           "seconds": 86.5,
-          "created": "2026-10-23T01:58:12"
+          "created": "2026-10-23T01:58:12",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         },
         {
           "version": "v2",
           "file": "art/incoming/pieces/front_mouths/m1_v2.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7817,7 +7820,27 @@
           "width": 1040,
           "height": 1008,
           "seconds": 78.7,
-          "created": "2026-10-23T01:59:31"
+          "created": "2026-10-23T01:59:31",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/front_mouths/m1_v3.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/face_v2.png",
+          "refs": [],
+          "instruction": "Change ONLY the mouth under the black nose of this front-facing fox: lips pressed together: the same mouth line made flatter and a little shorter, closed, with a tiny bulge in the middle. Same cartoon style and dark-brown ink as the current mouth. The mouth stays small, entirely inside the cream muzzle and well above the dark chin outline. Keep EVERYTHING else exactly the same: eyes, eyebrows, nose, chin outline, cheek ruff, neck, hat, ears, size and position. Plain green background.",
+          "corrections": [],
+          "prompt": "Change ONLY the mouth under the black nose of this front-facing fox: lips pressed together: the same mouth line made flatter and a little shorter, closed, with a tiny bulge in the middle. Same cartoon style and dark-brown ink as the current mouth. The mouth stays small, entirely inside the cream muzzle and well above the dark chin outline. Keep EVERYTHING else exactly the same: eyes, eyebrows, nose, chin outline, cheek ruff, neck, hat, ears, size and position. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1685438333,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 56.2,
+          "created": "2026-10-23T02:26:28"
         }
       ]
     },
@@ -7826,7 +7849,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/front_mouths/m2_v1.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7842,12 +7865,13 @@
           "width": 1040,
           "height": 1008,
           "seconds": 88.3,
-          "created": "2026-10-23T02:00:59"
+          "created": "2026-10-23T02:00:59",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         },
         {
           "version": "v2",
           "file": "art/incoming/pieces/front_mouths/m2_v2.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7863,7 +7887,8 @@
           "width": 1040,
           "height": 1008,
           "seconds": 1239.0,
-          "created": "2026-10-23T02:21:38"
+          "created": "2026-10-23T02:21:38",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         }
       ]
     },
@@ -7872,7 +7897,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/front_mouths/m3_v1.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7888,12 +7913,13 @@
           "width": 1040,
           "height": 1008,
           "seconds": 88.3,
-          "created": "2026-10-23T02:23:07"
+          "created": "2026-10-23T02:23:07",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         },
         {
           "version": "v2",
           "file": "art/incoming/pieces/front_mouths/m3_v2.png",
-          "status": "draft",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/front/head_v6.png",
           "refs": [
@@ -7909,7 +7935,8 @@
           "width": 1040,
           "height": 1008,
           "seconds": 80.3,
-          "created": "2026-10-23T02:24:27"
+          "created": "2026-10-23T02:24:27",
+          "review": "round 1: blank head start, shapes off-model (frown, grin, jaw drop)"
         }
       ]
     }

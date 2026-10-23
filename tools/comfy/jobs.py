@@ -352,3 +352,27 @@ JOBS['front_mouths'] = {
         'outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.'))
     for k in range(12)
 }
+# Round 2: start from the approved front FACE, whose closed smiling mouth is the rest mouth (m0 is cut from it
+# directly), and change only the mouth, in front-view shapes sized to stay inside the cream muzzle.
+FRONT_MOUTH_SHAPES = [
+    None,  # rest: the approved front face's own mouth
+    'lips pressed together: the same mouth line made flatter and a little shorter, closed, with a tiny bulge in the middle',
+    'mouth just slightly open: the line parts into a narrow dark lens-shaped opening with the upper teeth just showing, no wider than the current mouth',
+    'mouth open: a rounded dark opening hanging under the mouth line, about as tall as the black nose, a pink tongue at its bottom, two tiny fangs at the top corners',
+    'mouth open wide and shallow: a wide flat dark opening with the upper teeth showing as a white band, about half as tall as the black nose',
+    'a small round open mouth: a dark oval about two-thirds the size of the black nose, centred under the line coming down from the nose',
+    'lips pushed forward into a tiny round pucker, a small ring smaller than the black nose, with a tiny dark centre',
+    'the upper front teeth (a short white band) resting on the lower lip line, mouth barely open',
+    'mouth open about half as tall as the black nose, the upper teeth visible and the tongue tip touching behind them',
+    'mouth slightly open with the pink tongue tip showing between the teeth',
+    'a bigger happy smile: the same mouth line curving up more at both ends, still closed',
+    'mouth closed in a short straight line with the ends turned very slightly down, serious',
+]
+JOBS['front_mouths'] = {
+    f'm{k}': dict(image='approved:front/face', refs=[], prompt=(
+        f'Change ONLY the mouth under the black nose of this front-facing fox: {FRONT_MOUTH_SHAPES[k]}. Same cartoon '
+        'style and dark-brown ink as the current mouth. The mouth stays small, entirely inside the cream muzzle and well '
+        'above the dark chin outline. Keep EVERYTHING else exactly the same: eyes, eyebrows, nose, chin outline, cheek '
+        'ruff, neck, hat, ears, size and position. Plain green background.'))
+    for k in range(1, 12)
+}

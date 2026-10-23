@@ -189,18 +189,24 @@ def torso(neck):
 
 
 def mouths(head_bgr, nose, nose_bot, picks):
-    """Mouth k+1 (rig MouthId) from render m<k>: what differs from the blank head below the nose."""
+    """Mouth k+1 from render m<k> (mouth 1: the approved front face): the ink, teeth and tongue under the nose."""
     m = json.load(open(MANIFEST, encoding='utf8'))['sheets']
     done = []
     for k in range(12):
-        sheet = m.get(f'front_mouths/m{k}', {}).get('versions', [])
-        want = picks.get(k + 1)
-        pick = [v for v in sheet if want and v['version'] == want] or [v for v in sheet if v['status'] == 'approved']
-        if not pick:
+        if k == 0:
+            # Rest: the approved front face's own closed smile.
+            r = cv2.imread(os.path.join(ROOT, approved('front/face')))
+            pick = [{'version': 'face'}]
+        else:
+            sheet = m.get(f'front_mouths/m{k}', {}).get('versions', [])
+            want = picks.get(k + 1)
+            pick = [v for v in sheet if want and v['version'] == want] or [v for v in sheet if v['status'] == 'approved']
+        if k and not pick:
             pick = [v for v in sheet if v['status'] != 'rejected'][:1]
         if not pick:
             continue
-        r = cv2.imread(os.path.join(ROOT, pick[-1]['file']))
+        if k:
+            r = cv2.imread(os.path.join(ROOT, pick[-1]['file']))
         rn, _, _ = nose_of(r)
         d = nose - rn
         r = cv2.warpAffine(r, np.float32([[1, 0, d[0]], [0, 1, d[1]]]), (r.shape[1], r.shape[0]), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
