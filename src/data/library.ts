@@ -103,14 +103,24 @@ export function loadInitialProject(): Project {
   return (id && loadProject(id)) || createMkultraProject();
 }
 
-/** Save (and make current). Throws when storage is full or unavailable. */
-export function saveProject(p: Project): void {
+/** Save (and make current); returns what was saved (stamped with the time). Throws when storage is full or unavailable. */
+export function saveProject(p: Project): Project {
   const s = storage();
   if (!s) throw new Error('storage unavailable');
   const stamped = { ...p, updated: Date.now() };
   s.setItem(projectKey(p.id), JSON.stringify(stamped));
   const idx = readIndex(s);
   writeIndex(s, { current: p.id, projects: [...idx.projects.filter((e) => e.id !== p.id), entryOf(stamped)] });
+  return stamped;
+}
+
+/** Keep a copy of an episode in the library without opening it (e.g. the local side of a sync conflict). */
+export function stashProject(p: Project): void {
+  const s = storage();
+  if (!s) return;
+  s.setItem(projectKey(p.id), JSON.stringify(p));
+  const idx = readIndex(s);
+  writeIndex(s, { current: idx.current, projects: [...idx.projects.filter((e) => e.id !== p.id), entryOf(p)] });
 }
 
 export function deleteProject(id: string): void {

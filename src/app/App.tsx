@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Project, ProjectSettings, Scene, SubtitleStyle } from '../types';
 import { switchLanguage } from '../data/project';
-import { loadInitialProject, saveProject, storage } from '../data/library';
+import { loadInitialProject, loadProject, saveProject, stashProject, storage } from '../data/library';
+import { episodeHash, markSynced, onEpisodesChanged, pullEpisode, pushEpisode, syncAvailable, syncedHash, syncStatus, type SyncStatus } from '../data/episodeSync';
 import { projectHook } from '../data/projectText';
 import { buildTimeline, hasHook, locate, splitSentences } from '../animation/timeline';
 import { fitMusicTrack, renderAmbience } from '../audio/ambience';
@@ -167,11 +168,18 @@ export function App() {
 
   // ---- Persistence (debounced autosave into the project library).
   const firstSave = useRef(true);
+  // The repository copy (tools/vite/episodeSync.ts): pushed after each save once the startup check has run.
+  const syncReady = useRef(false);
   const persist = useCallback((p: Project) => {
     try {
-      saveProject(p);
+      const saved = saveProject(p);
       setSaveStatus('saved');
       setSavedTick((n) => n + 1);
+      if (syncReady.current && episodeHash(saved) !== syncedHash(saved.id)) {
+        void pushEpisode(saved)
+          .then(() => markSynced(saved))
+          .catch(() => undefined);
+      }
     } catch {
       setSaveStatus(storage() ? 'error' : 'unavailable');
     }
@@ -203,6 +211,91 @@ export function App() {
       window.removeEventListener('pagehide', flush);
       window.removeEventListener('beforeunload', flush);
     };
+  }, []);
+
+  // ---- Repository sync. At startup the episode in this browser and the one in the repository are
+  // compared with the version they last agreed on: whoever changed since wins; when both did, the
+  // repository's wins and this browser's is kept as a copy in the library. Afterwards episodes the
+  // repository changes (pulled from a remote session, or edited on disk) are loaded as an undoable step.
+  const [repo, setRepo] = useState<SyncStatus | null>(null);
+  const [repoNote, setRepoNote] = useState<string | null>(null);
+  const note = useCallback((msg: string) => {
+    setRepoNote(msg);
+    window.setTimeout(() => setRepoNote((m) => (m === msg ? null : m)), 6000);
+  }, []);
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      if (!(await syncAvailable())) return;
+      const local = latest.current;
+      const remote = await pullEpisode(local.id).catch(() => null);
+      if (!alive) return;
+      const take = (r: Project, msg: string) => {
+        markSynced(r);
+        hist.reset(r);
+        note(msg);
+      };
+      if (!remote) {
+        await pushEpisode(local);
+        markSynced(local);
+      } else {
+        const base = syncedHash(local.id);
+        const rh = episodeHash(remote);
+        const lh = episodeHash(local);
+        if (rh === lh) markSynced(local);
+        else if (base === null) {
+          if ((remote.updated ?? 0) > (local.updated ?? 0)) take(remote, 'Loaded the newer episode from the repository');
+          else {
+            await pushEpisode(local);
+            markSynced(local);
+          }
+        } else if (rh !== base && lh === base) take(remote, 'Loaded the changes from the repository');
+        else if (rh === base) {
+          await pushEpisode(local);
+          markSynced(local);
+        } else {
+          const id = `${local.id}-local-${Math.random().toString(36).slice(2, 6)}`;
+          stashProject({ ...local, id, episodeTitle: `${local.episodeTitle} (local copy)`, updated: Date.now() });
+          take(remote, 'Both changed: loaded the repository version, yours is kept as "(local copy)"');
+        }
+      }
+      syncReady.current = true;
+      setRepo(await syncStatus());
+    })();
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(
+    () =>
+      onEpisodesChanged((ids) => {
+        void (async () => {
+          for (const id of ids) {
+            const remote = await pullEpisode(id).catch(() => null);
+            if (!remote) continue;
+            if (id === latest.current.id) {
+              markSynced(remote);
+              if (episodeHash(remote) === episodeHash(latest.current)) continue;
+              setProject(() => remote, `repo:${Date.now()}`);
+              note('Updated from the repository (Ctrl+Z to undo)');
+            } else {
+              // Another episode of the library: refresh this browser's copy unless it has edits of its own.
+              const mine = loadProject(id);
+              if (!mine || episodeHash(mine) === syncedHash(id)) {
+                stashProject(remote);
+                markSynced(remote);
+              }
+            }
+          }
+          setRepo(await syncStatus());
+        })();
+      }),
+    [setProject, note],
+  );
+  useEffect(() => {
+    const id = window.setInterval(() => void syncStatus().then(setRepo), 10000);
+    return () => window.clearInterval(id);
   }, []);
 
   /** Switch to another episode: save this one now, then load the other with a fresh history. */
@@ -479,6 +572,8 @@ export function App() {
         project={project}
         page={page}
         saveStatus={saveStatus}
+        repo={repo}
+        repoNote={repoNote}
         canUndo={hist.canUndo}
         canRedo={hist.canRedo}
         theater={theater}
