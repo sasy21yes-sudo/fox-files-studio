@@ -75,12 +75,12 @@ def main():
         torch.cuda.empty_cache()
         print('designed reference', ref_path, flush=True)
 
-    clone = Qwen3TTSModel.from_pretrained('Qwen/Qwen3-TTS-12Hz-1.7B-Base', device_map='cuda:0', dtype=torch.bfloat16)
-    prompt = clone.create_voice_clone_prompt(ref_audio=str(ref_path), ref_text=REF_TEXT)
-    # Every sentence is cached by its text: re-runs only render new or --redo sentences.
+    # Every sentence is cached by its text: re-runs only render new or --redo sentences, and the model is
+    # loaded only when there is one (the studio calls this after every narration edit).
     import hashlib
     cache = kv.ROOT / 'voice' / 'cache' / a.voice
     cache.mkdir(parents=True, exist_ok=True)
+    clone = prompt = None
     clips = []
     for i, s in enumerate(sentences):
         text = speakable_it(s['say'])
@@ -88,6 +88,10 @@ def main():
         if f.exists() and not any(r in s['text'] for r in a.redo):
             clips.append(sf.read(f, dtype='float32')[0])
             continue
+        if clone is None:
+            print('loading the voice model', flush=True)
+            clone = Qwen3TTSModel.from_pretrained('Qwen/Qwen3-TTS-12Hz-1.7B-Base', device_map='cuda:0', dtype=torch.bfloat16)
+            prompt = clone.create_voice_clone_prompt(ref_audio=str(ref_path), ref_text=REF_TEXT)
         wavs, sr = clone.generate_voice_clone(text=text, language='Italian', voice_clone_prompt=prompt)
         clips.append(trim(to_24k(wavs[0], sr)))
         sf.write(f, clips[-1], kv.SAMPLE_RATE)

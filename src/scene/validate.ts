@@ -1,5 +1,6 @@
 import { ARM_MODES, ELEMENTS, FACE_KEYS } from './elements';
 import type { SceneSpec } from './spec';
+import { SFX_SOUNDS, isSfxSound } from '../audio/sfx';
 
 /**
  * Structural check of a scene document (from storage, an import or Claude).
@@ -23,6 +24,16 @@ export function validateSpec(raw: unknown): string[] {
   if (raw.version !== 1) errs.push('version must be 1');
   if (!Array.isArray(raw.elements)) errs.push('elements must be a list');
   if (!Array.isArray(raw.camera)) errs.push('camera must be a list');
+  if (raw.sfx !== undefined) {
+    if (!Array.isArray(raw.sfx)) errs.push('sfx must be a list');
+    else
+      raw.sfx.forEach((c, i) => {
+        const p = `sfx[${i}]`;
+        if (!isObj(c) || !isNum(c.at)) return errs.push(`${p}: needs a numeric "at"`);
+        if (!isSfxSound(c.sound)) errs.push(`${p}: unknown sound "${String(c.sound)}" (one of ${Object.keys(SFX_SOUNDS).join(', ')})`);
+        for (const f of ['gain', 'pan', 'count', 'every'] as const) if (c[f] !== undefined && !isNum(c[f])) errs.push(`${p}.${f} must be a number`);
+      });
+  }
   const ids = new Set<string>();
   (Array.isArray(raw.elements) ? raw.elements : []).forEach((el, i) => {
     const p = `elements[${i}]`;

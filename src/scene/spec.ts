@@ -1,3 +1,4 @@
+import type { SfxCue } from '../audio/sfx';
 /**
  * Scene documents: a scene described as data instead of code, so the editor
  * timeline, the inspector and Claude can all read and change it.
@@ -187,4 +188,6 @@ export interface SceneSpec {
   sepia?: number;
   /** Film darkening when the light is off. */
   gloom?: number;
+  /** Sound effects (authored s): audio/sfx.ts synthesises them, mixed in the preview and the export. */
+  sfx?: SfxCue[];
 }

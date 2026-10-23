@@ -6,6 +6,7 @@ import { buildPublishingKit } from '../export/publishingKit';
 import { EXPORT_FPS, EXPORT_SIZES, detectCapabilities, type Capabilities } from '../export/capabilities';
 import { runExport, verifyVideo, type VerifyResult } from '../export/runExport';
 import { audioBufferToWav, mixExportAudio } from '../audio/audioCapture';
+import { renderSfx } from '../audio/sfx';
 import type { NarrationFile } from '../audio/narration';
 
 interface Props {
@@ -278,6 +279,10 @@ export function ExportDialog({ project, timeline, musicBuffer, customMusic, narr
       duration: timeline.total,
       music: musicBuffer && includeMusic ? { buffer: musicBuffer, gain: project.settings.musicVolume } : null,
       narration: fileNarration && narrationFile ? { buffer: narrationFile.buffer, gain: 1 } : null,
+      sfx: (() => {
+        const fx = renderSfx(timeline);
+        return fx ? { buffer: fx, gain: 1 } : null;
+      })(),
     });
     if (buf) download(audioBufferToWav(buf), `${base}-soundtrack.wav`);
   };

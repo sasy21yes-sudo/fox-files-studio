@@ -19,6 +19,8 @@ export interface StudioStatus {
   /** Sentences being rendered by the local voice server right now. */
   rendering: number;
   server: 'unknown' | 'checking' | 'online' | 'offline';
+  /** Pack-only voices: the recording job on this computer (null when this voice is not recorded here). */
+  recorder?: { state: 'idle' | 'waiting' | 'running' | 'done' | 'error'; message: string } | null;
 }
 
 interface Props {
@@ -44,6 +46,8 @@ interface Props {
   onLanguageChange(lang: Lang): void;
   studio: StudioStatus;
   onProbeServer(): void;
+  /** Record the rewritten lines now with the pack-only voice (Qwen3) on this computer. */
+  onRecordVoice?(): void;
 }
 
 function Section({ title, children, defaultOpen = true }: { title: string; children: ReactNode; defaultOpen?: boolean }) {
@@ -262,7 +266,26 @@ export function PropertiesPanel(p: Props) {
                 exported video.
               </p>
             )}
-            {p.studio.missing > 0 && (
+            {p.studio.missing > 0 && p.studio.recorder && (
+              <div className={`notice ${p.studio.recorder.state === 'error' ? 'warn' : 'ok'}`}>
+                <p>
+                  {p.studio.missing} rewritten {p.studio.missing === 1 ? 'line is' : 'lines are'} not recorded yet.{' '}
+                  {p.studio.recorder.state === 'running' || p.studio.recorder.state === 'waiting'
+                    ? `Recording with this narrator on this computer… ${p.studio.recorder.message}`
+                    : p.studio.recorder.state === 'error'
+                      ? `Recording failed: ${p.studio.recorder.message}`
+                      : 'They are recorded with this narrator on this computer a few seconds after the text stops changing; the browser voice reads them meanwhile.'}
+                </p>
+                {p.studio.recorder.state !== 'running' && p.studio.recorder.state !== 'waiting' && p.onRecordVoice && (
+                  <p>
+                    <button className="btn small" onClick={p.onRecordVoice}>
+                      Record now
+                    </button>
+                  </p>
+                )}
+              </div>
+            )}
+            {p.studio.missing > 0 && !p.studio.recorder && (
               <div className="notice warn">
                 <p>
                   {p.studio.missing} rewritten {p.studio.missing === 1 ? 'line is' : 'lines are'} not in the voice pack

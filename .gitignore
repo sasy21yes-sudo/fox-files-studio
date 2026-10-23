@@ -13,3 +13,5 @@ voice/cache/
 .env.*
 art/parts_v4/up/
 art/parts_v4/compare_*.jpg
+voice/.episode.json
+voice/.cues-episode.json

@@ -71,11 +71,13 @@ function levels(buffer: AudioBuffer, offset: number, dur: number, norm?: number)
   return { level: out, p95 };
 }
 
-export async function loadStudioPack(lang: Lang, voice: string, signal?: AbortSignal): Promise<StudioPack> {
-  const res = await fetch(packUrl(`${lang}-${voice}.json`), { signal });
+/** `version` > 0 asks past the browser cache (the pack was just re-recorded). */
+export async function loadStudioPack(lang: Lang, voice: string, signal?: AbortSignal, version = 0): Promise<StudioPack> {
+  const bust = version ? `?v=${version}-${Date.now()}` : '';
+  const res = await fetch(packUrl(`${lang}-${voice}.json`) + bust, { signal });
   if (!res.ok) throw new Error(`voice pack ${lang}-${voice} not found (${res.status})`);
   const index = (await res.json()) as PackIndex;
-  const audio = await fetch(packUrl(index.audio), { signal });
+  const audio = await fetch(packUrl(index.audio) + bust, { signal });
   if (!audio.ok) throw new Error(`voice audio ${index.audio} not found (${audio.status})`);
   const buffer = await decodeCtx().decodeAudioData(await audio.arrayBuffer());
   const clips = new Map<string, Clip>();

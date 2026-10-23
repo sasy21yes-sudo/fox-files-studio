@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -48,14 +49,18 @@ def render_pack(lang: str, voice: dict, sentences: list[dict], out_dir: Path, bi
     track = np.concatenate(pieces)
     out_dir.mkdir(parents=True, exist_ok=True)
     name = f"{lang}-{vid}"
-    with tempfile.TemporaryDirectory() as td:
-        wav = Path(td) / "pack.wav"
-        sf.write(wav, track, kv.SAMPLE_RATE, subtype="PCM_16")
-        subprocess.run(
-            ["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-ac", "1", "-ar", str(kv.SAMPLE_RATE),
-             "-c:a", "libmp3lame", "-b:a", bitrate, str(out_dir / f"{name}.mp3")],
-            check=True,
-        )
+    if shutil.which("ffmpeg") is None:
+        # No ffmpeg (e.g. the studio's own PC): libsndfile writes the MP3 itself.
+        sf.write(out_dir / f"{name}.mp3", track, kv.SAMPLE_RATE, format="MP3")
+    else:
+        with tempfile.TemporaryDirectory() as td:
+            wav = Path(td) / "pack.wav"
+            sf.write(wav, track, kv.SAMPLE_RATE, subtype="PCM_16")
+            subprocess.run(
+                ["ffmpeg", "-y", "-loglevel", "error", "-i", str(wav), "-ac", "1", "-ar", str(kv.SAMPLE_RATE),
+                 "-c:a", "libmp3lame", "-b:a", bitrate, str(out_dir / f"{name}.mp3")],
+                check=True,
+            )
     meta = {
         "version": 1,
         "lang": lang,
@@ -66,7 +71,7 @@ def render_pack(lang: str, voice: dict, sentences: list[dict], out_dir: Path, bi
         "duration": round(len(track) / kv.SAMPLE_RATE, 3),
         "sentences": index,
     }
-    (out_dir / f"{name}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=0))
+    (out_dir / f"{name}.json").write_text(json.dumps(meta, ensure_ascii=False, indent=0), encoding="utf8")
     print(f"wrote {name}: {meta['duration']:.1f}s of audio in {time.time() - t0:.0f}s", flush=True)
 
 
@@ -78,7 +83,7 @@ def main():
     ap.add_argument("--bitrate", default="56k")
     ap.add_argument("--model-dir", type=Path, default=kv.MODEL_DIR)
     a = ap.parse_args()
-    data = json.loads(a.cues.read_text())
+    data = json.loads(a.cues.read_text(encoding="utf8"))
     only = {x.strip() for x in a.only.split(",") if x.strip()}
     for lang, entry in data["languages"].items():
         for voice in entry["voices"]:

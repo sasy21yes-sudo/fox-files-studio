@@ -37,6 +37,7 @@ function applyResult(p: Project, r: AiResult): Project {
       updateScene(proj, c.index, (s) => {
         const patch: Partial<typeof s> = {
           ...(c.spec ? { spec: c.spec } : {}),
+          ...(c.narration ? { narration: c.narration } : {}),
           ...(c.beats ? withBeats(s, proj.settings.language, c.beats) : {}),
         };
         if (c.duration && Math.abs(c.duration - s.duration) > 0.05) {

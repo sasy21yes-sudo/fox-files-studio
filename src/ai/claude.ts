@@ -29,6 +29,8 @@ export interface AiSceneChange {
   spec: SceneSpec | null;
   beats: Beat[] | null;
   duration: number | null;
+  /** New narration (the studio voice records the new sentences), or null to keep it. */
+  narration?: string | null;
 }
 
 export interface AiResult {

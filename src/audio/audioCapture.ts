@@ -17,11 +17,13 @@ export interface ExportAudioInput {
   duration: number;
   music?: { buffer: AudioBuffer; gain: number } | null;
   narration?: { buffer: AudioBuffer; gain: number } | null;
+  /** Scene sound effects (audio/sfx.ts). */
+  sfx?: { buffer: AudioBuffer; gain: number } | null;
 }
 
 /** Mix the export soundtrack. Returns null when there is nothing to include. */
 export async function mixExportAudio(input: ExportAudioInput): Promise<AudioBuffer | null> {
-  const tracks = [input.music, input.narration].filter(Boolean) as { buffer: AudioBuffer; gain: number }[];
+  const tracks = [input.music, input.narration, input.sfx].filter(Boolean) as { buffer: AudioBuffer; gain: number }[];
   if (!tracks.length) return null;
   const sr = EXPORT_SAMPLE_RATE;
   const ctx = new OfflineAudioContext(2, Math.max(1, Math.ceil(input.duration * sr)), sr);

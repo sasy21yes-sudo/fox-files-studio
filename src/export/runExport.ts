@@ -3,6 +3,7 @@ import { renderFrame } from '../animation/renderScene';
 import { loadProjectMedia } from '../media/store';
 import type { Timeline } from '../animation/timeline';
 import { mixExportAudio } from '../audio/audioCapture';
+import { renderSfx } from '../audio/sfx';
 import { recordWithMediaRecorder } from './browserRecorder';
 import { WebCodecsMp4Encoder, type Mp4Encoder } from './mp4Encoder';
 import type { Capabilities } from './capabilities';
@@ -45,14 +46,17 @@ export async function runExport(inp: ExportInputs): Promise<ExportResult> {
 
   // Soundtrack.
   inp.onProgress(0, 'Preparing soundtrack');
+  const sfx = renderSfx(timeline);
   const audio = await mixExportAudio({
     duration: timeline.total,
     music: es.includeMusic && inp.musicBuffer ? { buffer: inp.musicBuffer, gain: project.settings.musicVolume } : null,
     narration: es.includeNarrationFile && inp.narrationBuffer ? { buffer: inp.narrationBuffer, gain: 1 } : null,
+    sfx: sfx ? { buffer: sfx, gain: 1 } : null,
   });
   const parts: string[] = [];
   if (audio && es.includeMusic && inp.musicBuffer) parts.push('score & room tone');
   if (audio && es.includeNarrationFile && inp.narrationBuffer) parts.push('the narration');
+  if (audio && sfx) parts.push('sound effects');
 
   let blob: Blob;
   let mimeType: string;

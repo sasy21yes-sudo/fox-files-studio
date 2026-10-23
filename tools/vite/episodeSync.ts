@@ -6,7 +6,8 @@
  *   episodes/media/<mediaId>.<ext>  its images (the browser keeps them in IndexedDB)
  *
  * Browser -> repo: the page PUTs every autosave; when files change, a few seconds later the episodes
- * folder (and nothing else) is committed, merged with the remote and pushed on the current branch.
+ * folder and the studio voice packs (public/voice, re-recorded for an edited narration) — nothing
+ * else — are committed, merged with the remote and pushed on the current branch.
  * Repo -> browser: every 45 s the remote is fetched and pulled when it has new commits; any change to an
  * episode file that this server did not write (a pull, or a local Claude Code session editing the file)
  * is announced to the page over Vite's websocket ("fox:episodes"), which reloads that episode.
@@ -33,6 +34,8 @@ const ID = /^[\w-]{1,80}$/;
 const MEDIA_NAME = /^[\w-]{1,80}\.(png|jpe?g|webp|gif)$/;
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
 const COMMIT_DELAY = 8000;
+/** What the studio commits: the episodes and the voice packs (re-recorded for their narration). */
+const SYNCED = ['episodes', 'public/voice'];
 const POLL = 45000;
 
 interface State {
@@ -159,8 +162,9 @@ export function episodeSync(): Plugin {
       const commitAndPush = async () => {
         if (!state.git) return;
         await refreshBranch();
-        await git(['add', '-A', '--', 'episodes']);
-        const staged = await git(['diff', '--cached', '--name-only', '--', 'episodes']);
+        // The episodes, and the studio voice packs re-recorded for their narration (voiceRecord.ts).
+        await git(['add', '-A', '--', ...SYNCED]);
+        const staged = await git(['diff', '--cached', '--name-only', '--', ...SYNCED]);
         if (staged.out) {
           const ids = [...new Set(staged.out.split('\n').map(idOf).filter((x): x is string => !!x))];
           const titles = ids.map((id) => {
@@ -171,8 +175,13 @@ export function episodeSync(): Plugin {
               return id;
             }
           });
-          const msg = `Episode: ${titles.join(', ') || 'images'} (edited in the studio)`;
-          const c = await git(['commit', '--quiet', '-m', msg, '--', 'episodes']);
+          const voiced = staged.out.split('\n').some((f) => f.startsWith('public/voice/'));
+          const msg = ids.length
+            ? `Episode: ${titles.join(', ')} (edited in the studio)${voiced ? ' + voice pack' : ''}`
+            : voiced
+              ? 'Voice pack re-recorded for the edited narration'
+              : 'Episode images (edited in the studio)';
+          const c = await git(['commit', '--quiet', '-m', msg, '--', ...SYNCED]);
           if (c.code !== 0) return void (state.error = `commit: ${(c.err || c.out).split('\n')[0]}`);
           state.lastCommit = (await git(['rev-parse', '--short', 'HEAD'])).out;
           log(`committed ${state.lastCommit}: ${msg}`);
@@ -236,9 +245,17 @@ export function episodeSync(): Plugin {
           }
         }, 400);
       });
+      // A voice pack rewritten for the edited narration (voiceRecord.ts) is committed like the episode.
+      const voiceDir = path.join(root, 'public', 'voice');
+      const voiceWatcher = fs.existsSync(voiceDir)
+        ? fs.watch(voiceDir, (_ev, name) => {
+            if (name && String(name).endsWith('.json')) scheduleCommit();
+          })
+        : null;
       server.httpServer?.on('close', () => {
         clearInterval(poll);
         watcher.close();
+        voiceWatcher?.close();
       });
 
       server.middlewares.use('/__episodes', (req, res, next) => {

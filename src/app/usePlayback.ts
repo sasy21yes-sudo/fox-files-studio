@@ -12,6 +12,8 @@ interface PlaybackDeps {
   engine: AudioEngine;
   narrator: SpeechNarrator;
   musicBuffer: AudioBuffer | null;
+  /** Scene sound effects (audio/sfx.ts), played whether or not the score is on. */
+  sfxBuffer?: AudioBuffer | null;
   narrationFile: NarrationFile | null;
 }
 
@@ -41,11 +43,12 @@ export function usePlayback(deps: PlaybackDeps): Playback {
   depsRef.current = deps;
 
   const startAudio = useCallback((t: number) => {
-    const { project, engine, musicBuffer, narrationFile } = depsRef.current;
+    const { project, engine, musicBuffer, narrationFile, sfxBuffer } = depsRef.current;
     const s = project.settings;
     const tracks: { buffer: AudioBuffer; gain: number }[] = [];
     if (s.music && musicBuffer) tracks.push({ buffer: musicBuffer, gain: s.musicVolume });
     if ((s.narrationMode === 'file' || s.narrationMode === 'studio') && narrationFile) tracks.push({ buffer: narrationFile.buffer, gain: 1 });
+    if (sfxBuffer) tracks.push({ buffer: sfxBuffer, gain: 1 });
     engine.start(t, s.previewSpeed, tracks);
   }, []);
 
@@ -125,7 +128,7 @@ export function usePlayback(deps: PlaybackDeps): Playback {
       depsRef.current.narrator.cancel();
       startAudio(timeRef.current);
     }
-  }, [s.music, s.musicVolume, s.previewSpeed, s.narrationMode, s.voiceURI, s.speechRate, deps.musicBuffer, deps.narrationFile, deps.timeline, startAudio]);
+  }, [s.music, s.musicVolume, s.previewSpeed, s.narrationMode, s.voiceURI, s.speechRate, deps.musicBuffer, deps.narrationFile, deps.sfxBuffer, deps.timeline, startAudio]);
 
   // Keep time inside the timeline when durations shrink.
   useEffect(() => {

@@ -7,12 +7,13 @@
  *
  * - Claude Code (default): runs the local `claude` CLI headless (`claude -p`),
  *   so requests use the Claude Code login of this computer — no API key. Its
- *   tools are disabled: it only answers, it never touches files.
+ *   only tools are web search and web fetch (ideas and references; CLAUDE_WEB=off
+ *   in .env turns them off): it never touches files.
  * - Anthropic API: only when no Claude Code binary is found and
  *   ANTHROPIC_API_KEY is set in .env (read on the Node side, never sent to the page).
  *
  *   GET  /api/claude/status -> { available, backend, model }
- *   POST /api/claude/edit   -> { summary, scenes: [{ index, spec, beats, duration }], usage, model, attempts } | { error }
+ *   POST /api/claude/edit   -> { summary, scenes: [{ index, spec, beats, duration, narration }], usage, model, attempts } | { error }
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { spawn, spawnSync } from 'node:child_process';
@@ -57,6 +58,8 @@ interface SceneOut {
   spec: unknown | null;
   beats: unknown[] | null;
   duration: number | null;
+  /** New narration text (the studio voice records the new sentences), or null to keep it. */
+  narration: string | null;
 }
 
 interface Usage {
@@ -81,8 +84,12 @@ const REPLY_SCHEMA = {
           spec_json: { type: 'string', description: 'The complete new SceneSpec as a JSON string, or "" to keep the current one.' },
           beats_json: { type: 'string', description: 'The complete new list of pop-ups as a JSON string, or "" to keep them.' },
           duration: { type: 'number', description: 'New scene length in seconds, or 0 to keep it.' },
+          narration: {
+            type: 'string',
+            description: 'The complete new narration of the scene (what the voice says), or "" to keep it. Only when the instruction asks to change what is said.',
+          },
         },
-        required: ['index', 'spec_json', 'beats_json', 'duration'],
+        required: ['index', 'spec_json', 'beats_json', 'duration', 'narration'],
         additionalProperties: false,
       },
     },
@@ -93,7 +100,7 @@ const REPLY_SCHEMA = {
 
 interface Reply {
   summary: string;
-  scenes: { index: number; spec_json: string; beats_json: string; duration: number }[];
+  scenes: { index: number; spec_json: string; beats_json: string; duration: number; narration: string }[];
 }
 
 interface Catalog {
@@ -101,6 +108,7 @@ interface Catalog {
   ARM_MODES: readonly string[];
   FACE_KEYS: readonly string[];
   MOUTHS: readonly string[];
+  SFX_SOUNDS: Record<string, string>;
 }
 
 /** Static system prompt: format, rules, element catalog and the reference scene. */
@@ -145,9 +153,18 @@ Camera: [{"at", "kind": "wide"|"medium"|"close"|"extreme"|"insert", "target"?: "
 
 Overlays (screen space): [{"kind": "title", "at", "subAt", "y", "maxWidth", "sunburst"?}] = the episode title slam.
 
+Sound effects: "sfx": [{"at", "sound", "gain"? (0..2, default 1), "pan"? (-1 left .. 1 right), "count"? (repeats), "every"? (seconds between repeats, default 0.12)}] — synthesised by the studio and mixed over the music and the voice, in the preview and the export. Land them exactly on the picture's beats (a key strike on each letter, a stamp on the slam, a whoosh on a whip pan); a few strong ones beat a constant clatter, and keep them out of the way of spoken words when you can. Sounds:
+${Object.entries(cat.SFX_SOUNDS).map(([k, d]) => `- ${k}: ${d}`).join('\n')}
+
 # Pop-ups ("beats")
 Explainer cards that appear when a phrase of the narration is spoken. Each has "cue": an EXACT phrase copied from that scene's narration, and "kind" with its fields:
 question {text} · span {from, to, label} · count {value, label, note?} · versus {left, right, caption?} · define {word, pos, meaning} · waffle {total, hit, label, note?} · list {items[], title?} · record {tag, who, text, highlight, note} · statement {lines[]}.
+
+# Narration
+"narration" replaces what the voice says in a scene; leave it "" unless the instruction asks to change the words. The studio records new or changed sentences with its narrator voice automatically and keeps the recording of every sentence you leave word-for-word the same, so change only the sentences that need it. Same rules as everything on screen: only facts from the narration you were given or the listed sources, no invented numbers, names, dates or quotes; keep the tone of the series (clear, catchy explainer, short sentences that read well aloud). Pop-up cues must then be phrases of the NEW narration.
+
+# Research
+You may use web search and web fetch for ideas: cartoon staging and gags, editing rhythm, how explainers keep viewers watching, period look and props. The web is for craft, not for content: a fact you find there never goes on screen or into the narration unless the listed sources support it. Mention in the summary anything useful you found that you could not use.
 
 # Hand-coded scenes
 Some scenes have no spec ("spec": null): they are drawn by code. You can still change their pop-ups and length without touching the picture (spec_json ""). Write a new spec for one only when the instruction needs a change to its picture; it then replaces the coded version, so build it complete from the narration and the scene intent.
@@ -159,7 +176,7 @@ Some scenes have no spec ("spec": null): they are drawn by code. You can still c
 4. Good cartoon staging: anticipation before big moves, overlapping action, a camera change every 2-4 seconds, key moments on close-ups or inserts, Agent Fox fully in frame in both formats, nothing important hidden behind the subtitles (bottom 20%).
 5. Use only the element types, poses and fields listed above. Element ids are lowercase words with dashes.
    Picture elements may only use image ids from the episode's image library given in the request. You cannot create images: if none fits, say so in the summary (the director can generate one in the studio).
-6. Pop-ups: beats_json is the complete list for that scene when you change it, else "". Each cue must be a phrase that appears verbatim in that scene's narration.
+6. Pop-ups: beats_json is the complete list for that scene when you change it, else "". Each cue must be a phrase that appears verbatim in that scene's narration (the new one, when you change it).
 7. duration: 0 unless the instruction needs a different scene length (3-90 s).
 8. The summary is for the director: plain words, saying which scenes you changed. Write it in the language of the director's instruction (an Italian instruction gets an Italian summary), whatever the language of the rest of this prompt.
 
@@ -242,16 +259,29 @@ function checkReply(
       problems.push(`${at}: not valid JSON (${e instanceof Error ? e.message : String(e)})`);
       continue;
     }
+    const newNarration = typeof s.narration === 'string' && s.narration.trim() ? s.narration.trim() : null;
+    if (newNarration && newNarration.split(/\s+/).length < 3) problems.push(`${at}: the new narration is too short`);
+    // Pop-ups must follow the words that will be spoken: the new narration, or the current one.
+    const spoken = newNarration ?? src.narration;
+    if (
+      newNarration &&
+      beats === null &&
+      src.beats.some((b) => {
+        const cue = (b as { cue?: unknown })?.cue;
+        return typeof cue === 'string' && !spoken.toLowerCase().includes(cue.toLowerCase().trim());
+      })
+    )
+      problems.push(`${at}: the new narration drops phrases the current pop-ups are cued on; return beats_json with cues from the new narration`);
     if (beats !== null && !Array.isArray(beats)) problems.push(`${at}: beats_json must be a JSON list`);
     else if (Array.isArray(beats)) {
-      const narration = src.narration.toLowerCase();
+      const narration = spoken.toLowerCase();
       beats.forEach((b, i) => {
         const cue = (b as { cue?: unknown })?.cue;
         if (typeof cue !== 'string' || !cue.trim() || !narration.includes(cue.toLowerCase().trim()))
           problems.push(`${at}: beats[${i}].cue is not a phrase of that scene's narration`);
       });
     }
-    scenes.push({ index: s.index, spec, beats: beats as unknown[] | null, duration: s.duration || null });
+    scenes.push({ index: s.index, spec, beats: beats as unknown[] | null, duration: s.duration || null, narration: newNarration });
   }
   return { scenes, problems };
 }
@@ -305,7 +335,7 @@ function findClaudeCode(env: Record<string, string>): string | null {
 /** Variables that tie a process to a running Claude Code session; the studio's call must be its own session. */
 const SESSION_VARS = /^(CLAUDECODE|CLAUDE_PID|CLAUDE_EFFORT|CLAUDE_AGENT_SDK_VERSION|CLAUDE_CODE_(ENTRYPOINT|SESSION_ID|CHILD_SESSION|MESSAGING_SOCKET|MESSAGING_TOKEN|SESSION_ATTENDED|EXECPATH|EMIT_STARTUP_TIMING|ENABLE_SDK_FILE_CHECKPOINTING))$/;
 
-function claudeCodeBackend(bin: string, model: string): Backend {
+function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
   // Runs outside the project so no CLAUDE.md, settings or MCP servers are picked up.
   const work = path.join(os.tmpdir(), 'fox-studio-claude');
   fs.mkdirSync(work, { recursive: true });
@@ -324,7 +354,8 @@ function claudeCodeBackend(bin: string, model: string): Backend {
         '--system-prompt-file', sysFile,
         '--model', model,
         '--effort', 'high',
-        '--tools', '',
+        // Web search/fetch only (ideas and references); no file, shell or other tools.
+        ...(web ? ['--tools', 'WebSearch,WebFetch', '--allowedTools', 'WebSearch', 'WebFetch'] : ['--tools', '']),
         '--setting-sources', '',
         '--strict-mcp-config',
         '--disable-slash-commands',
@@ -441,7 +472,10 @@ export function claudeScene(): Plugin {
 
   const system = async () => {
     if (cachedSystem) return cachedSystem;
-    const cat = (await server.ssrLoadModule('/src/scene/elements.ts')) as unknown as Catalog;
+    const cat = {
+      ...((await server.ssrLoadModule('/src/scene/elements.ts')) as unknown as Omit<Catalog, 'SFX_SOUNDS'>),
+      SFX_SOUNDS: ((await server.ssrLoadModule('/src/audio/sfx.ts')) as { SFX_SOUNDS: Record<string, string> }).SFX_SOUNDS,
+    } as Catalog;
     const { FILE_SPEC } = (await server.ssrLoadModule('/src/data/specs/file.ts')) as { FILE_SPEC: unknown };
     cachedSystem = systemPrompt(cat, FILE_SPEC);
     return cachedSystem;
@@ -456,12 +490,12 @@ export function claudeScene(): Plugin {
       const model = env.CLAUDE_MODEL || DEFAULT_MODEL;
       const bin = findClaudeCode(env);
       const key = env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
-      if (bin && spawnSync(bin, ['--version'], { windowsHide: true, timeout: 20000 }).status === 0) backend = claudeCodeBackend(bin, model);
+      if (bin && spawnSync(bin, ['--version'], { windowsHide: true, timeout: 20000 }).status === 0) backend = claudeCodeBackend(bin, model, env.CLAUDE_WEB !== 'off');
       else if (key) backend = apiBackend(new Anthropic({ apiKey: key }), model);
       s.config.logger.info(`  Claude editing: ${backend ? `${backend.name === 'api' ? 'Anthropic API' : `Claude Code (${bin})`}, ${model}` : 'off (no Claude Code found, no ANTHROPIC_API_KEY)'}`);
       // The catalog may change while developing: rebuild the prompt on the next request.
       s.watcher.on('change', (file) => {
-        if (/src[\\/](scene|data[\\/]specs)[\\/]/.test(file)) cachedSystem = null;
+        if (/src[\\/](scene|data[\\/]specs|audio)[\\/]/.test(file)) cachedSystem = null;
       });
 
       s.middlewares.use('/api/claude', async (req, res) => {

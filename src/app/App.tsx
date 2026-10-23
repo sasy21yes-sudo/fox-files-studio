@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Project, ProjectSettings, Scene, SubtitleStyle } from '../types';
 import { switchLanguage } from '../data/project';
 import { loadInitialProject, loadProject, saveProject, stashProject, storage } from '../data/library';
+import { recorderStatus, startRecorder, type RecorderStatus } from '../audio/voiceRecorder';
 import { episodeHash, markSynced, onEpisodesChanged, pullEpisode, pushEpisode, syncAvailable, syncedHash, syncStatus, type SyncStatus } from '../data/episodeSync';
 import { projectHook } from '../data/projectText';
 import { buildTimeline, hasHook, locate, splitSentences } from '../animation/timeline';
 import { fitMusicTrack, renderAmbience } from '../audio/ambience';
+import { renderSfx } from '../audio/sfx';
 import { AudioEngine, type NarrationFile } from '../audio/narration';
 import { SpeechNarrator, setSpeechLanguage, speechSupported, watchVoices } from '../audio/speechSynthesis';
 import { loadStudioPack, probeVoiceServer, renderSentence, renderStudioTrack, studioTiming, type StudioPack } from '../audio/studioVoice';
@@ -80,14 +82,19 @@ export function App() {
   const [server, setServer] = useState<'unknown' | 'checking' | 'online' | 'offline'>('unknown');
   const [rendering, setRendering] = useState<string[]>([]);
 
+  // Bumped when a pack-only voice re-recorded the edited lines (tools/vite/voiceRecord.ts): reload the pack.
+  const [packVersion, setPackVersion] = useState(0);
+  const packLoaded = useRef({ key: '', version: 0 });
   useEffect(() => {
     if (!studioMode) return;
-    if (pack && `${pack.lang}-${pack.voice}` === voiceKey) return;
+    if (pack && `${pack.lang}-${pack.voice}` === voiceKey && packLoaded.current.version === packVersion) return;
     const ac = new AbortController();
-    setPack(null);
+    // A fresh voice starts empty; a re-recorded one keeps playing the old pack until the new one is in.
+    if (packLoaded.current.key !== voiceKey) setPack(null);
     setPackStatus({ state: 'loading' });
-    loadStudioPack(lang, studio.id, ac.signal).then(
+    loadStudioPack(lang, studio.id, ac.signal, packVersion).then(
       (p) => {
+        packLoaded.current = { key: voiceKey, version: packVersion };
         setPack(p);
         setPackStatus({ state: 'ready' });
       },
@@ -95,7 +102,7 @@ export function App() {
     );
     return () => ac.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [studioMode, voiceKey]);
+  }, [studioMode, voiceKey, packVersion]);
 
   const timing = useMemo(() => {
     if (!studioMode) return null;
@@ -163,7 +170,8 @@ export function App() {
   // A music track loaded by the user replaces the built-in score (looped, ducked under the voice).
   const fittedMusic = useMemo(() => (customMusic ? fitMusicTrack(customMusic.buffer, timeline) : null), [customMusic, timeline]);
   const activeMusic = fittedMusic ?? musicBuffer;
-  const playback = usePlayback({ project, timeline, engine, narrator, musicBuffer: activeMusic, narrationFile: narrationTrack });
+  const sfxBuffer = useMemo(() => renderSfx(timeline), [timeline]);
+  const playback = usePlayback({ project, timeline, engine, narrator, musicBuffer: activeMusic, narrationFile: narrationTrack, sfxBuffer });
   const current = locate(timeline, playback.time).span.index;
 
   // ---- Persistence (debounced autosave into the project library).
@@ -314,6 +322,47 @@ export function App() {
     const id = window.setInterval(() => void syncStatus().then(setRepo), 10000);
     return () => window.clearInterval(id);
   }, []);
+
+  // ---- Pack-only voices (Qwen3): rewritten lines are recorded on this computer by the dev server
+  // (tools/vite/voiceRecord.ts) a few seconds after the narration stops changing; the pack then reloads.
+  const [recorder, setRecorder] = useState<RecorderStatus | null>(null);
+  const triedRecording = useRef('');
+  const refreshRecorder = useCallback(async () => {
+    const r = await recorderStatus();
+    setRecorder(r);
+    return r;
+  }, []);
+  useEffect(() => {
+    void refreshRecorder();
+  }, [refreshRecorder]);
+  const startRecording = useCallback(async () => {
+    triedRecording.current = `${studio.id}|${missing.join('\n')}`;
+    await startRecorder(lang, studio.id, latest.current);
+    await refreshRecorder();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, studio.id, missing.join('\n'), refreshRecorder]);
+  // (voices the local voice server renders live are recorded there first; whatever is still missing comes here)
+  const canRecord = !!recorder?.voices.includes(`${lang}:${studio.id}`);
+  const recordable = studioMode && packStatus.state === 'ready' && missing.length > 0 && rendering.length === 0 && canRecord;
+  const recBusy = recorder?.job.state === 'running' || recorder?.job.state === 'waiting';
+  useEffect(() => {
+    if (!recordable || recBusy || triedRecording.current === `${studio.id}|${missing.join('\n')}`) return;
+    const id = window.setTimeout(() => void startRecording(), 6000);
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordable, recBusy, missing.join('\n'), studio.id]);
+  const seenRecording = useRef(0);
+  useEffect(() => {
+    if (!recBusy) return;
+    const id = window.setInterval(async () => {
+      const r = await refreshRecorder();
+      if (r && r.job.state === 'done' && r.job.version !== seenRecording.current) {
+        seenRecording.current = r.job.version;
+        setPackVersion((v) => v + 1);
+      }
+    }, 2500);
+    return () => window.clearInterval(id);
+  }, [recBusy, refreshRecorder]);
 
   /** Switch to another episode: save this one now, then load the other with a fresh history. */
   const openProject = useCallback(
@@ -678,7 +727,12 @@ export function App() {
                 missing: missing.length,
                 rendering: rendering.length,
                 server,
+                recorder:
+                  recorder && canRecord
+                    ? { state: recorder.job.state, message: recorder.job.error ?? recorder.job.log[recorder.job.log.length - 1] ?? '' }
+                    : null,
               }}
+              onRecordVoice={() => void startRecording()}
               onProbeServer={probeServer}
             />
           ) : (
