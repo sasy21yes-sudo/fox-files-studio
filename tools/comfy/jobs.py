@@ -376,3 +376,12 @@ JOBS['front_mouths'] = {
         'ruff, neck, hat, ears, size and position. Plain green background.'))
     for k in range(1, 12)
 }
+# Round 3 of the blank front head: the hat sits ON the head, between the ears (it looked pasted over them).
+JOBS['front']['head'] = dict(image='approved:front/head', refs=[], prompt=(
+    'Make the fedora sit ON this fox\'s head, fitted down between the two ears: both ears stand up IN FRONT of '
+    'the hat brim, their full shape and inner fur visible from base to tip, the brim passing behind them. The '
+    'crown fits the round top of the skull and the brim curves down a little at the front and sweeps back round '
+    'the head at the sides, in perspective, instead of a flat straight band across the face. Same hat (dark brown '
+    'felt, lighter brown band, gold diamond badge), same size. Keep EVERYTHING else exactly the same: the blank '
+    'face with no eyes and no mouth, the black nose, fur, cheek ruff, neck, outline, size and position. Plain '
+    'green background.'))
