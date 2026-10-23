@@ -1,7 +1,8 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
 import { face as faceTweak, motion, tweaks } from './rig/tweaks';
-import { RIG, anchored, anchoredFlex, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
+import { RIG, anchored, anchoredFlex, placedClip, placedHatBend, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 import { loadRig } from './rig/rigPuppet';
+import { gloveFlip } from './rig/gloves';
 import { drawFoxFront, frontReady, loadFront, type FrontMouth } from './foxFront';
 
 /** Load the painted rigs (side and front views). */
@@ -1806,13 +1807,15 @@ function drawGloveRig(g: G, A: RigArm, alpha = 1) {
   const drag = Math.cos(wrist.phase + side) * 0.32 * wrist.walk;
   const idle = Math.sin(wrist.time * 1.7 + (A.phys === 'far' ? 0 : 1.3)) * 0.05 * (1 - wrist.walk);
   const flex = drag + idle;
+  // Mirrored by the thumb rule (gloves.ts): the far hand is the one on the right of the picture.
+  const flip = gloveFlip(A.handName, A.phys === 'far', A.flip);
   anchoredFlex(g, `hand_${A.handName}${GLOVE_SUFFIX[A.phys]}`, h.hx, h.hy, h.rot + flex * 0.5, {
-    bend: flex * 0.7 * (A.flip ? -1 : 1),
+    bend: flex * 0.7 * (flip ? -1 : 1),
     pivot: 0.42,
     scale: 1.12,
     sx: 1 + Math.abs(drag) * 0.05,
     sy: 1 - Math.abs(drag) * 0.04,
-    flipY: A.flip,
+    flipY: flip,
   });
   if (alpha < 1) g.globalAlpha = 1;
 }
@@ -1861,6 +1864,28 @@ function mark(g: G, name: string, p: V2) {
 
 /** Rig px the hat sits above its baked place (master look: brows clear of the brim). */
 const HAT_RAISE = 34;
+/** The far ear on the head sprite (rig px), stopping just above the skull's outline at its base. */
+const FAR_EAR: V2[] = [
+  [1768, 246],
+  [1800, 196],
+  [1852, 146],
+  [1902, 104],
+  [1936, 98],
+  [1946, 180],
+  [1944, 262],
+  [1916, 336],
+  [1900, 326],
+  [1862, 298],
+  [1826, 266],
+  [1792, 252],
+];
+/** The worn hat (master look): forward tip (rad), how much lower it sits (rig px), brim droop and back curl (rad). */
+const HAT_TIP = 0.07;
+const HAT_SEAT = 10;
+/** Worn further back on the head (rig px), as in the master: the badge shows beside the far ear. */
+const HAT_BACK = 80;
+const HAT_DROOP = 0.6;
+const HAT_CURL = 0.3;
 
 /** Gaze, lids, brows and mouth for a pose (shared by the side and front views). lookX: the resting gaze. */
 function foxExpression(pose: FoxPose, lookX: number) {
@@ -2127,14 +2152,19 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     // Follow-through: the hat lags the head's bounce a little and settles.
     const hatLag = (beatLift(time - 0.16) - beatLift(time - 0.08)) * 14 * bounceAmt * RK;
     // Master look: the hat sits a little higher, leaving fur between the brows and the brim.
-    g.translate(pivot[0], pivot[1] - hatLift + hatLag - HAT_RAISE);
-    g.rotate(-0.1 * clamp(hatLift / 60) - surprise * 0.08 + (beatLift(time - 0.2) - 0.5) * 0.025 * bounceAmt);
+    // Worn (master look): tipped forward with the brim bent down over the brow and up at the back; as it
+    // lifts off the head the felt relaxes into the flat hat of the model sheet.
+    const worn = 1 - clamp(hatLift / 50);
+    g.translate(pivot[0] - worn * HAT_BACK, pivot[1] - hatLift + hatLag - HAT_RAISE + worn * HAT_SEAT);
+    g.rotate(-0.1 * clamp(hatLift / 60) + worn * HAT_TIP - surprise * 0.08 + (beatLift(time - 0.2) - 0.5) * 0.025 * bounceAmt);
     g.translate(-pivot[0], -pivot[1]);
-    placed(g, 'hat');
+    placedHatBend(g, 'hat', worn * HAT_DROOP, worn * HAT_CURL);
     g.restore();
   }
   // Master look: the far ear stands in front of the hat brim, the brows are never hidden by it.
   if (RIG.parts.ear_over) placed(g, 'ear_over');
+  // ...and so does the far one (master look): without it only its tip peeks out beside the crown.
+  if (hatOff <= 0) placedClip(g, 'head', FAR_EAR);
   drawFaceBrows(g, face);
   // Sweat drop.
   const sweat = clamp(pose.sweat ?? 0);

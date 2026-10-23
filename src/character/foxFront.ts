@@ -15,6 +15,7 @@ import FRONT_JSON from './rig/front/front.json';
 import { FRONT_ASSETS } from './rig/front/assets';
 import { FRONT_FACE } from './rig/frontFace';
 import { makeFaceRig, type Face, type TracedFace } from './rig/faceRig';
+import { gloveFlip } from './rig/gloves';
 import { RIG, anchoredFlex, ik, noodle, part as rigPart, type V2 } from './rig/rigPuppet';
 
 type G = CanvasRenderingContext2D;
@@ -271,14 +272,15 @@ function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolea
   g.save();
   g.scale(F, F);
   const s = (p: V2): V2 => [p[0] / F, p[1] / F];
-  // Glove first, the cuff of the sleeve over its wrist; the left glove is the right one mirrored.
+  // Glove first, the cuff of the sleeve over its wrist.
   anchoredFlex(g, `hand_${st.glove}${side === 'right' ? '_back' : ''}`, st.H[0] / F + Math.cos(st.fore) * 10, st.H[1] / F + Math.sin(st.fore) * 10, st.rot, {
     bend: st.bend,
     pivot: 0.42,
     scale: 1.12,
     sx: 1,
     sy: 1,
-    flipY: side === 'left',
+    // Mirrored by the thumb rule (gloves.ts).
+    flipY: gloveFlip(st.glove, side === 'right', side === 'left'),
   });
   // Seen from the front the hose reads thinner than in the 3/4 view.
   noodle(g, side === 'right' ? 'sleeve_back' : 'sleeve_front', s(st.S), s(st.c), s(st.H), 0, 1, () => SLEEVE_W);

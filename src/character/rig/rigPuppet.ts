@@ -168,6 +168,84 @@ export function anchoredFlex(
   g.restore();
 }
 
+/** A baked-in-place part drawn again inside a polygon (rig px): e.g. an ear over the hat. */
+export function placedClip(g: G, name: string, poly: readonly V2[]) {
+  const p = RIG.parts[name];
+  const img = images[name];
+  if (!img) return;
+  g.save();
+  g.beginPath();
+  g.moveTo(poly[0][0], poly[0][1]);
+  for (const q of poly) g.lineTo(q[0], q[1]);
+  g.closePath();
+  g.clip();
+  g.drawImage(img, p.x, p.y);
+  g.restore();
+}
+
+/**
+ * The hat as worn (master look): the brim bends DOWN at the front and curls UP at the back, the crown
+ * stays as drawn. Vertical strips of the brim's two ends turn in a chain around the brim line, a little
+ * more each, so it curves instead of folding. droop/curl in radians at the tips; 0, 0 = the flat hat.
+ * front/back: where the bend starts (fractions of the width from the back edge); lineY: the brim line
+ * (fraction of the height).
+ */
+export function placedHatBend(g: G, name: string, droop: number, curl: number, front = 0.76, back = 0.26, lineY = 0.82) {
+  const p = RIG.parts[name];
+  const img = images[name];
+  if (!img) return;
+  if (Math.abs(droop) < 0.003 && Math.abs(curl) < 0.003) {
+    g.drawImage(img, p.x, p.y);
+    return;
+  }
+  const W = img.width;
+  const H = img.height;
+  const xf = p.x + W * front;
+  const xb = p.x + W * back;
+  const ly = p.y + H * lineY;
+  const strip = (sx: number, w: number, cx: number, cy: number, a: number, fromX: number) => {
+    g.save();
+    g.translate(cx, cy);
+    g.rotate(a);
+    g.translate(-fromX, -ly);
+    g.beginPath();
+    g.rect(sx, p.y - H, w, H * 3);
+    g.clip();
+    g.drawImage(img, p.x, p.y);
+    g.restore();
+  };
+  // Middle (the crown and the brim under it): unchanged.
+  g.save();
+  g.beginPath();
+  g.rect(xb - 0.5, p.y - H, xf - xb + 1, H * 3);
+  g.clip();
+  g.drawImage(img, p.x, p.y);
+  g.restore();
+  const N = 12;
+  // Front: strips rightwards, each turned a little more (down).
+  let cx = xf;
+  let cy = ly;
+  const fs = (p.x + W - xf) / N;
+  for (let i = 0; i < N; i++) {
+    const a = (droop * (i + 1)) / N;
+    const sx = xf + i * fs;
+    strip(sx - 0.6, fs + 4, cx, cy, a, sx);
+    cx += Math.cos(a) * fs;
+    cy += Math.sin(a) * fs;
+  }
+  // Back: strips leftwards, each turned a little more (up).
+  cx = xb;
+  cy = ly;
+  const bs = (xb - p.x) / N;
+  for (let i = 0; i < N; i++) {
+    const a = (curl * (i + 1)) / N;
+    const sx = xb - (i + 1) * bs;
+    strip(sx - 4, bs + 4.6, cx, cy, a, sx + bs);
+    cx -= Math.cos(a) * bs;
+    cy -= Math.sin(a) * bs;
+  }
+}
+
 /**
  * Draw a sprite as thin horizontal bands, each shifted sideways by dx(row):
  * a smooth bend of the drawing itself (spine sway, coat swing, tail wave)
