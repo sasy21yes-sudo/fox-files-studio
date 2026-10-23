@@ -128,6 +128,8 @@ export interface FoxElement extends ElementBase {
   mouth?: Key<string>[];
   eyes?: Key<'open' | 'happy'>[];
   facing?: 1 | -1;
+  /** Camera-facing talk: 'front' draws the waist-up front view (a cut, no turn), 'side' the usual 3/4 figure. */
+  view?: Key<'side' | 'front'>[];
 }
 
 export type SceneElement = ElementBase | FoxElement;

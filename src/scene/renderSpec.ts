@@ -262,6 +262,7 @@ function foxPose(spec: SceneSpec, s: Stage, light: number, fox: FoxElement, plac
     y: place.y,
     scale: place.S,
     facing: fox.facing,
+    view: evalStep(fox.view, k, 'side'),
     time: s.time,
     walk: walking,
     walkPhase: k * TAU * cadence,

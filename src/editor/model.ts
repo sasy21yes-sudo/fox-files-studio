@@ -14,7 +14,7 @@ export type Selection =
   | { kind: 'beat'; scene: number; index: number };
 
 /** Keyed tracks of Agent Fox shown on the timeline. */
-export type FoxTrack = 'armFront' | 'armBack' | 'look' | 'mouth' | 'eyes' | `face.${string}`;
+export type FoxTrack = 'armFront' | 'armBack' | 'look' | 'mouth' | 'eyes' | 'view' | `face.${string}`;
 
 // ------------------------------------------------------------------ time mapping
 

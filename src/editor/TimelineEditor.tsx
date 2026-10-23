@@ -496,7 +496,7 @@ export function TimelineEditor({ project, timeline, time, selection, onSeek, onS
                   </Row>
                   <Row head="Fox · face & look" sub>
                     <div className="tl-lane-inner keys" style={{ width }} onPointerDown={seekFromLane}>
-                      {keyLane(['look', 'mouth', 'eyes', ...Object.keys(fox.face ?? {}).map((f) => `face.${f}` as FoxTrack)])}
+                      {keyLane(['view', 'look', 'mouth', 'eyes', ...Object.keys(fox.face ?? {}).map((f) => `face.${f}` as FoxTrack)])}
                     </div>
                   </Row>
                 </>

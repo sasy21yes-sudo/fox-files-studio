@@ -1,7 +1,13 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
 import { face as faceTweak, motion, tweaks } from './rig/tweaks';
 import { RIG, anchored, anchoredFlex, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
-export { loadRig as loadPuppet } from './rig/rigPuppet';
+import { loadRig } from './rig/rigPuppet';
+import { drawFoxFront, frontReady, loadFront, type FrontMouth } from './foxFront';
+
+/** Load the painted rigs (side and front views). */
+export function loadPuppet(): Promise<void> {
+  return Promise.all([loadRig(), loadFront()]).then(() => undefined);
+}
 
 /**
  * Agent Fox — character rig, version 3.
@@ -75,6 +81,8 @@ export interface FoxPose {
   y: number;
   scale: number;
   facing?: 1 | -1;
+  /** 'front': waist-up, looking into the camera (character/foxFront.ts). */
+  view?: 'side' | 'front';
   time: number;
   bounce?: number;
   walk?: number;
@@ -261,6 +269,7 @@ export function getFoxStyle(): FoxStyle {
 }
 
 export function drawFox(g: G, pose: FoxPose): void {
+  if (foxStyle === 'painted' && rigReady() && pose.view === 'front' && frontReady()) return drawFoxFrontRig(g, pose);
   if (foxStyle === 'painted' && rigReady()) return drawFoxSheetRig(g, pose);
   const time = pose.time;
   const facing = pose.facing ?? 1;
@@ -1820,24 +1829,10 @@ function mark(g: G, name: string, p: V2) {
 /** Rig px the hat sits above its baked place (master look: brows clear of the brim). */
 const HAT_RAISE = 34;
 
-function drawFoxSheetRig(g: G, pose: FoxPose): void {
+/** Gaze, lids, brows and mouth for a pose (shared by the side and front views). lookX: the resting gaze. */
+function foxExpression(pose: FoxPose, lookX: number) {
   const time = pose.time;
-  const facing = pose.facing ?? 1;
-  const walk = clamp(pose.walk ?? 0);
-  const phase = pose.walkPhase ?? time * TAU * 1.6;
   const surprise = clamp(pose.surprise ?? 0);
-  const bounceAmt = (pose.bounce ?? 1) * motion('bounce') * (1 - walk);
-  const lift = beatLift(time);
-  const landing = Math.pow(1 - lift, 6);
-  // Up at passing (one foot under the hips), down at heel strike: twice per cycle.
-  const walkBob = Math.abs(Math.sin(phase)) * 12 * walk;
-  const bob = -(lift * 12 * bounceAmt + walkBob) + landing * 4 * bounceAmt - surprise * 8;
-  const squash = (pose.squash ?? 0) + landing * 0.045 * bounceAmt - lift * 0.02 * bounceAmt - surprise * 0.05 - Math.sin(time * 1.9) * 0.006 * (1 - walk);
-  const lean = (pose.lean ?? 0) * 0.7 + walk * 0.05;
-  const jump = pose.jump ?? 0;
-  const headLag = -(beatLift(time - 0.08) * 6 * bounceAmt + Math.abs(Math.sin(phase - 0.4)) * 10 * walk) - surprise * 10;
-
-  // Expression.
   const speaking = !!pose.speaking && !pose.mouth;
   let shape: MouthShape = pose.mouth ?? 'closed';
   if (speaking) shape = pose.viseme ?? speakingMouth(time);
@@ -1856,7 +1851,7 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   const lids = clamp(pose.lids ?? 0) * 0.7;
   const baseLid = 0.04 + angry * 0.22 + worry * 0.1 - surprise * 0.2;
   const face: Face = {
-    lookX: clamp((pose.lookX ?? 0.3) + lerp(prevX, sx, dart) * (1 - surprise), -1, 1),
+    lookX: clamp((pose.lookX ?? lookX) + lerp(prevX, sx, dart) * (1 - surprise), -1, 1),
     lookY: clamp((pose.lookY ?? 0) + lerp(prevY, sy, dart) * (1 - surprise), -1, 1),
     lid: [Math.max(blink, clamp(baseLid + lids + skeptic * 0.35)), Math.max(blink, clamp(baseLid + lids - skeptic * 0.05))],
     lidTilt: angry * 0.6 - worry * 0.55,
@@ -1868,6 +1863,72 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     brows: { raise: (pose.brows ?? 0) + surprise * 1.2, worry, angry, skeptic },
     mouth: happy && !speaking ? 11 : VISEME_MOUTH[shape],
   };
+
+  return { face, shape, speaking, surprise, angry, worry, happy };
+}
+
+/** The talking bust, looking into the camera (character/foxFront.ts). */
+function drawFoxFrontRig(g: G, pose: FoxPose): void {
+  const time = pose.time;
+  const { face, shape, speaking, surprise, angry, happy } = foxExpression(pose, 0);
+  const bounceAmt = (pose.bounce ?? 1) * motion('bounce');
+  const lift = beatLift(time);
+  const landing = Math.pow(1 - lift, 6);
+  // A bust bounces less than the whole body: the shoulders ride the beat, the head lags it.
+  const bob = -(lift * 5 * bounceAmt) + landing * 2 * bounceAmt - surprise * 6;
+  const headLag = -beatLift(time - 0.08) * 4 * bounceAmt - surprise * 8;
+  const talkNod = speaking ? (Math.sin(time * 6.3) * 0.02 + Math.sin(time * 2.7) * 0.015) * motion('talkNod') : 0;
+  const idle = (Math.sin(time * 1.1) * 0.018 + Math.sin(time * 0.53 + 1) * 0.01) * motion('headSway');
+  const headRot = (pose.headTilt ?? 0) + talkNod + idle + angry * 0.02 + (beatLift(time - 0.08) - 0.5) * 0.02 * bounceAmt;
+  const mouth: FrontMouth = happy && !speaking ? 'smile' : shape === 'grin' ? 'smile' : (shape as FrontMouth);
+  const arms = physStates(resolveArms(pose));
+  if (debugSink) {
+    debugSink.pose = { ...pose };
+    debugSink.face = face;
+    const info = (st: ArmState) => ({ from: st.from, to: st.to, blend: st.b, mode: st.b >= 0.5 ? st.to : st.from, hand: '', layer: 'front view' });
+    debugSink.arms = { near: info(arms.near), far: info(arms.far) };
+  }
+  g.save();
+  g.translate(pose.x, pose.y);
+  g.scale(pose.scale * (pose.facing ?? 1), pose.scale);
+  drawFoxFront(g, {
+    face,
+    mouth,
+    speaking,
+    surprise,
+    headRot,
+    bob,
+    headLag,
+    arms: { right: arms.far, left: arms.near },
+    time,
+  });
+  g.restore();
+  g.save();
+  g.translate(pose.x, pose.y);
+  g.scale(pose.scale, pose.scale);
+  drawPop(g, pose, headLag);
+  g.restore();
+}
+
+function drawFoxSheetRig(g: G, pose: FoxPose): void {
+  const time = pose.time;
+  const facing = pose.facing ?? 1;
+  const walk = clamp(pose.walk ?? 0);
+  const phase = pose.walkPhase ?? time * TAU * 1.6;
+  const surprise = clamp(pose.surprise ?? 0);
+  const bounceAmt = (pose.bounce ?? 1) * motion('bounce') * (1 - walk);
+  const lift = beatLift(time);
+  const landing = Math.pow(1 - lift, 6);
+  // Up at passing (one foot under the hips), down at heel strike: twice per cycle.
+  const walkBob = Math.abs(Math.sin(phase)) * 12 * walk;
+  const bob = -(lift * 12 * bounceAmt + walkBob) + landing * 4 * bounceAmt - surprise * 8;
+  const squash = (pose.squash ?? 0) + landing * 0.045 * bounceAmt - lift * 0.02 * bounceAmt - surprise * 0.05 - Math.sin(time * 1.9) * 0.006 * (1 - walk);
+  const lean = (pose.lean ?? 0) * 0.7 + walk * 0.05;
+  const jump = pose.jump ?? 0;
+  const headLag = -(beatLift(time - 0.08) * 6 * bounceAmt + Math.abs(Math.sin(phase - 0.4)) * 10 * walk) - surprise * 10;
+
+  // Expression.
+  const { face, speaking, angry } = foxExpression(pose, 0.3);
 
   // Head motion: beat lag, talking nods, idle sway, mood, gaze.
   const talkNod = speaking ? (Math.sin(time * 6.3) * 0.025 + Math.sin(time * 2.7) * 0.018) * motion('talkNod') : 0;

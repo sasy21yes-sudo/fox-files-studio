@@ -284,6 +284,9 @@ function FoxPanel({ fox, scene, vertical, onChange, onSelect, kNow, ids }: {
         <Field label="Eyes">
           <Select value="" options={['', 'open', 'happy']} labels={{ '': 'add eyes key…' }} onChange={(m) => m && addKey('eyes', m)} />
         </Field>
+        <Field label="View" hint="front = waist-up, talking into the camera (a cut)">
+          <Select value="" options={['', 'front', 'side']} labels={{ '': 'add view key…', front: 'front (talk to camera)', side: 'side (3/4 figure)' }} onChange={(m) => m && addKey('view', m)} />
+        </Field>
         <Field label="Look at">
           <Select value="-" options={['-', 'camera', 'left', 'up', 'down', ...ids]} labels={{ '-': 'add look key…' }} onChange={(m) => {
             if (m === '-') return;
@@ -361,6 +364,11 @@ function KeyPanel({ fox, track, index, scene, onChange, onSelect, ids }: { fox: 
       {track === 'mouth' && (
         <Field label="Mouth">
           <Select value={v as string} options={MOUTHS} labels={{ '': 'none (talking)' }} onChange={(value) => write({ ...key, value }, 'v')} />
+        </Field>
+      )}
+      {track === 'view' && (
+        <Field label="View">
+          <Select value={v as 'side' | 'front'} options={['side', 'front'] as const} onChange={(value) => write({ ...key, value }, 'v')} />
         </Field>
       )}
       {track === 'eyes' && (

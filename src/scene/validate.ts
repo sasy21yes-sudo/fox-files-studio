@@ -43,6 +43,7 @@ export function validateSpec(raw: unknown): string[] {
       keys(el.look, `${p}.look`, (v) => isObj(v) && ((isNum(v.x) && isNum(v.y)) || typeof v.target === 'string'));
       keys(el.mouth, `${p}.mouth`, (v) => typeof v === 'string');
       keys(el.eyes, `${p}.eyes`, (v) => v === 'open' || v === 'happy');
+      keys(el.view, `${p}.view`, (v) => v === 'side' || v === 'front');
       if (el.face !== undefined) {
         if (!isObj(el.face)) errs.push(`${p}.face must be an object`);
         else
