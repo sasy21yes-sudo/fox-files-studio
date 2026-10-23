@@ -168,6 +168,10 @@ def main():
     rows_ = -(-len(sources) // 4)
     sheet = np.empty((rows_ * (sh_ + gap) + gap, 4 * (sw + gap) + gap, 3), np.uint8)
     sheet[:] = bg
+    # The 4x sheet the bake cuts from, made from the renders themselves (render px ~ 4x sheet px): the
+    # mouths keep the renders' own lines instead of an upscale of the shrunk 1x sheet.
+    sheet4 = np.empty((sheet.shape[0] * 4, sheet.shape[1] * 4, 3), np.uint8)
+    sheet4[:] = bg
     fits, points, placed = {}, {}, []
     for k in range(len(sources)):
         R = renders[k][rb[1]:rb[3], rb[0]:rb[2]].astype(np.float32)
@@ -180,6 +184,10 @@ def main():
         qx, qy = gap + (k % 4) * (sw + gap), gap + (k // 4) * (sh_ + gap)
         region = sheet[qy:qy + sh_, qx:qx + sw].astype(np.float32)
         sheet[qy:qy + sh_, qx:qx + sw] = (spr * sal + region * (1 - sal)).astype(np.uint8)
+        spr4 = cv2.resize(R, (sw * 4, sh_ * 4), interpolation=cv2.INTER_AREA)
+        sal4 = (cv2.resize(al, (sw * 4, sh_ * 4), interpolation=cv2.INTER_LINEAR) > 0.5).astype(np.float32)[..., None]
+        region4 = sheet4[qy * 4:(qy + sh_) * 4, qx * 4:(qx + sw) * 4].astype(np.float32)
+        sheet4[qy * 4:(qy + sh_) * 4, qx * 4:(qx + sw) * 4] = (spr4 * sal4 + region4 * (1 - sal4)).astype(np.uint8)
         placed.append((ids[k], qx, qy))
 
     lab, _ = ndi.label(ndi.binary_closing(alpha_of(sheet) > 0.5, iterations=2))
@@ -212,6 +220,8 @@ def main():
     old_fits = json.load(open(os.path.join(ROOT, 'art', 'parts', 'fits.json')))
     json.dump({'a_to_b': old_fits['a_to_b'], 'mouths': fits, 'points': points, 'exact': True, 'b_shift': list(shift), 'emotions': {str(13 + EMOTIONS.index(e)): e for e in emos}}, open(os.path.join(OUT, 'fits.json'), 'w'), indent=1)
     cv2.imwrite(os.path.join(OUT, 'mouths.jpg'), sheet, [cv2.IMWRITE_JPEG_QUALITY, 96])
+    os.makedirs(os.path.join(OUT, 'up'), exist_ok=True)
+    cv2.imwrite(os.path.join(OUT, 'up', 'mouths.png'), sheet4)
     
     print('art/parts_v4/mouths.jpg', sheet.shape[1], 'x', sheet.shape[0], '+ fits.json: 12 mouths, sprite', sw, 'x', sh_, 'px at 1x')
 
