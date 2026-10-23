@@ -1,8 +1,10 @@
-import type { Project } from '../types';
+import type { Project, Scene, TransitionType } from '../types';
 import type { SceneSpec } from '../scene/spec';
 import type { Beat } from '../data/mkultraScript';
-import { sceneBeats } from '../data/projectText';
-import { sourceById } from '../data/sources';
+import { projectHook, sceneBeats } from '../data/projectText';
+import { SOURCES } from '../data/sources';
+import { STUDIO_VOICES } from '../audio/studioVoices';
+import { IMAGE_STYLES, imageStatus } from './localImage';
 import type { Timeline } from '../animation/timeline';
 import { toAuthored } from '../editor/model';
 
@@ -31,11 +33,39 @@ export interface AiSceneChange {
   duration: number | null;
   /** New narration (the studio voice records the new sentences), or null to keep it. */
   narration?: string | null;
+  /** Other scene fields to change. */
+  fields?: Partial<Pick<Scene, 'title' | 'summary' | 'transition' | 'chapterCard' | 'keywords' | 'sourceIds'>> | null;
+}
+
+/** A scene Claude adds (whole-video edits). */
+export interface AiNewScene {
+  ref: string;
+  title: string;
+  summary: string;
+  narration: string;
+  duration: number;
+  transition: TransitionType;
+  spec: SceneSpec;
+  beats: Beat[];
+}
+
+/** A picture Claude asks the local image model for; specs refer to it as "new:<key>". */
+export interface AiImage {
+  key: string;
+  prompt: string;
+  style: string;
+  aspect: string;
 }
 
 export interface AiResult {
   summary: string;
   scenes: AiSceneChange[];
+  newScenes?: AiNewScene[];
+  /** Final scene order (current indices and new-scene refs); scenes left out are deleted. */
+  order?: (number | string)[] | null;
+  /** Episode changes: episodeTitle, episodeSubtitle, hook, settings, sources_add. */
+  episode?: Record<string, unknown> | null;
+  images?: AiImage[];
   usage: { input: number; output: number; cacheRead: number; cacheWrite: number };
   model: string;
   attempts: number;
@@ -64,6 +94,9 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
     title: s.title,
     summary: s.summary,
     narration: s.narration,
+    transition: s.transition,
+    chapterCard: s.chapterCard,
+    keywords: s.keywords,
     duration: s.duration,
     authoredDuration: s.authoredDuration,
     spec: target === 'all' || target === index ? (s.spec ?? null) : null,
@@ -81,15 +114,42 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
             }))
         : undefined,
   }));
-  const ids = [...new Set((target === 'all' ? project.scenes : [project.scenes[target]]).flatMap((s) => s.sourceIds))];
-  const sources = ids
-    .map((id) => project.sources?.find((s) => s.id === id) ?? sourceById(id))
-    .filter((s): s is NonNullable<typeof s> => !!s)
-    .map((s) => ({ id: s.id, title: s.title, publisher: s.publisher, date: s.date, claims: s.claims }));
+  // Every source of the episode (Claude may attach them to scenes); the MKUltra episode uses data/sources.ts.
+  const sources = (project.template === 'mkultra' ? SOURCES : (project.sources ?? [])).map((s) => ({
+    id: s.id,
+    title: s.title,
+    publisher: s.publisher,
+    date: s.date,
+    claims: s.claims,
+  }));
+  const st = project.settings;
+  const images = await imageStatus();
   const body = {
     prompt,
     target,
-    episode: { title: project.episodeTitle, language: lang, aspect: project.settings.aspect, template: project.template },
+    episode: {
+      title: project.episodeTitle,
+      subtitle: project.episodeSubtitle,
+      language: lang,
+      aspect: st.aspect,
+      template: project.template,
+      hook: projectHook(project, lang),
+      settings: {
+        filmGrain: st.filmGrain,
+        music: st.music,
+        musicVolume: st.musicVolume,
+        chapterCards: st.chapterCards,
+        shortHook: st.shortHook,
+        characterStyle: st.characterStyle,
+        narrationMode: st.narrationMode,
+        speechRate: st.speechRate,
+        studioVoice: st.studioVoice?.[lang] ?? STUDIO_VOICES[lang][0]?.id,
+        subtitles: st.subtitles,
+      },
+      voices: STUDIO_VOICES[lang].map((v) => ({ id: v.id, label: v.label })),
+      images: images.available,
+      imageStyles: IMAGE_STYLES,
+    },
     scenes,
     sources,
     media: (project.media ?? []).map((m) => ({ id: m.id, name: m.name, prompt: m.prompt ?? '', width: m.width, height: m.height })),

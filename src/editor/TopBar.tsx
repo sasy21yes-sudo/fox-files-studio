@@ -78,6 +78,9 @@ export function TopBar(p: Props) {
         <button className={`btn ${p.theater ? 'active' : ''}`} onClick={p.onToggleTheater} aria-pressed={p.theater}>
           {p.theater ? 'Exit preview' : 'Preview'}
         </button>
+        <button className="btn primary" onClick={() => p.onPage('deliver')} title="Export the video (YouTube 16:9 and Short 9:16), subtitles and soundtrack">
+          Export
+        </button>
       </div>
     </header>
   );

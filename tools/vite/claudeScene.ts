@@ -13,7 +13,8 @@
  *   ANTHROPIC_API_KEY is set in .env (read on the Node side, never sent to the page).
  *
  *   GET  /api/claude/status -> { available, backend, model }
- *   POST /api/claude/edit   -> { summary, scenes: [{ index, spec, beats, duration, narration }], usage, model, attempts } | { error }
+ *   POST /api/claude/edit   -> { summary, scenes: [{ index, spec, beats, duration, narration, fields }], newScenes, order, episode, images,
+ *                                usage, model, attempts } | { error }
  */
 import Anthropic from '@anthropic-ai/sdk';
 import { spawn, spawnSync } from 'node:child_process';
@@ -33,6 +34,9 @@ interface SceneIn {
   title: string;
   summary: string;
   narration: string;
+  transition?: string;
+  chapterCard?: boolean;
+  keywords?: string[];
   duration: number;
   authoredDuration: number;
   spec: unknown | null;
@@ -42,11 +46,28 @@ interface SceneIn {
   speech?: { text: string; from: number; to: number; exact: boolean }[];
 }
 
+interface EpisodeIn {
+  title: string;
+  subtitle?: string;
+  language: string;
+  aspect: string;
+  template: string;
+  /** The Short's cold-open line in this language. */
+  hook?: { text: string; keywords: string[] } | null;
+  /** The settings Claude may change (see EPISODE_SETTINGS). */
+  settings?: Record<string, unknown>;
+  /** Studio narrator voices of this language. */
+  voices?: { id: string; label: string }[];
+  /** Whether the local image model (ComfyUI) is running: only then can Claude ask for new images. */
+  images?: boolean;
+  imageStyles?: Record<string, string>;
+}
+
 interface EditRequest {
   prompt: string;
   /** Index of the scene to edit, or "all" for the whole episode. */
   target: number | 'all';
-  episode: { title: string; language: string; aspect: string; template: string };
+  episode: EpisodeIn;
   scenes: SceneIn[];
   sources: { id: string; title: string; publisher?: string; date?: string; claims: string[] }[];
   /** The episode's image library (picture elements may only use these ids). */
@@ -60,7 +81,42 @@ interface SceneOut {
   duration: number | null;
   /** New narration text (the studio voice records the new sentences), or null to keep it. */
   narration: string | null;
+  /** Other scene fields to change (title, summary, transition, chapterCard, keywords, sourceIds). */
+  fields: Record<string, unknown> | null;
 }
+
+interface NewSceneOut {
+  ref: string;
+  title: string;
+  summary: string;
+  narration: string;
+  duration: number;
+  transition: string;
+  spec: unknown | null;
+  beats: unknown[];
+}
+
+interface ImageOut {
+  key: string;
+  prompt: string;
+  style: string;
+  aspect: string;
+}
+
+/** Everything a checked reply changes. */
+interface Changes {
+  scenes: SceneOut[];
+  newScenes: NewSceneOut[];
+  /** Final scene order: existing indices and new-scene refs; null = keep. */
+  order: (number | string)[] | null;
+  episode: Record<string, unknown> | null;
+  images: ImageOut[];
+}
+
+const TRANSITIONS = ['iris', 'fade', 'flash', 'ink'];
+const IMAGE_ASPECTS = ['16:9', '9:16', '1:1'];
+const NARRATION_MODES = ['studio', 'speech', 'file', 'off'];
+const SCENE_FIELDS = ['title', 'summary', 'transition', 'chapterCard', 'keywords', 'sourceIds'];
 
 interface Usage {
   input: number;
@@ -88,19 +144,70 @@ const REPLY_SCHEMA = {
             type: 'string',
             description: 'The complete new narration of the scene (what the voice says), or "" to keep it. Only when the instruction asks to change what is said.',
           },
+          fields_json: {
+            type: 'string',
+            description: 'Other scene fields to change as a JSON object (title, summary, transition, chapterCard, keywords, sourceIds), or "" to keep them.',
+          },
         },
-        required: ['index', 'spec_json', 'beats_json', 'duration', 'narration'],
+        required: ['index', 'spec_json', 'beats_json', 'duration', 'narration', 'fields_json'],
+        additionalProperties: false,
+      },
+    },
+    new_scenes: {
+      type: 'array',
+      description: 'Scenes to add (whole-episode instructions only). Place them with order_json; without it they go at the end.',
+      items: {
+        type: 'object',
+        properties: {
+          ref: { type: 'string', description: 'Your name for it, "new-1", "new-2"... (used in order_json).' },
+          title: { type: 'string' },
+          summary: { type: 'string', description: 'What the scene is for, one sentence.' },
+          narration: { type: 'string', description: 'What the voice says in it.' },
+          duration: { type: 'number', description: 'Length in seconds (3-90).' },
+          transition: { type: 'string', description: 'iris | fade | flash | ink' },
+          spec_json: { type: 'string', description: 'Its complete SceneSpec as a JSON string (times in 0..duration).' },
+          beats_json: { type: 'string', description: 'Its pop-ups as a JSON list, or "[]".' },
+        },
+        required: ['ref', 'title', 'summary', 'narration', 'duration', 'transition', 'spec_json', 'beats_json'],
+        additionalProperties: false,
+      },
+    },
+    order_json: {
+      type: 'string',
+      description:
+        'Whole-episode instructions only: the final order of the scenes as a JSON list of current indices (numbers) and new-scene refs ("new-1"). A current scene left out is DELETED. "" keeps the order.',
+    },
+    episode_json: {
+      type: 'string',
+      description: 'Whole-episode instructions only: episode changes as a JSON object (episodeTitle, episodeSubtitle, hook, settings, sources_add), or "".',
+    },
+    images: {
+      type: 'array',
+      description: 'New pictures for the local image model to paint before your changes are applied; use them in picture elements as "new:<key>".',
+      items: {
+        type: 'object',
+        properties: {
+          key: { type: 'string', description: 'Lowercase name with dashes, e.g. "senate-hearing".' },
+          prompt: { type: 'string', description: 'What the picture shows (no text, no logos in it).' },
+          style: { type: 'string', description: 'One of the image styles listed in the request.' },
+          aspect: { type: 'string', description: '16:9 | 9:16 | 1:1' },
+        },
+        required: ['key', 'prompt', 'style', 'aspect'],
         additionalProperties: false,
       },
     },
   },
-  required: ['summary', 'scenes'],
+  required: ['summary', 'scenes', 'new_scenes', 'order_json', 'episode_json', 'images'],
   additionalProperties: false,
 } as const;
 
 interface Reply {
   summary: string;
-  scenes: { index: number; spec_json: string; beats_json: string; duration: number; narration: string }[];
+  scenes: { index: number; spec_json: string; beats_json: string; duration: number; narration: string; fields_json: string }[];
+  new_scenes?: { ref: string; title: string; summary: string; narration: string; duration: number; transition: string; spec_json: string; beats_json: string }[];
+  order_json?: string;
+  episode_json?: string;
+  images?: { key: string; prompt: string; style: string; aspect: string }[];
 }
 
 interface Catalog {
@@ -166,6 +273,15 @@ question {text} · span {from, to, label} · count {value, label, note?} · vers
 # Research
 You may use web search and web fetch for ideas: cartoon staging and gags, editing rhythm, how explainers keep viewers watching, period look and props. The web is for craft, not for content: a fact you find there never goes on screen or into the narration unless the listed sources support it. Mention in the summary anything useful you found that you could not use.
 
+# Everything else in the studio
+You can change everything the director can change in the editor:
+- Scene fields ("fields_json" of a scene): title, summary (its intent), transition ("iris" | "fade" | "flash" | "ink", the wipe INTO the scene), chapterCard (false = no chapter intertitle on it), keywords (words highlighted in its burned-in subtitles; they must appear in its narration), sourceIds (ids of the listed sources that back its claims).
+- Whole-episode instructions only:
+  - New scenes ("new_scenes", with a complete spec built like the reference) and the scene order ("order_json"; a current scene you leave out of it is deleted — only when the instruction asks to remove it).
+  - The episode ("episode_json"): episodeTitle, episodeSubtitle, hook ({"text", "keywords"}: the cold-open line of the vertical Short, in the episode language), settings (a partial object: filmGrain, music, musicVolume 0..1, chapterCards, shortHook, characterStyle "painted"|"vector", narrationMode ("studio" = the studio narrator, "speech" = the browser voice, "file", "off"), speechRate 0.5..2, studioVoice (one of the listed voice ids), subtitles {enabled, fontScale 0.6..2, position 0..1, highlightKeywords}), and sources_add (custom episodes only: [{"id","title","publisher","date","url","claims":[...]}] — only real pages you actually opened with web fetch, claims copied from what they say).
+- New pictures ("images"): the studio paints them with its local image model before applying your changes, only when the request says the model is running. Use one in a picture element with "media": "new:<key>". Describe the picture, never text in it (the model cannot letter).
+The MKUltra episode takes its episode title, subtitle and scene titles from its script: leave those as they are there.
+
 # Hand-coded scenes
 Some scenes have no spec ("spec": null): they are drawn by code. You can still change their pop-ups and length without touching the picture (spec_json ""). Write a new spec for one only when the instruction needs a change to its picture; it then replaces the coded version, so build it complete from the narration and the scene intent.
 
@@ -178,7 +294,8 @@ Some scenes have no spec ("spec": null): they are drawn by code. You can still c
    Picture elements may only use image ids from the episode's image library given in the request. You cannot create images: if none fits, say so in the summary (the director can generate one in the studio).
 6. Pop-ups: beats_json is the complete list for that scene when you change it, else "". Each cue must be a phrase that appears verbatim in that scene's narration (the new one, when you change it).
 7. duration: 0 unless the instruction needs a different scene length (3-90 s).
-8. The summary is for the director: plain words, saying which scenes you changed. Write it in the language of the director's instruction (an Italian instruction gets an Italian summary), whatever the language of the rest of this prompt.
+8. Anything you do not change stays "" / [] in the reply (scene fields, new_scenes, order_json, episode_json, images).
+9. The summary is for the director: plain words, saying which scenes you changed. Write it in the language of the director's instruction (an Italian instruction gets an Italian summary), whatever the language of the rest of this prompt.
 
 # Reference: scene 1 of the MKUltra episode (authoredDuration 9)
 ${JSON.stringify(example)}`;
@@ -195,6 +312,7 @@ function userMessage(r: EditRequest): string {
       `## Scene ${s.index + 1} (index ${s.index}): "${s.title}"`,
       `Real length ${s.duration.toFixed(1)} s, authoredDuration ${s.authoredDuration} (spec times in 0..${s.authoredDuration}).`,
       s.summary ? `Intent: ${s.summary}` : '',
+      `Fields: ${JSON.stringify({ transition: s.transition, chapterCard: s.chapterCard !== false, keywords: s.keywords ?? [], sourceIds: s.sourceIds })}`,
       s.sourceIds.length ? `Sources: ${s.sourceIds.map((id) => sourceTitle.get(id) ?? id).join('; ')}` : 'No sources listed: add no new facts.',
       `Narration:\n"""${s.narration}"""`,
       s.speech?.length
@@ -205,12 +323,29 @@ function userMessage(r: EditRequest): string {
     ]
       .filter(Boolean)
       .join('\n');
+  const e = r.episode;
   return [
-    `Episode: "${r.episode.title}" (${r.episode.template === 'mkultra' ? 'MKUltra episode' : 'custom episode'}), language ${r.episode.language}, editing in ${r.episode.aspect}, ${r.scenes.length} scene(s).`,
+    `Episode: "${e.title}" (${e.template === 'mkultra' ? 'MKUltra episode' : 'custom episode'}), language ${e.language}, editing in ${e.aspect}, ${r.scenes.length} scene(s).`,
+    !target
+      ? [
+          '# Episode',
+          e.subtitle ? `Subtitle: "${e.subtitle}"` : '',
+          e.hook ? `Short hook: ${JSON.stringify(e.hook)}` : 'Short hook: none',
+          e.settings ? `Settings: ${JSON.stringify(e.settings)}` : '',
+          e.voices?.length ? `Studio voices for ${e.language}: ${e.voices.map((v) => `${v.id} (${v.label})`).join(', ')}` : '',
+        ]
+          .filter(Boolean)
+          .join('\n')
+      : '',
+    e.images
+      ? `# Image model\nRunning: you may ask for new pictures. Styles: ${Object.entries(e.imageStyles ?? {})
+          .map(([k, d]) => `${k} (${d})`)
+          .join('; ')}.`
+      : '# Image model\nNot running: no new pictures (only the library).',
     r.media?.length
       ? `# Image library (for picture elements)\n${r.media.map((m) => `- ${m.id}: "${m.name}" ${m.width}x${m.height}${m.prompt ? ` — ${m.prompt}` : ''}`).join('\n')}`
       : '# Image library\nEmpty: no picture elements possible.',
-    r.sources.length ? `# Sources\n${r.sources.map((s) => `- ${s.title}${[s.publisher, s.date].filter(Boolean).map((x) => ` (${x})`).join('')}: ${s.claims.join(' | ')}`).join('\n')}` : '',
+    r.sources.length ? `# Sources (by id)\n${r.sources.map((s) => `- ${s.id}: ${s.title}${[s.publisher, s.date].filter(Boolean).map((x) => ` (${x})`).join('')}: ${s.claims.join(' | ')}`).join('\n')}` : '',
     `# Scenes\n${r.scenes.map(scene).join('\n\n')}`,
     target
       ? `# Instruction for scene ${target.index + 1} only (index ${target.index})\n"""${r.prompt}"""`
@@ -220,15 +355,129 @@ function userMessage(r: EditRequest): string {
     .join('\n\n');
 }
 
-/** Checks Claude's reply against the request; returns the scenes to apply or the problems. */
-function checkReply(
-  reply: Reply,
-  r: EditRequest,
-  validateSpec: (x: unknown) => string[],
-): { scenes: SceneOut[]; problems: string[] } {
+const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
+const isStrList = (v: unknown) => Array.isArray(v) && v.every((x) => typeof x === 'string');
+
+/** Picture elements may show a library image or one of the reply's new images ("new:<key>"). */
+function checkPictures(spec: unknown, at: string, r: EditRequest, newKeys: Set<string>, problems: string[]) {
+  const known = new Set((r.media ?? []).map((m) => m.id));
+  for (const el of (spec as { elements?: { type?: string; id?: string; params?: { media?: unknown } }[] }).elements ?? []) {
+    if (el.type !== 'picture') continue;
+    const id = String(el.params?.media ?? '');
+    if (id.startsWith('new:') ? !newKeys.has(id.slice(4)) : !known.has(id)) problems.push(`${at}: picture "${el.id}" uses "${id}", which is neither in the library nor in your images`);
+  }
+}
+
+/** Pop-ups: a list whose cues are phrases of `narration`. */
+function checkBeats(beats: unknown, narration: string, at: string, problems: string[]) {
+  if (!Array.isArray(beats)) return void problems.push(`${at}: pop-ups must be a JSON list`);
+  const text = narration.toLowerCase();
+  beats.forEach((b, i) => {
+    const cue = (b as { cue?: unknown })?.cue;
+    if (typeof cue !== 'string' || !cue.trim() || !text.includes(cue.toLowerCase().trim())) problems.push(`${at}: beats[${i}].cue is not a phrase of that scene's narration`);
+  });
+}
+
+function checkFields(f: unknown, at: string, r: EditRequest, src: SceneIn | null, narration: string, problems: string[]): Record<string, unknown> | null {
+  if (!isObj(f)) return void problems.push(`${at}: fields_json must be a JSON object`), null;
+  const known = new Set(r.sources.map((x) => x.id));
+  for (const k of Object.keys(f)) if (!SCENE_FIELDS.includes(k)) problems.push(`${at}: unknown scene field "${k}"`);
+  if (f.title !== undefined && (typeof f.title !== 'string' || !f.title.trim())) problems.push(`${at}: title must be text`);
+  if (f.title !== undefined && r.episode.template === 'mkultra' && src) problems.push(`${at}: MKUltra scene titles come from the script; leave the title out`);
+  if (f.summary !== undefined && typeof f.summary !== 'string') problems.push(`${at}: summary must be text`);
+  if (f.transition !== undefined && !TRANSITIONS.includes(String(f.transition))) problems.push(`${at}: transition must be one of ${TRANSITIONS.join(', ')}`);
+  if (f.chapterCard !== undefined && typeof f.chapterCard !== 'boolean') problems.push(`${at}: chapterCard must be true or false`);
+  if (f.keywords !== undefined) {
+    if (!isStrList(f.keywords)) problems.push(`${at}: keywords must be a list of text`);
+    else for (const k of f.keywords as string[]) if (!narration.toLowerCase().includes(k.toLowerCase())) problems.push(`${at}: keyword "${k}" is not in the narration`);
+  }
+  if (f.sourceIds !== undefined) {
+    if (!isStrList(f.sourceIds)) problems.push(`${at}: sourceIds must be a list of ids`);
+    else for (const id of f.sourceIds as string[]) if (!known.has(id)) problems.push(`${at}: source "${id}" is not in the list`);
+  }
+  return f;
+}
+
+function checkEpisode(e: unknown, r: EditRequest, problems: string[]): Record<string, unknown> | null {
+  if (!isObj(e)) return void problems.push('episode_json must be a JSON object'), null;
+  const allowed = ['episodeTitle', 'episodeSubtitle', 'hook', 'settings', 'sources_add'];
+  for (const k of Object.keys(e)) if (!allowed.includes(k)) problems.push(`episode_json: unknown field "${k}"`);
+  const mk = r.episode.template === 'mkultra';
+  if ((e.episodeTitle !== undefined || e.episodeSubtitle !== undefined) && mk) problems.push('episode_json: the MKUltra title and subtitle come from the script');
+  for (const k of ['episodeTitle', 'episodeSubtitle']) if (e[k] !== undefined && typeof e[k] !== 'string') problems.push(`episode_json.${k} must be text`);
+  if (e.hook !== undefined && !(isObj(e.hook) && typeof e.hook.text === 'string' && e.hook.text.trim() && isStrList(e.hook.keywords)))
+    problems.push('episode_json.hook must be {"text": "...", "keywords": [...]}');
+  if (e.settings !== undefined) {
+    if (!isObj(e.settings)) problems.push('episode_json.settings must be an object');
+    else {
+      const st = e.settings;
+      const bool = ['filmGrain', 'music', 'chapterCards', 'shortHook'];
+      const num: Record<string, [number, number]> = { musicVolume: [0, 1], speechRate: [0.5, 2] };
+      for (const k of Object.keys(st)) {
+        if (bool.includes(k)) {
+          if (typeof st[k] !== 'boolean') problems.push(`settings.${k} must be true or false`);
+        } else if (k in num) {
+          const v = st[k];
+          if (typeof v !== 'number' || v < num[k][0] || v > num[k][1]) problems.push(`settings.${k} must be a number in ${num[k][0]}..${num[k][1]}`);
+        } else if (k === 'characterStyle') {
+          if (st[k] !== 'painted' && st[k] !== 'vector') problems.push('settings.characterStyle must be "painted" or "vector"');
+        } else if (k === 'narrationMode') {
+          if (!NARRATION_MODES.includes(String(st[k]))) problems.push(`settings.narrationMode must be one of ${NARRATION_MODES.join(', ')}`);
+        } else if (k === 'studioVoice') {
+          if (!(r.episode.voices ?? []).some((v) => v.id === st[k])) problems.push('settings.studioVoice must be one of the listed voice ids');
+        } else if (k === 'subtitles') {
+          const sb = st[k];
+          if (!isObj(sb)) problems.push('settings.subtitles must be an object');
+          else
+            for (const [sk, sv] of Object.entries(sb)) {
+              if (sk === 'enabled' || sk === 'highlightKeywords') {
+                if (typeof sv !== 'boolean') problems.push(`settings.subtitles.${sk} must be true or false`);
+              } else if (sk === 'fontScale') {
+                if (typeof sv !== 'number' || sv < 0.6 || sv > 2) problems.push('settings.subtitles.fontScale must be 0.6..2');
+              } else if (sk === 'position') {
+                if (typeof sv !== 'number' || sv < 0 || sv > 1) problems.push('settings.subtitles.position must be 0..1');
+              } else problems.push(`settings.subtitles: unknown field "${sk}"`);
+            }
+        } else problems.push(`settings: "${k}" cannot be changed here`);
+      }
+    }
+  }
+  if (e.sources_add !== undefined) {
+    if (mk) problems.push('episode_json.sources_add: the MKUltra sources are fixed');
+    else if (!Array.isArray(e.sources_add)) problems.push('episode_json.sources_add must be a list');
+    else
+      e.sources_add.forEach((x, i) => {
+        if (!(isObj(x) && typeof x.id === 'string' && typeof x.title === 'string' && typeof x.url === 'string' && /^https?:\/\//.test(x.url) && isStrList(x.claims)))
+          problems.push(`sources_add[${i}] needs id, title, url (http...) and claims`);
+      });
+  }
+  return e;
+}
+
+/** Checks Claude's reply against the request; returns what to apply or the problems. */
+function checkReply(reply: Reply, r: EditRequest, validateSpec: (x: unknown) => string[]): Changes & { problems: string[] } {
   const problems: string[] = [];
   const scenes: SceneOut[] = [];
-  if (!Array.isArray(reply?.scenes)) return { scenes, problems: ['"scenes" must be a list'] };
+  const changes: Changes = { scenes, newScenes: [], order: null, episode: null, images: [] };
+  if (!Array.isArray(reply?.scenes)) return { ...changes, problems: ['"scenes" must be a list'] };
+  const whole = r.target === 'all';
+
+  // Images first: specs may refer to them.
+  const keys = new Set<string>();
+  for (const [i, im] of (reply.images ?? []).entries()) {
+    const at = `images[${i}]`;
+    if (!r.episode.images) {
+      problems.push(`${at}: the image model is not running, no new pictures`);
+      continue;
+    }
+    if (!/^[a-z0-9][a-z0-9-]{0,40}$/.test(im.key) || keys.has(im.key)) problems.push(`${at}: key must be a unique lowercase name with dashes`);
+    if (!im.prompt?.trim()) problems.push(`${at}: empty prompt`);
+    if (!Object.keys(r.episode.imageStyles ?? {}).includes(im.style)) problems.push(`${at}: style must be one of ${Object.keys(r.episode.imageStyles ?? {}).join(', ')}`);
+    if (!IMAGE_ASPECTS.includes(im.aspect)) problems.push(`${at}: aspect must be one of ${IMAGE_ASPECTS.join(', ')}`);
+    keys.add(im.key);
+    changes.images.push({ key: im.key, prompt: im.prompt.trim(), style: im.style, aspect: im.aspect });
+  }
+
   const seen = new Set<number>();
   for (const s of reply.scenes) {
     const at = `scene index ${s.index}`;
@@ -249,10 +498,7 @@ function checkReply(
       if (s.spec_json) {
         spec = JSON.parse(s.spec_json);
         problems.push(...validateSpec(spec).map((p) => `${at}: ${p}`));
-        const known = new Set((r.media ?? []).map((m) => m.id));
-        for (const el of (spec as { elements?: { type?: string; id?: string; params?: { media?: unknown } }[] }).elements ?? []) {
-          if (el.type === 'picture' && !known.has(String(el.params?.media ?? ''))) problems.push(`${at}: picture "${el.id}" uses an image id that is not in the library`);
-        }
+        checkPictures(spec, at, r, keys, problems);
       }
       if (s.beats_json) beats = JSON.parse(s.beats_json);
     } catch (e) {
@@ -272,18 +518,76 @@ function checkReply(
       })
     )
       problems.push(`${at}: the new narration drops phrases the current pop-ups are cued on; return beats_json with cues from the new narration`);
-    if (beats !== null && !Array.isArray(beats)) problems.push(`${at}: beats_json must be a JSON list`);
-    else if (Array.isArray(beats)) {
-      const narration = spoken.toLowerCase();
-      beats.forEach((b, i) => {
-        const cue = (b as { cue?: unknown })?.cue;
-        if (typeof cue !== 'string' || !cue.trim() || !narration.includes(cue.toLowerCase().trim()))
-          problems.push(`${at}: beats[${i}].cue is not a phrase of that scene's narration`);
-      });
+    if (beats !== null) checkBeats(beats, spoken, at, problems);
+    let fields: Record<string, unknown> | null = null;
+    if (s.fields_json) {
+      try {
+        fields = checkFields(JSON.parse(s.fields_json), at, r, src, spoken, problems);
+      } catch (e) {
+        problems.push(`${at}: fields_json is not valid JSON (${e instanceof Error ? e.message : String(e)})`);
+      }
     }
-    scenes.push({ index: s.index, spec, beats: beats as unknown[] | null, duration: s.duration || null, narration: newNarration });
+    scenes.push({ index: s.index, spec, beats: beats as unknown[] | null, duration: s.duration || null, narration: newNarration, fields });
   }
-  return { scenes, problems };
+
+  // Whole-episode changes.
+  const newRefs = new Set<string>();
+  for (const [i, n] of (reply.new_scenes ?? []).entries()) {
+    const at = `new_scenes[${i}]`;
+    if (!whole) {
+      problems.push(`${at}: new scenes only with a whole-video instruction`);
+      continue;
+    }
+    if (!/^new-\d+$/.test(n.ref) || newRefs.has(n.ref)) problems.push(`${at}: ref must be a unique "new-<n>"`);
+    newRefs.add(n.ref);
+    if (!n.title?.trim()) problems.push(`${at}: needs a title`);
+    if (!(n.duration >= 3 && n.duration <= 90)) problems.push(`${at}: duration must be 3..90 s`);
+    if (!TRANSITIONS.includes(n.transition)) problems.push(`${at}: transition must be one of ${TRANSITIONS.join(', ')}`);
+    let spec: unknown = null;
+    let beats: unknown = [];
+    try {
+      spec = n.spec_json ? JSON.parse(n.spec_json) : null;
+      beats = n.beats_json ? JSON.parse(n.beats_json) : [];
+    } catch (e) {
+      problems.push(`${at}: not valid JSON (${e instanceof Error ? e.message : String(e)})`);
+      continue;
+    }
+    if (spec === null) problems.push(`${at}: needs a complete spec`);
+    else {
+      problems.push(...validateSpec(spec).map((p) => `${at}: ${p}`));
+      checkPictures(spec, at, r, keys, problems);
+    }
+    checkBeats(beats, n.narration ?? '', at, problems);
+    changes.newScenes.push({ ref: n.ref, title: n.title.trim(), summary: n.summary ?? '', narration: (n.narration ?? '').trim(), duration: n.duration, transition: n.transition, spec, beats: (beats as unknown[]) ?? [] });
+  }
+  if (reply.order_json) {
+    try {
+      const order = JSON.parse(reply.order_json);
+      if (!whole) problems.push('order_json: only with a whole-video instruction');
+      else if (!Array.isArray(order) || !order.length) problems.push('order_json must be a non-empty JSON list');
+      else {
+        const seen = new Set<string>();
+        for (const x of order) {
+          const key = String(x);
+          if (seen.has(key)) problems.push(`order_json: ${key} appears twice`);
+          seen.add(key);
+          if (typeof x === 'number' ? !r.scenes.some((sc) => sc.index === x) : !newRefs.has(String(x))) problems.push(`order_json: ${JSON.stringify(x)} is neither a scene index nor a new scene`);
+        }
+        changes.order = order;
+      }
+    } catch (e) {
+      problems.push(`order_json is not valid JSON (${e instanceof Error ? e.message : String(e)})`);
+    }
+  }
+  if (reply.episode_json) {
+    try {
+      if (!whole) problems.push('episode_json: only with a whole-video instruction');
+      else changes.episode = checkEpisode(JSON.parse(reply.episode_json), r, problems);
+    } catch (e) {
+      problems.push(`episode_json is not valid JSON (${e instanceof Error ? e.message : String(e)})`);
+    }
+  }
+  return { ...changes, problems };
 }
 
 // ------------------------------------------------------------------ backends
@@ -524,8 +828,8 @@ export function claudeScene(): Plugin {
             usage.cacheRead += a.usage.cacheRead;
             usage.cacheWrite += a.usage.cacheWrite;
             if (!a.reply) return send(res, 502, { error: a.error, usage });
-            const { scenes, problems } = checkReply(a.reply, r, validateSpec);
-            if (!problems.length) return send(res, 200, { summary: a.reply.summary, scenes, usage, model: a.model, attempts: attempt });
+            const { problems, ...changes } = checkReply(a.reply, r, validateSpec);
+            if (!problems.length) return send(res, 200, { summary: a.reply.summary, ...changes, usage, model: a.model, attempts: attempt });
             if (attempt === MAX_ATTEMPTS) return send(res, 502, { error: `Claude's answer did not pass the checks: ${problems.slice(0, 6).join('; ')}`, usage });
             // Second try: same request plus the previous answer and what to fix.
             user = `${userMessage(r)}\n\n# Your previous answer\n${JSON.stringify(a.reply)}\n\nIt does not pass the studio's checks:\n- ${problems.join('\n- ')}\nReturn the corrected complete reply.`;
