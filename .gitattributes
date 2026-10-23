@@ -1,0 +1,2 @@
+# Episodes are edited on Windows and in remote (Linux) sessions: one line ending for clean diffs.
+episodes/**/*.json text eol=lf

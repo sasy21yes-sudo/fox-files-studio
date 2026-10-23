@@ -6,7 +6,7 @@
  *   episodes/media/<mediaId>.<ext>  its images (the browser keeps them in IndexedDB)
  *
  * Browser -> repo: the page PUTs every autosave; when files change, a few seconds later the episodes
- * folder (and nothing else) is committed, rebased on the remote and pushed on the current branch.
+ * folder (and nothing else) is committed, merged with the remote and pushed on the current branch.
  * Repo -> browser: every 45 s the remote is fetched and pulled when it has new commits; any change to an
  * episode file that this server did not write (a pull, or a local Claude Code session editing the file)
  * is announced to the page over Vite's websocket ("fox:episodes"), which reloads that episode.
@@ -14,7 +14,7 @@
  * Runs only inside `npm run dev`. Settings in .env: FOX_EPISODE_GIT=off (files only, no git),
  * FOX_EPISODE_PUSH=off (commit locally, never push).
  *
- *   GET /__episodes/status            -> { enabled, git, push, branch, upstream, lastSync, lastCommit, error }
+ *   GET /__episodes/status            -> { enabled, git, push, branch, upstream, lastSync, lastCommit, error, episodes: {id: hash} }
  *   GET /__episodes/index             -> [{ id, title, updated }]
  *   GET /__episodes/p/<id>            -> the episode file
  *   PUT /__episodes/p/<id>            <- Project JSON
@@ -139,10 +139,14 @@ export function episodeSync(): Plugin {
         const behind = Number((await git(['rev-list', '--count', 'HEAD..@{u}'])).out || 0);
         if (!behind) return;
         const changed = (await git(['diff', '--name-only', 'HEAD', '@{u}', '--', 'episodes'])).out.split('\n').map(idOf).filter((x): x is string => !!x);
-        const p = await git(['pull', '--rebase', '--autostash', '--quiet']);
+        // Fast-forward, or merge when this side has commits too: either way git only touches the files the
+        // incoming commits change (no stash/rebase of the working tree, which would rewrite unrelated files
+        // being edited and make Vite restart and reload the page).
+        const ahead = Number((await git(['rev-list', '--count', '@{u}..HEAD'])).out || 0);
+        const p = await git(ahead ? ['merge', '--no-edit', '--quiet', '@{u}'] : ['merge', '--ff-only', '--quiet', '@{u}']);
         if (p.code !== 0) {
-          await git(['rebase', '--abort']);
-          state.error = `pull: ${p.err.split('\n')[0] || 'conflict'} (local episode kept; resolve with git)`;
+          await git(['merge', '--abort']);
+          state.error = `pull: ${(p.err || p.out).split('\n')[0] || 'conflict'} (local episode kept; resolve with git)`;
           return;
         }
         state.lastSync = Date.now();
@@ -151,7 +155,7 @@ export function episodeSync(): Plugin {
         notify([...new Set(changed)]);
       };
 
-      /** Commit the episodes folder only, then rebase on the remote and push. */
+      /** Commit the episodes folder only, then merge the remote and push. */
       const commitAndPush = async () => {
         if (!state.git) return;
         await refreshBranch();
@@ -241,7 +245,7 @@ export function episodeSync(): Plugin {
         void (async () => {
           const url = new URL(req.url ?? '/', 'http://x');
           const parts = url.pathname.split('/').filter(Boolean);
-          if (req.method === 'GET' && parts[0] === 'status') return sendJson(res, 200, { enabled: true, ...state });
+          if (req.method === 'GET' && parts[0] === 'status') return sendJson(res, 200, { enabled: true, ...state, episodes: Object.fromEntries(known) });
           if (req.method === 'GET' && parts[0] === 'index') {
             const list = fs
               .readdirSync(dir)

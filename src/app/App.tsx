@@ -260,6 +260,7 @@ export function App() {
         }
       }
       syncReady.current = true;
+      if (queued.current.length) await applyRemote([...new Set(queued.current.splice(0))]);
       setRepo(await syncStatus());
     })();
     return () => {
@@ -267,32 +268,48 @@ export function App() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  /** Load episodes the repository changed: the open one as an undoable step, others into the library. */
+  const applyRemote = useCallback(
+    async (ids: string[]) => {
+      for (const id of ids) {
+        const remote = await pullEpisode(id).catch(() => null);
+        if (!remote) continue;
+        if (id === latest.current.id) {
+          markSynced(remote);
+          if (episodeHash(remote) === episodeHash(latest.current)) continue;
+          setProject(() => remote, `repo:${Date.now()}`);
+          note('Updated from the repository (Ctrl+Z to undo)');
+        } else {
+          // Another episode of the library: refresh this browser's copy unless it has edits of its own.
+          const mine = loadProject(id);
+          if (!mine || episodeHash(mine) === syncedHash(id)) {
+            stashProject(remote);
+            markSynced(remote);
+          }
+        }
+      }
+    },
+    [setProject, note],
+  );
+  // Changes announced while the startup check runs wait for it (it would otherwise load an older copy over them).
+  const queued = useRef<string[]>([]);
   useEffect(
     () =>
       onEpisodesChanged((ids) => {
-        void (async () => {
-          for (const id of ids) {
-            const remote = await pullEpisode(id).catch(() => null);
-            if (!remote) continue;
-            if (id === latest.current.id) {
-              markSynced(remote);
-              if (episodeHash(remote) === episodeHash(latest.current)) continue;
-              setProject(() => remote, `repo:${Date.now()}`);
-              note('Updated from the repository (Ctrl+Z to undo)');
-            } else {
-              // Another episode of the library: refresh this browser's copy unless it has edits of its own.
-              const mine = loadProject(id);
-              if (!mine || episodeHash(mine) === syncedHash(id)) {
-                stashProject(remote);
-                markSynced(remote);
-              }
-            }
-          }
-          setRepo(await syncStatus());
-        })();
+        if (!syncReady.current) return void queued.current.push(...ids);
+        void applyRemote(ids).then(async () => setRepo(await syncStatus()));
       }),
-    [setProject, note],
+    [applyRemote],
   );
+  // Safety net for announcements the page missed (not connected yet, asleep): the status lists each
+  // episode file's fingerprint; when the open episode's changes, it is reloaded the same way.
+  const seenFile = useRef<string | null>(null);
+  useEffect(() => {
+    if (!syncReady.current || !repo?.episodes) return;
+    const h = repo.episodes[project.id] ?? null;
+    if (seenFile.current !== null && h !== null && h !== seenFile.current) void applyRemote([project.id]);
+    seenFile.current = h;
+  }, [repo, project.id, applyRemote]);
   useEffect(() => {
     const id = window.setInterval(() => void syncStatus().then(setRepo), 10000);
     return () => window.clearInterval(id);

@@ -42,6 +42,16 @@ npm run build          # typecheck + production build (dist/, relative base './'
 - Character parts: art sheets in `art/parts/*.jpg` (green-screen, Gemini-generated to the model sheet) → `python tools/upscale.py` (Real-ESRGAN anime, weights in `tools/weights/`, not in git) → `python tools/bake_rig.py` → `src/character/rig/` sprites + `rig.json` + `assets.ts`. Mouth/face alignment in `art/parts/fits.json`.
 - Voice: `node tools/export_cues.mjs` → `python tools/render_voice.py [--only it:im_nicola]` (needs `pip install kokoro-onnx soundfile numpy` + ffmpeg; model auto-downloads to `voice/models/`, not in git). Re-render after changing narration text or the sentence splitter.
 
+## Episodes in the repository (editing a video remotely)
+
+The editor's episodes live in the browser (localStorage + IndexedDB for images) **and** in `episodes/`: the dev server (`tools/vite/episodeSync.ts`) writes every save to `episodes/<id>.foxproj.json` (images in `episodes/media/<mediaId>.<ext>`), commits only that folder ("Episode: … (edited in the studio)") and pushes on the branch the dev server runs on. Every 45 s it pulls (fast-forward or merge, never touching other files); episodes changed by a pull or on disk reload in the open editor as an undoable step (header pill "Repo · <branch>").
+
+To change a video from a remote Claude Code session: edit the episode JSON, commit, push — the local editor picks it up within a minute.
+- Format: `Project` in `src/types.ts`; each `scenes[i].spec` is a `SceneSpec` (`src/scene/spec.ts`) — the same data the in-app "Ask Claude" edits, whose rules are spelled out in `systemPrompt()` in `tools/vite/claudeScene.ts` (read it before editing a spec). Times in a spec are the scene's authored seconds.
+- Keep `id` unchanged. MKUltra episodes take their titles from the script (`src/i18n/scripts.ts`): edit narration/beats there or in `scenes[i].narrations[lang]` / `beatsByLang[lang]`. A beat's `cue` must be an exact phrase of that scene's narration. Facts only from `src/data/sources.ts`.
+- An invalid spec is replaced by the scene's default when the page loads it (`restoreProject`), so keep to the types exactly; pictures must be listed in `media` and exist in `episodes/media/`.
+- `.env`: `FOX_EPISODE_GIT=off` (files only), `FOX_EPISODE_PUSH=off` (commit, never push).
+
 ## Verifying changes
 
 ```bash

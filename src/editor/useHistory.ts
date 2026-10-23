@@ -22,12 +22,14 @@ export function useHistory<T>(initial: () => T): History<T> {
   const last = useRef<{ key?: string; at: number }>({ at: 0 });
 
   const set = useCallback((update: T | ((prev: T) => T), key?: string) => {
+    // Decided once per call, outside the state updater: React may run an updater twice (StrictMode),
+    // and a second run would see this very edit's key and merge it into nothing (no undo step).
+    const now = performance.now();
+    const merge = key !== undefined && last.current.key === key && now - last.current.at < COALESCE_MS;
+    last.current = { key, at: now };
     setState((s) => {
       const next = typeof update === 'function' ? (update as (p: T) => T)(s.present) : update;
       if (Object.is(next, s.present)) return s;
-      const now = performance.now();
-      const merge = key !== undefined && last.current.key === key && now - last.current.at < COALESCE_MS;
-      last.current = { key, at: now };
       return {
         past: merge ? s.past : [...s.past, s.present].slice(-LIMIT),
         present: next,

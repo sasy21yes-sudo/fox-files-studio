@@ -19,6 +19,8 @@ export interface SyncStatus {
   lastSync: number | null;
   lastCommit: string | null;
   error: string | null;
+  /** Fingerprint of each episode file on disk (a change the page has not been told about shows here too). */
+  episodes?: Record<string, string>;
 }
 
 const local = () => typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
