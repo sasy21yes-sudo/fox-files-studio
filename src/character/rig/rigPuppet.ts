@@ -190,7 +190,7 @@ export function placedClip(g: G, name: string, poly: readonly V2[]) {
  * front/back: where the bend starts (fractions of the width from the back edge); lineY: the brim line
  * (fraction of the height).
  */
-export function placedHatBend(g: G, name: string, droop: number, curl: number, front = 0.76, back = 0.26, lineY = 0.82) {
+export function placedHatBend(g: G, name: string, droop: number, curl: number, front = 0.8, back = 0.21, lineY = 0.82) {
   const p = RIG.parts[name];
   const img = images[name];
   if (!img) return;
@@ -214,10 +214,11 @@ export function placedHatBend(g: G, name: string, droop: number, curl: number, f
     g.drawImage(img, p.x, p.y);
     g.restore();
   };
-  // Middle (the crown and the brim under it): unchanged.
+  // Middle (the crown and the brim under it): unchanged, a little wider than the bent ends so the
+  // first strips' turn never opens a wedge of background between them.
   g.save();
   g.beginPath();
-  g.rect(xb - 0.5, p.y - H, xf - xb + 1, H * 3);
+  g.rect(xb - 3, p.y - H, xf - xb + 6, H * 3);
   g.clip();
   g.drawImage(img, p.x, p.y);
   g.restore();
