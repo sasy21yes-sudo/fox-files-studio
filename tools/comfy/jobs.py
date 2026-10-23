@@ -311,3 +311,44 @@ JOBS['rig_emotions'] = {
         'position, still no eyes and no eyebrows. Plain green background, no shadow.'))
     for k, expr in _EMO.items()
 }
+
+# ------------------------------------------------------------------ front-facing talking (bust shot)
+# Agent Fox looking into the camera, master look. Pieces for a separate front rig (tools/bake_front.py).
+FRONT_HEAD = ('Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, '
+              'symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the '
+              'middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen '
+              'from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same '
+              'clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. ')
+JOBS['front'] = {
+    'head': dict(image=MASTER_HEAD, refs=[MASTER], prompt=FRONT_HEAD + (
+        'The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.')),
+    'face': dict(image=MASTER_HEAD, refs=[MASTER], prompt=FRONT_HEAD + (
+        'Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, '
+        'the same thick dark-brown eyebrows, mouth closed in a calm line.')),
+    'torso': dict(image='art/parts/torso.jpg#0', refs=[MASTER], prompt=(
+        'Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in '
+        'image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two '
+        'rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening '
+        'with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at '
+        'the hips just below the belt. Plain green background, no shadow.')),
+}
+# Round 2: the blank front head from the approved front face (erase, like the 3/4 heads); the torso from a
+# 3/4 render, pushed to a straight-on symmetric view.
+JOBS['front']['head'] = dict(image='approved:front/face', refs=[], prompt=(
+    'Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only '
+    'ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the '
+    'surroundings, so the face is blank. Keep the black nose. Plain green background.'))
+JOBS['front']['torso'] = dict(image='art/incoming/pieces/front/torso_v2.png', refs=['approved:front/face'], prompt=(
+    'Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening '
+    'centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both '
+    'shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. '
+    'No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green '
+    'background, no shadow.'))
+# Front lip-sync mouths on the approved blank front head (same canvas, so the sprite is cut in place).
+JOBS['front_mouths'] = {
+    f'm{k}': dict(image='approved:front/head', refs=['approved:front/face'], prompt=(
+        f'Give this front-facing fox head (image 1) this mouth: {MOUTH_SHAPES[k]}, seen from the front, centred under '
+        'the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, '
+        'outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.'))
+    for k in range(12)
+}

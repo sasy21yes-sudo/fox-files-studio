@@ -115,16 +115,13 @@ def control(curve, n):
     return [[round(float(np.interp(v, t, curve[:, 0])), 1), round(float(np.interp(v, t, curve[:, 1])), 1)] for v in u]
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--ts', default=None)
-    a = ap.parse_args()
-    img = cv2.imread(SRC)
+def trace_eyes(img, white_band=0.72):
+    """Eyes (silhouette, white, pupil, catch-light) and brows of a face image; see main()."""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(int)
     H, S, V = hsv[..., 0], hsv[..., 1], hsv[..., 2]
     # Eye whites are near-neutral (the cream muzzle is warmer); only the eye band of the crop is searched.
     white = (V > 200) & (S < 28)
-    white[int(img.shape[0] * 0.72):] = False
+    white[int(img.shape[0] * white_band):] = False
     dark = V < 100
 
     # The two eye whites: the two largest white blobs (the catch-lights are small).
@@ -196,6 +193,16 @@ def main():
                 best, score = m, d
         best = ndi.binary_dilation(best, iterations=4) & (dark | brow_fill)  # its ink outline
         brows[side] = fourier(contour(ndi.binary_fill_holes(best), 0.5), 12)
+    return eyes, brows, dict(H=H, S=S, V=V, dark=dark, white=white)
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--ts', default=None)
+    a = ap.parse_args()
+    img = cv2.imread(SRC)
+    eyes, brows, _m = trace_eyes(img)
+    H, S, V, dark, white = _m['H'], _m['S'], _m['V'], _m['dark'], _m['white']
 
     # The nose: the dark blob at the tip of the muzzle (bottom right of the crop).
     nb = ndi.binary_opening(dark[595:700, 480:600], iterations=2)

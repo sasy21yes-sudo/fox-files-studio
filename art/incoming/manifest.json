@@ -6758,7 +6758,7 @@
         {
           "version": "v2",
           "file": "art/incoming/pieces/rig_emotions/scream_v2.png",
-          "status": "rejected",
+          "status": "approved",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/rig_head/p1_v2.png",
           "refs": [
@@ -6775,7 +6775,7 @@
           "height": 1024,
           "seconds": 74.3,
           "created": "2026-10-22T22:37:35",
-          "review": "snout lifted"
+          "review": "chosen in the studio (model sheet)"
         }
       ]
     },
@@ -7256,6 +7256,660 @@
           "seconds": 74.2,
           "created": "2026-10-22T23:03:30",
           "review": "the other version is cleaner"
+        }
+      ]
+    },
+    "front/head": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front/head_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 592571544,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 92.3,
+          "created": "2026-10-23T01:26:45",
+          "review": "not blank: drew closed eyes / brows"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front/head_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 604871315,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 80.3,
+          "created": "2026-10-23T01:28:05",
+          "review": "not blank: drew closed eyes / brows"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/front/head_v3.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. The face is BLANK: no eyes, no eyebrows, no mouth line, just smooth fur where they go.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 362600934,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 80.2,
+          "created": "2026-10-23T01:29:25",
+          "review": "not blank: drew closed eyes / brows"
+        },
+        {
+          "version": "v4",
+          "file": "art/incoming/pieces/front/head_v4.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/face_v2.png",
+          "refs": [],
+          "instruction": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.",
+          "corrections": [],
+          "prompt": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1206610539,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 56.2,
+          "created": "2026-10-23T01:47:47",
+          "review": "ghost of the muzzle bridge"
+        },
+        {
+          "version": "v5",
+          "file": "art/incoming/pieces/front/head_v5.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/face_v2.png",
+          "refs": [],
+          "instruction": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.",
+          "corrections": [],
+          "prompt": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1505393853,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 50.2,
+          "created": "2026-10-23T01:48:37",
+          "review": "ghost of the muzzle bridge"
+        },
+        {
+          "version": "v6",
+          "file": "art/incoming/pieces/front/head_v6.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/face_v2.png",
+          "refs": [],
+          "instruction": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.",
+          "corrections": [],
+          "prompt": "Keep this fox head exactly as it is (same angle, hat, ears, fur, ruff, nose, outline, size and position). Only ERASE the eyes, the eyebrows and the mouth line: where they were, paint smooth orange and cream fur matching the surroundings, so the face is blank. Keep the black nose. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 725490235,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 50.2,
+          "created": "2026-10-23T01:49:27",
+          "review": "clean blank front head, diamond badge"
+        }
+      ]
+    },
+    "master_views/profile": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/master_views/profile_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 957771900,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 130.3,
+          "created": "2026-10-23T01:30:53"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/master_views/profile_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1320462497,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 174.8,
+          "created": "2026-10-23T01:33:48"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/master_views/profile_v3.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body standing upright, feet visible: the same fedora with the diamond brass badge, the same long pointed muzzle and black nose, the same oval eye with dark-brown pupil and thick eyebrow, the same brown trench coat with belt and brass buttons, white shirt cuff, white gloves, brown trousers and dark shoes, the same fluffy tail with a large white tip behind him. Arms relaxed, holding nothing. Same art style, colours, cel shading and clean dark outline. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 756286348,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 176.4,
+          "created": "2026-10-23T01:36:45"
+        }
+      ]
+    },
+    "master_views/profile_looney": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/master_views/profile_looney_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1487670258,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 146.5,
+          "created": "2026-10-23T01:32:21"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/master_views/profile_looney_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 111272424,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 175.0,
+          "created": "2026-10-23T01:35:16"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/master_views/profile_looney_v3.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.",
+          "corrections": [],
+          "prompt": "Redraw this exact character, Agent Fox, in a full SIDE PROFILE view facing right, full body, feet visible, in the classic 1940s Warner Bros Looney Tunes cartoon style (like Bugs Bunny): bold confident ink outlines with varying thickness, flat bright cel colours with no gradients, simple rounded shapes, expressive squash-and-stretch proportions, big white gloves, a cheeky confident stance. Keep his design: fedora with the diamond brass badge, long pointed muzzle and black nose, brown trench coat with belt and brass buttons, brown trousers, dark shoes, fluffy tail with a large white tip. Plain green background, no shadow, no text.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1882549045,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1376,
+          "height": 768,
+          "seconds": 174.8,
+          "created": "2026-10-23T01:38:11"
+        }
+      ]
+    },
+    "front/face": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front/face_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1563286591,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 614.0,
+          "created": "2026-10-23T01:39:40",
+          "review": "v2 closer to the master"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front/face_v2.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1248419746,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 80.3,
+          "created": "2026-10-23T01:41:00",
+          "review": "front face reference: master eyes, brows, calm smile, diamond badge"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/front/face_v3.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/reference/agent-fox-master.png@590,25,290,280",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.",
+          "corrections": [],
+          "prompt": "Turn this fox head (the fox in image 1) to a perfectly FRONT view, looking straight at the viewer, symmetrical left and right: the same fedora with its band and small DIAMOND-shaped brass badge in the middle, the same tall ears on both sides, the same orange fur with soft cel shading, the long muzzle seen from the front with the black nose at its tip, the same jagged cream cheek ruff on both sides, the same clean dark outline. Head only, neck cut off cleanly just under the ruff. Plain green background, no shadow. Draw the face like the fox in image 2: the same large oval eyes with dark-brown pupils and a white catch-light, the same thick dark-brown eyebrows, mouth closed in a calm line.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 200696131,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 80.3,
+          "created": "2026-10-23T01:42:20",
+          "review": "v2 closer to the master"
+        }
+      ]
+    },
+    "front/torso": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front/torso_v1.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/parts/torso.jpg#0",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1356103608,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 88.3,
+          "created": "2026-10-23T01:43:49",
+          "review": "still a 3/4 torso, glare"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front/torso_v2.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/parts/torso.jpg#0",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 325872263,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 78.6,
+          "created": "2026-10-23T01:45:08",
+          "review": "still a 3/4 torso, glare"
+        },
+        {
+          "version": "v3",
+          "file": "art/incoming/pieces/front/torso_v3.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/parts/torso.jpg#0",
+          "refs": [
+            "art/reference/agent-fox-master.png"
+          ],
+          "instruction": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Redraw this trench-coat torso (image 1) in a perfectly FRONT view, symmetrical, in the style of the coat in image 2: brown gabardine with soft shading, wide lapels on both sides, white shirt collar, dark-red tie, two rows of brass buttons, belt with a brass buckle at the waist, both shoulders. NO head (an empty collar opening with the dark inside of the collar), NO arms: the sleeves are cut off cleanly at the shoulder seams. Cut off at the hips just below the belt. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1129733041,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 78.6,
+          "created": "2026-10-23T01:46:26",
+          "review": "still a 3/4 torso, glare"
+        },
+        {
+          "version": "v4",
+          "file": "art/incoming/pieces/front/torso_v4.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/torso_v2.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1152457572,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 88.3,
+          "created": "2026-10-23T01:50:56",
+          "review": "collar opening filled (no room for the neck)"
+        },
+        {
+          "version": "v5",
+          "file": "art/incoming/pieces/front/torso_v5.png",
+          "status": "rejected",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/torso_v2.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1534055516,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 80.2,
+          "created": "2026-10-23T01:52:16",
+          "review": "collar opening filled (no room for the neck)"
+        },
+        {
+          "version": "v6",
+          "file": "art/incoming/pieces/front/torso_v6.png",
+          "status": "approved",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/torso_v2.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.",
+          "corrections": [],
+          "prompt": "Turn this headless trench-coat torso to a perfectly FRONT view, straight on and SYMMETRICAL: the collar opening centred at the top, the white shirt collar and dark-red tie exactly in the middle, both lapels mirror images, both shoulders at the same height and width, the belt with its brass buckle centred, the buttons in two straight rows. No arms (sleeves cut off at the shoulder seams), no head. Flat even lighting with no white glare. Plain green background, no shadow.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 982816272,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 864,
+          "height": 1216,
+          "seconds": 80.3,
+          "created": "2026-10-23T01:53:36",
+          "review": "straight-on symmetric torso with a dark collar opening"
+        }
+      ]
+    },
+    "front_mouths/m0": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front_mouths/m0_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: REST: mouth closed, a short gently curved lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: REST: mouth closed, a short gently curved lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1912027876,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 88.3,
+          "created": "2026-10-23T01:55:26"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front_mouths/m0_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: REST: mouth closed, a short gently curved lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: REST: mouth closed, a short gently curved lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1166207683,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 78.7,
+          "created": "2026-10-23T01:56:45"
+        }
+      ]
+    },
+    "front_mouths/m1": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front_mouths/m1_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: M/B/P: lips pressed firmly together, a closed straight lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: M/B/P: lips pressed firmly together, a closed straight lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1295244324,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 86.5,
+          "created": "2026-10-23T01:58:12"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front_mouths/m1_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: M/B/P: lips pressed firmly together, a closed straight lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: M/B/P: lips pressed firmly together, a closed straight lip line, no teeth, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 821716011,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 78.7,
+          "created": "2026-10-23T01:59:31"
+        }
+      ]
+    },
+    "front_mouths/m2": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front_mouths/m2_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: consonant: mouth just slightly open, the upper and lower front teeth visible close together, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: consonant: mouth just slightly open, the upper and lower front teeth visible close together, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1082480965,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 88.3,
+          "created": "2026-10-23T02:00:59"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front_mouths/m2_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: consonant: mouth just slightly open, the upper and lower front teeth visible close together, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: consonant: mouth just slightly open, the upper and lower front teeth visible close together, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1434692208,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 1239.0,
+          "created": "2026-10-23T02:21:38"
+        }
+      ]
+    },
+    "front_mouths/m3": {
+      "versions": [
+        {
+          "version": "v1",
+          "file": "art/incoming/pieces/front_mouths/m3_v1.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: A: jaw dropped wide open, dark mouth, pink tongue, small fangs top and bottom, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: A: jaw dropped wide open, dark mouth, pink tongue, small fangs top and bottom, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 229540707,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 88.3,
+          "created": "2026-10-23T02:23:07"
+        },
+        {
+          "version": "v2",
+          "file": "art/incoming/pieces/front_mouths/m3_v2.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/front/head_v6.png",
+          "refs": [
+            "art/incoming/pieces/front/face_v2.png"
+          ],
+          "instruction": "Give this front-facing fox head (image 1) this mouth: A: jaw dropped wide open, dark mouth, pink tongue, small fangs top and bottom, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.",
+          "corrections": [],
+          "prompt": "Give this front-facing fox head (image 1) this mouth: A: jaw dropped wide open, dark mouth, pink tongue, small fangs top and bottom, seen from the front, centred under the black nose, in the style of the mouth in image 2. Change NOTHING else: same head, hat, ears, nose, fur, ruff, outline, size and position as image 1, and still no eyes and no eyebrows. Plain green background.  Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1577099714,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1040,
+          "height": 1008,
+          "seconds": 80.3,
+          "created": "2026-10-23T02:24:27"
         }
       ]
     }
