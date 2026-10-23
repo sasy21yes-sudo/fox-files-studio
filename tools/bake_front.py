@@ -192,6 +192,7 @@ def mouths(head_bgr, nose, nose_bot, picks):
     """Mouth k+1 from render m<k> (mouth 1: the approved front face): the ink, teeth and tongue under the nose."""
     m = json.load(open(MANIFEST, encoding='utf8'))['sheets']
     done = []
+    _, _, hnose = nose_of(head_bgr)
     for k in range(12):
         if k == 0:
             # Rest: the approved front face's own closed smile.
@@ -207,24 +208,28 @@ def mouths(head_bgr, nose, nose_bot, picks):
             continue
         if k:
             r = cv2.imread(os.path.join(ROOT, pick[-1]['file']))
-        rn, _, _ = nose_of(r)
-        d = nose - rn
+        # Align on the nose, unless the render's nose blob has merged with its mouth (then trust the canvas:
+        # the renders are edits of the same head image).
+        rn, _, rmask = nose_of(r)
+        d = nose - rn if 0.6 < rmask.sum() / hnose.sum() < 1.5 else np.zeros(2)
         r = cv2.warpAffine(r, np.float32([[1, 0, d[0]], [0, 1, d[1]]]), (r.shape[1], r.shape[0]), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
         box = np.zeros(r.shape[:2], bool)
-        x0, x1, y0, y1 = int(nose[0] - 200), int(nose[0] + 200), nose_bot - 4, 885
-        box[y0:y1, x0:x1] = True
+        x0, x1, y0 = int(nose[0] - 200), int(nose[0] + 200), nose_bot - 4
+        # Down to just above the head's chin outline, column by column.
+        for x in range(x0, x1):
+            col = np.nonzero(head_bgr[nose_bot + 40: 900, x].max(1) < 80)[0]
+            box[y0: (nose_bot + 40 + int(col[0]) - 5) if len(col) else 885, x] = True
         # The muzzle's cream on the blank head, and the render's own nose (left out: the head keeps its nose).
         cream = np.median(head_bgr[nose_bot + 10: nose_bot + 30, int(nose[0]) - 60: int(nose[0]) + 60].reshape(-1, 3), 0)
-        _, _, rnose = nose_of(r)
-        ink = (np.abs(r.astype(float) - cream).max(2) > 55) & box & ~ndi.binary_dilation(rnose, iterations=3)
+        f = r.astype(float)
+        orange = (f[..., 2] > 170) & (f[..., 0] < 110) & (f[..., 1] > 70) & (f[..., 1] < 175)   # cheek fur, not mouth
+        ink = (np.abs(f - cream).max(2) > 55) & box & ~orange & ~ndi.binary_dilation(hnose, iterations=4)
         lab, n = ndi.label(ink)
         keep = []
         for i, sl in enumerate(ndi.find_objects(lab), 1):
             ys_, xs_ = sl
-            if xs_.start <= x0 + 1 or xs_.stop >= x1 - 1 or ys_.stop >= y1 - 1:
-                continue  # cheek fur, ruff and chin outline reach the box's sides or bottom
-            if ys_.start <= y0 + 1 and abs((xs_.start + xs_.stop) / 2 - nose[0]) > 30:
-                continue  # orange fur hanging into the top of the box (the philtrum stays)
+            if xs_.start <= x0 + 1 or xs_.stop >= x1 - 1:
+                continue  # ruff fur reaching the box's sides
             if (lab[sl] == i).sum() < 25:
                 continue
             keep.append(i)
