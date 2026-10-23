@@ -14,6 +14,8 @@ Pipeline
 Output: src/character/rig/<part>.webp + rig.json + assets.ts
 
 Usage: python3 tools/bake_rig.py
+Env: FOX_PARTS = a folder of restyled sheets (e.g. art/parts_v4, with up/ inside) used
+     instead of art/parts sheet by sheet where present; FOX_RIG_OUT = output folder.
 """
 import json, math, os
 import numpy as np, cv2
@@ -22,7 +24,14 @@ from scipy import ndimage as ndi
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ART = os.path.join(ROOT, 'art', 'parts')
 UP = os.path.join(ART, 'up')
-OUT = os.path.join(ROOT, 'src', 'character', 'rig')
+ALT = os.environ.get('FOX_PARTS')  # restyled sheets override the originals one by one
+OUT = os.environ.get('FOX_RIG_OUT') or os.path.join(ROOT, 'src', 'character', 'rig')
+
+
+def sheet_paths(name):
+    if ALT and os.path.exists(os.path.join(ALT, name + '.jpg')):
+        return os.path.join(ALT, name + '.jpg'), os.path.join(ALT, 'up', name + '.png')
+    return os.path.join(ART, name + '.jpg'), os.path.join(UP, name + '.png')
 os.makedirs(OUT, exist_ok=True)
 
 K = 3.364            # rig px per reference px (figure ~1800 px tall)
@@ -46,8 +55,10 @@ _cache = {}
 
 def sheet(name):
     if name not in _cache:
-        s1 = cv2.imread(os.path.join(ART, name + '.jpg'))
-        s4 = cv2.imread(os.path.join(UP, name + '.png'))
+        p1, p4 = sheet_paths(name)
+        s1, s4 = cv2.imread(p1), cv2.imread(p4)
+        if s4 is None:
+            raise SystemExit(f'missing 4x sheet {p4}: run tools/upscale.py on {p1}')
         b1, a1 = key(s1)
         m = ndi.binary_closing(a1 > 0.5, iterations=2)
         lab, n = ndi.label(m)
@@ -164,6 +175,12 @@ META = {'K': K, 'origin': ref2rig(ORIGIN), 'unit': 1.0 / K, 'parts': {}}
 
 
 def save(name, img, origin, **extra):
+    if name in globals().get('PARAMS', {}).get('mirror', []):
+        # Mirrored left-right (e.g. the far sleeve, so its light and cuff face the other way); anchors follow.
+        img = cv2.flip(img, 1)
+        for k in ('ax', 'bx'):
+            if k in extra:
+                extra[k] = float(img.shape[1] - extra[k])
     cv2.imwrite(os.path.join(OUT, name + '.webp'), img, [cv2.IMWRITE_WEBP_QUALITY, 92])
     META['parts'][name] = {'x': float(origin[0]), 'y': float(origin[1]), 'w': int(img.shape[1]), 'h': int(img.shape[0]), **extra}
 
@@ -187,9 +204,17 @@ def blob(img, reg, thr=55):
 
 headB, oB = cut('head', 790, 200)    # blank head without hat
 headA, oA = cut('head', 260, 190)    # head with hat (for the hat and alignment)
-fits = json.load(open(os.path.join(ART, 'fits.json')))
+# Restyled sheets come with art/parts_v4/rig_params.json: tail anchor/turn, joint offsets, mirrored
+# sprites and the polygon of the ear drawn over the hat (head crop px of the restyled sheet).
+PARAMS = json.load(open(os.path.join(ALT, 'rig_params.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_params.json')) else {}
+FITS = os.path.join(ALT, 'fits.json') if ALT and os.path.exists(os.path.join(ALT, 'fits.json')) else os.path.join(ART, 'fits.json')
+fits = json.load(open(FITS))
 A_to_B = np.array(fits['a_to_b'])     # headA crop px -> headB crop px (1x)
 MOUTH_FITS = {int(k): np.array(v) for k, v in fits['mouths'].items()}  # mouth crop px -> headB crop px
+# A restyled blank head can have a different crop origin (taller ears...). The head frame stays the
+# original one: SHIFT = new crop origin - original crop origin (1x px), written by tools/comfy/rig_mouths.py.
+SHIFT = np.array(fits.get('b_shift', [0, 0]), float)
+RESTYLED_HEAD = 'b_shift' in fits
 # headA crop px -> reference px (landmarks: nose, crown, brim).
 A_to_ref = sim(0.628, 0.0, (310.0, 225.0), (616.7, 151.7))
 B_to_ref = compose(A_to_ref, inv(A_to_B))
@@ -201,12 +226,62 @@ h4, w4 = hb.shape[:2]
 hsv = cv2.cvtColor(hb[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
 orange = (hsv[:, :, 0] >= 4) & (hsv[:, :, 0] <= 24) & (hsv[:, :, 1] > 120)
 yy = np.mgrid[0:h4, 0:w4][0]
-stub = orange & (yy > 268 * 4)  # below the ruff in headB 1x crop px
+# Below the ruff (headB 1x px, original frame); the restyled head's neck also has a cream stripe.
+cream_neck = (hsv[:, :, 2] > 170) & (hsv[:, :, 1] < 110) if RESTYLED_HEAD else np.zeros_like(orange)
+stub = (orange | cream_neck) & (yy > (268 - SHIFT[1]) * 4)
+if RESTYLED_HEAD:
+    # Only the orange fur of the neck goes (the cream ruff stays whole); the cream neck piece shows instead.
+    # Below the ruff line keep only the cream ruff spikes that hang from above it (and their ink edge);
+    # the neck's orange fur and stray lines go, the cream neck piece shows instead.
+    below = yy > (262 - SHIFT[1]) * 4
+    creamy = (hsv[:, :, 2] > 165) & (hsv[:, :, 1] < 110) & (hb[:, :, 3] > 128)
+    lab_c, _ = ndi.label(creamy)
+    line = int((262 - SHIFT[1]) * 4)
+    top_ids = np.unique(lab_c[max(0, line - 6):line + 1][lab_c[max(0, line - 6):line + 1] > 0])
+    ruff = ndi.binary_dilation(np.isin(lab_c, top_ids), iterations=10)
+    stub = below & ~ruff
 stub = ndi.binary_opening(stub, iterations=3)
 keep = 1 - cv2.GaussianBlur(ndi.binary_dilation(stub, iterations=2).astype(np.float32), (0, 0), 2)
 hb[:, :, 3] = (hb[:, :, 3] * keep).astype(np.uint8)
-img, o = warp(hb, at4(B_to_rig, (0, 0)))
+MUZZLE = os.path.join(ALT, 'muzzle_mask.png') if ALT else ''
+if EXACT_MOUTHS := bool(fits.get('exact')) and os.path.exists(MUZZLE):
+    # Restyled mouths carry the whole muzzle: take it out of the head so there is only ever one nose.
+    mm = cv2.imread(MUZZLE, cv2.IMREAD_GRAYSCALE).astype(np.float32) / 255
+    h1, w1 = hb.shape[0] // 4, hb.shape[1] // 4
+    crop = np.zeros((h1, w1), np.float32)
+    sub = mm[oB[1]:oB[1] + h1, oB[0]:oB[0] + w1]
+    crop[:sub.shape[0], :sub.shape[1]] = sub
+    m4 = cv2.resize(crop, (hb.shape[1], hb.shape[0]), interpolation=cv2.INTER_LINEAR)
+    hb[:, :, 3] = (hb[:, :, 3] * (1 - m4)).astype(np.uint8)
+img, o = warp(hb, at4(B_to_rig, SHIFT))
 save('head', img, o)
+
+# Inside of the head outline (alpha eroded past the ink line), in rig px: the eyes are clipped to it,
+# so the far eye tucks behind the bridge of the muzzle as in a 3/4 view.
+_a = (headB[:, :, 3] > 128).astype(np.uint8)
+_a = cv2.erode(_a, np.ones((15, 15), np.uint8))
+_cs, _ = cv2.findContours(_a, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+_c = cv2.approxPolyDP(max(_cs, key=cv2.contourArea), 2.0, True).reshape(-1, 2).astype(np.float64)
+_A = at4(B_to_rig, SHIFT)
+META['headClip'] = [[round(float(v), 1) for v in (_A @ np.array([x, y, 1.0]))] for x, y in _c]
+
+# The nose tip (centre of the black nose blob), in rig px: the face is posed against it.
+_d = ((headB[:, :, :3].max(2) < 60) & (headB[:, :, 3] > 200)).astype(np.uint8)
+_d = cv2.morphologyEx(_d, cv2.MORPH_OPEN, np.ones((9, 9), np.uint8))
+_n, _l, _st, _c = cv2.connectedComponentsWithStats(_d)
+_i = max(range(1, _n), key=lambda i: (_st[i, 0] + _st[i, 2]) if _st[i, 4] > 2000 and _st[i, 2] < _st[i, 3] * 3 else -1)
+META['nose'] = [float(v) for v in (at4(B_to_rig, SHIFT) @ np.array([_c[_i][0], _c[_i][1], 1.0]))]
+
+if 'ear_over' in PARAMS:
+    # The far ear stands in front of the hat (master look): the same head pixels inside a polygon,
+    # feathered, drawn again after the hat.
+    em = np.zeros(hb.shape[:2], np.uint8)
+    cv2.fillPoly(em, [np.array(PARAMS['ear_over'], np.float32).reshape(-1, 2).__mul__(4).astype(np.int32)], 1)
+    em = cv2.GaussianBlur(em.astype(np.float32), (0, 0), 3)
+    ear = hb.copy()
+    ear[:, :, 3] = (ear[:, :, 3] * em).astype(np.uint8)
+    img, o = warp(ear, at4(B_to_rig, SHIFT))
+    save('ear_over', img, o)
 
 # Neck pivot (where the head turns): centre of the collar, in rig px.
 NECK_REF = (532.0, 205.0)
@@ -233,7 +308,14 @@ lab, n = ndi.label(m)
 sz = ndi.sum(m, lab, range(1, n + 1))
 m = ndi.binary_fill_holes(lab == int(np.argmax(sz)) + 1)
 m = ndi.binary_opening(m, iterations=3) | core
+# Thin bits hanging off the brim's edge (a pointed flap of green-screen spill under the back of the brim,
+# stray bristles) read as little triangles on screen: open them away, keeping the brim's own shape.
+m = ndi.binary_opening(m, structure=np.ones((3, 3)), iterations=6) | core
 hat = ha.copy()
+# Green spill left on the brim's underside (olive: green as high as red): back to the felt's brown.
+_b, _g, _r = (hat[:, :, i].astype(int) for i in range(3))
+spill = (_g > _b * 1.5) & (_r - _g < 8)
+hat[:, :, 1] = np.where(spill, (_r * 0.77).astype(np.uint8), hat[:, :, 1])
 hat[:, :, 3] = (255 * cv2.GaussianBlur(m.astype(np.float32), (0, 0), 1.6)).astype(np.uint8)
 # The pin: the compact gold blob nearest to where it sits on the 1x sheet.
 labg, ng = ndi.label(ndi.binary_opening(gold & m, iterations=2))
@@ -256,6 +338,11 @@ cv2.fillPoly(hat, [inner], (120, 215, 245, 255), cv2.LINE_AA)
 cv2.polylines(hat, [pts], True, (12, 22, 34, 255), 7, cv2.LINE_AA)
 A_hat = compose(B_to_rig, A_to_B)  # headA crop px -> rig
 img, o = warp(hat, at4(A_hat, (0, 0)))
+for poly in PARAMS.get('hat_erase', []):
+    # Cut, feathered, in the baked sprite's own px (rig_params.json says why).
+    cut_ = np.zeros(img.shape[:2], np.float32)
+    cv2.fillPoly(cut_, [np.array(poly, np.int32)], 1.0, cv2.LINE_AA)
+    img[:, :, 3] = (img[:, :, 3] * (1 - cv2.GaussianBlur(cut_, (0, 0), 0.8))).astype(np.uint8)
 save('hat', img, o)
 
 # Eyes: whites, pupils, closed and happy eyes, sized and placed in head space.
@@ -297,7 +384,7 @@ META['eyes'] = eyes_meta
 hsvB = cv2.cvtColor(headB[:, :, :3], cv2.COLOR_BGR2HSV)
 ring = np.zeros(headB.shape[:2], bool)
 for e in EYES.values():
-    cv2.circle(ring.view(np.uint8), (int(e['x'] * 4), int(e['y'] * 4)), int(e['w'] * 4 * 0.85), 1, -1)
+    cv2.circle(ring.view(np.uint8), (int((e['x'] - SHIFT[0]) * 4), int((e['y'] - SHIFT[1]) * 4)), int(e['w'] * 4 * 0.85), 1, -1)
 furm = ring & (hsvB[:, :, 1] > 140) & (hsvB[:, :, 2] > 150)
 fur = np.median(headB[:, :, :3][furm], 0)
 META['furColor'] = [int(fur[2]), int(fur[1]), int(fur[0])]
@@ -308,18 +395,30 @@ MOUTHS = {  # id on the 1x mouth sheet -> a point inside it
     6: (150, 290), 8: (400, 290), 7: (640, 290), 5: (870, 290),
     9: (140, 460), 10: (360, 460), 11: (590, 460), 12: (820, 460),
 }
+# Restyled mouths (tools/comfy/rig_mouths.py) were cut from renders of the blank head itself:
+# their points come with the fits and they are used as they are.
+EXACT = bool(fits.get('exact'))
+META['emotionMouths'] = {v: int(k) for k, v in fits.get('emotions', {}).items()}
+if 'points' in fits:
+    MOUTHS = {int(k): tuple(v) for k, v in fits['points'].items()}
 for mid, pt in MOUTHS.items():
     piece, o1 = cut('mouths', *pt)
-    # The piece's upper outline duplicates the head's own muzzle outline: drop it.
-    a = piece[:, :, 3].astype(np.float32) / 255
-    k = 28
-    sh = np.zeros_like(a)
-    sh[k:] = a[:-k]
-    a = a * sh
-    w = a.shape[1]
-    ramp = np.clip((np.arange(w) / w - 0.12) / 0.22, 0, 1)
-    a = cv2.GaussianBlur(a * ramp[None, :], (0, 0), 1.6)
-    piece[:, :, 3] = (a * 255).astype(np.uint8)
+    if EXACT:
+        # Hard-edged sprite cut from the head render: feather it inwards so it melts into the head.
+        a = piece[:, :, 3].astype(np.float32) / 255
+        a = cv2.GaussianBlur(cv2.erode(a, np.ones((13, 13), np.uint8)), (0, 0), 7)
+        piece[:, :, 3] = (np.minimum(a, piece[:, :, 3] / 255) * 255).astype(np.uint8)
+    else:
+        # The piece's upper outline duplicates the head's own muzzle outline: drop it.
+        a = piece[:, :, 3].astype(np.float32) / 255
+        k = 28
+        sh = np.zeros_like(a)
+        sh[k:] = a[:-k]
+        a = a * sh
+        w = a.shape[1]
+        ramp = np.clip((np.arange(w) / w - 0.12) / 0.22, 0, 1)
+        a = cv2.GaussianBlur(a * ramp[None, :], (0, 0), 1.6)
+        piece[:, :, 3] = (a * 255).astype(np.uint8)
     A = compose(B_to_rig, MOUTH_FITS[mid])
     img, o = warp(piece, at4(A, (0, 0)))
     save(f'mouth_{mid}', img, o)
@@ -340,13 +439,37 @@ if n:
     sz = ndi.sum(hole, lab, range(1, n + 1))
     hole = ndi.binary_fill_holes(lab == int(np.argmax(sz)) + 1)
     hole = ndi.binary_erosion(hole, iterations=6)
-    torso[:, :, 3] = (torso[:, :, 3] * (1 - cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 2))).astype(np.uint8)
+    if RESTYLED_HEAD:
+        # Master look: the collar opening is filled with the cream neck fur (shaded under the collar's
+        # back edge), so there is never a gap between shirt and fur; the head's ruff tucks into it.
+        TORSO_HOLE = hole.copy()
+        cream = np.array([196, 228, 244], np.float32)
+        yy_, xx_ = np.mgrid[0:hole.shape[0], 0:hole.shape[1]]
+        ys_ = np.nonzero(hole)[0]
+        t = np.clip((yy_ - ys_.min()) / max(1, np.ptp(ys_)), 0, 1)[..., None]
+        shade = 0.62 + 0.38 * t  # darker at the top: the inside of the collar
+        fill = np.clip(cream * shade, 0, 255)
+        soft = cv2.GaussianBlur(ndi.binary_dilation(hole, iterations=4).astype(np.float32), (0, 0), 2)[..., None]
+        torso[:, :, :3] = (torso[:, :, :3] * (1 - soft) + fill * soft).astype(np.uint8)
+    else:
+        torso[:, :, 3] = (torso[:, :, 3] * (1 - cv2.GaussianBlur(hole.astype(np.float32), (0, 0), 2))).astype(np.uint8)
 img, o = warp(torso, at4(to_rig(T_ref), o1))
 save('torso', img, o)
+o1_torso = o1
 
 neck, o1 = cut('torso', 740, 260)
 nh, nw = neck.shape[0] / 4, neck.shape[1] / 4
-N_ref = sim(0.30, 0, (o1[0] + nw / 2, o1[1] + nh * 0.12), (533.0, 160.0))
+NECK_S = 0.30
+if RESTYLED_HEAD:
+    # Master look: cream fur from under the ruff into the collar (no orange band), a little wider so it
+    # fills the collar's opening.
+    hsvn = cv2.cvtColor(neck[:, :, :3], cv2.COLOR_BGR2HSV).astype(np.float32)
+    org = (hsvn[..., 0] <= 30) & (hsvn[..., 1] > 40) & (hsvn[..., 2] > 60)  # all the fur, light or shaded
+    cream = np.array([196, 228, 244], np.float32)  # BGR of the new ruff
+    shade = np.clip(hsvn[..., 2:3] / 235.0, 0.55, 1.05)
+    neck[:, :, :3] = np.where(org[..., None], np.clip(cream * shade, 0, 255), neck[:, :, :3]).astype(np.uint8)
+    NECK_S = 0.36
+N_ref = sim(NECK_S, 0, (o1[0] + nw / 2, o1[1] + nh * 0.12), (533.0, 160.0))
 img, o = warp(neck, at4(to_rig(N_ref), o1))
 save('neck', img, o)
 
@@ -453,7 +576,12 @@ def part_at(name, pt, scale_ref, anchor_frac=None, anchor_px=None, rot=0.0, dark
 SHOE_S = 0.52
 img, o = part_at('legs9', (130, 470), SHOE_S, anchor_px=(103, 432))
 save('shoe_near', img, o)
-img, o = part_at('legs9', (350, 465), SHOE_S, anchor_px=(320, 428), dark=0.85)
+if PARAMS.get('far_shoe_from_near'):
+    # The far shoe drawing reads as pointing backwards (big heel, short toe): use the near shoe, a bit
+    # smaller and darker, so both feet clearly point forward.
+    img, o = part_at('legs9', (130, 470), SHOE_S * 0.94, anchor_px=(103, 432), dark=0.82)
+else:
+    img, o = part_at('legs9', (350, 465), SHOE_S, anchor_px=(320, 428), dark=0.85)
 save('shoe_far', img, o)
 
 HAND_S = 0.37
@@ -473,8 +601,85 @@ for nm, (pt, wrist, axis) in HANDS.items():
     img, o = part_at('hands', pt, HAND_S, anchor_px=wrist, rot=-axis, dark=0.86)
     save('hand_' + nm + '_back', img, o)
 
+# New gloves (art/incoming hands_new_back / hands_new_front, approved renders): the glove is cut
+# from its render without the short brown cuff (the restyled sleeve has its own), anchored at the
+# wrist (where glove and cuff meet) and turned so its axis is +x, like the sheet gloves; the cuff's
+# thickness sets the scale so every glove matches the sleeve's width.
+NEW_GLOVES = ['one', 'two', 'three', 'pinch_paper', 'pencil', 'magnifier', 'stop', 'chin', 'fist_tremble', 'relaxed', 'knock']
+def new_glove(path):
+    bgr = cv2.imread(path)
+    f = bgr.astype(np.float32)
+    dom = f[..., 1] - np.maximum(f[..., 0], f[..., 2])
+    alpha = np.clip((150 - dom) / 90.0, 0, 1)
+    f[..., 1] = np.minimum(f[..., 1], np.maximum(f[..., 0], f[..., 2]))
+    hsv = cv2.cvtColor(bgr, cv2.COLOR_BGR2HSV).astype(int)
+    fg = alpha > 0.5
+    # The cuff's brown fabric (the ink lines are darker, the brass button brighter and more yellow).
+    cuff = fg & (hsv[..., 0] >= 5) & (hsv[..., 0] <= 22) & (hsv[..., 1] > 110) & (hsv[..., 2] > 70) & (hsv[..., 2] < 175)
+    cuff = ndi.binary_opening(cuff, iterations=4)
+    lab, n = ndi.label(cuff)
+    if not n:
+        return None
+    cuff = ndi.binary_fill_holes(lab == 1 + int(np.argmax(ndi.sum(cuff, lab, range(1, n + 1)))))  # with its button
+    glove = fg & (hsv[..., 2] > 150) & (hsv[..., 1] < 70)
+    gl, gn = ndi.label(ndi.binary_opening(glove, iterations=2))
+    glove = gl == 1 + int(np.argmax(ndi.sum(glove, gl, range(1, gn + 1))))
+    # Keep everything but the cuff (and the button/ink inside it), grown a little to take its outline.
+    # Wrist: the white pixels (glove + shirt cuff) closest to the brown cuff, across its ink line.
+    dcuff = ndi.distance_transform_edt(~cuff)
+    near = glove & (dcuff < dcuff[glove].min() + 14)
+    ys, xs = np.nonzero(near)
+    wrist = (float(xs.mean()), float(ys.mean()))
+    gy, gx = np.nonzero(glove)
+    axis = math.degrees(math.atan2(gy.mean() - wrist[1], gx.mean() - wrist[0]))
+    # Remove the whole cuff (fabric, shade, ink outline, button): the brown-or-dark region joined to the
+    # cuff that lies behind the wrist along the hand's axis.
+    fabric = fg & (hsv[..., 0] >= 4) & (hsv[..., 0] <= 24) & (hsv[..., 1] > 100) & (hsv[..., 2] > 45) & (hsv[..., 2] < 180)
+    fl, fn = ndi.label(ndi.binary_opening(fabric, iterations=2))
+    ids = np.unique(fl[cuff & (fl > 0)])
+    region = ndi.binary_dilation(ndi.binary_fill_holes(np.isin(fl, ids) | cuff), iterations=14)
+    ax, ay = math.cos(math.radians(axis)), math.sin(math.radians(axis))
+    yy, xx = np.mgrid[0:bgr.shape[0], 0:bgr.shape[1]]
+    behind = (xx - wrist[0]) * ax + (yy - wrist[1]) * ay < 6
+    alpha = alpha * ~(region & behind)
+    # Drop whatever is left detached from the glove (bits of outline, the button); held props stay.
+    keep = alpha > 0.5
+    kl, kn = ndi.label(keep)
+    sizes = ndi.sum(keep, kl, range(1, kn + 1))
+    big = [i + 1 for i, v in enumerate(sizes) if v > 0.08 * sizes.max()]
+    alpha = alpha * (cv2.dilate(np.isin(kl, big).astype(np.uint8), np.ones((3, 3), np.uint8)) > 0)
+    # Scale: the white glove's area matches the rig's own fist glove (its inner ink lines make the
+    # palm-circle measure unreliable).
+    s = math.sqrt(FIST_AREA / max(float(ndi.binary_fill_holes(glove).sum()), 1.0))
+    img = np.dstack([np.clip(f, 0, 255).astype(np.uint8), (alpha * 255).astype(np.uint8)])
+    A = sim(s, -axis, wrist, (0, 0))
+    return warp(img, A)
+
+def _glove_area(name):
+    im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
+    h = cv2.cvtColor(im[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
+    m = (im[:, :, 3] > 128) & (h[..., 2] > 150) & (h[..., 1] < 70)
+    return float(ndi.binary_fill_holes(m).sum())
+
+if PARAMS.get('new_gloves'):
+    FIST_AREA = _glove_area('hand_fist') * 1.1
+    _man = json.load(open(os.path.join(ROOT, 'art', 'incoming', 'manifest.json'), encoding='utf8'))['sheets']
+    def _approved(key):
+        vs = [v for v in _man.get(key, {}).get('versions', []) if v['status'] in ('approved', 'final')]
+        return os.path.join(ROOT, vs[-1]['file']) if vs else None
+    for nm in NEW_GLOVES:
+        for sheet_, suffix in (('hands_new_back', ''), ('hands_new_front', '_palm')):
+            src = _approved(f'{sheet_}/{nm}')
+            r = new_glove(src) if src else None
+            if r is None:
+                continue
+            img, o = r
+            save(f'hand_n_{nm}{suffix}', img, o)
+            save(f'hand_n_{nm}{suffix}_back', darken(img, 0.86), o)
+
 # Tail: base on the right end of the piece; turned so it rises behind the back as in the reference.
-img, o = part_at('legs9', (820, 200), 0.48, anchor_px=(955, 115), rot=92)
+TAIL = PARAMS.get('tail', {})
+img, o = part_at('legs9', (820, 200), 0.48 * TAIL.get('scale', 1.0), anchor_px=tuple(TAIL.get('anchor', (955, 115))), rot=TAIL.get('rot', 92))
 save('tail', img, o)
 
 img, o = part_at('legs9', (660, 400), 0.42, anchor_px=(608, 505))
@@ -492,8 +697,117 @@ J = {
     'hipNear': (490.0, 363.0), 'hipFar': (553.0, 356.0),
     'tailBase': (445.0, 360.0),
 }
+for k, (dx, dy) in PARAMS.get('joints', {}).items():  # reference px offsets for restyled parts
+    J[k] = (J[k][0] + dx, J[k][1] + dy)
 META['joints'] = {k: ref2rig(v) for k, v in J.items()}
 META['headRef'] = ref2rig((545.0, 140.0))
+
+# Snout bridge after the master (art/reference/trace, tools/trace_face.py writes masterFace.ts): the head
+# sprite is stretched row by row so its upper muzzle outline, from the far eye to the nose, lies on the
+# master's outline, posed like the face is at runtime (near eye + nose similarity). Then the eye clip is
+# rebuilt from the stretched head.
+FACE_TS = os.path.join(OUT, 'masterFace.ts')
+if RESTYLED_HEAD and os.path.exists(FACE_TS) and PARAMS.get('stretch_bridge'):  # off: not what the master needs
+    _t = open(FACE_TS, encoding='utf8').read()
+    MF = json.loads(_t[_t.index('{'):_t.rindex('}') + 1])
+    ne = np.array(META['eyes']['near']['white'])
+    rn = np.array(META['nose'])
+    mn = np.array(MF['nose'])
+    roll = math.atan2(mn[1], mn[0]) - math.atan2(rn[1] - ne[1], rn[0] - ne[0])
+    kf = np.linalg.norm(rn - ne) / np.linalg.norm(mn)
+    c_, s_ = math.cos(-roll), math.sin(-roll)
+    tgt = np.array([ne + kf * np.array([x * c_ - y * s_, x * s_ + y * c_]) for x, y in MF['bridge']])
+    tgt = tgt[np.argsort(tgt[:, 1])]
+    hp = META['parts']['head']
+    img = cv2.imread(os.path.join(OUT, 'head.webp'), cv2.IMREAD_UNCHANGED)
+    PADR = 140
+    img = cv2.copyMakeBorder(img, 0, 0, 0, PADR, cv2.BORDER_CONSTANT, value=(0, 0, 0, 0))
+    H_, W_ = img.shape[:2]
+    y0, y1 = int(tgt[0, 1] - hp['y']), int(tgt[-1, 1] - hp['y'])
+    dx = np.zeros(H_)
+    xc = np.zeros(H_)
+    for y in range(max(0, y0), min(H_, y1)):
+        cols = np.nonzero(img[y, :, 3] > 128)[0]
+        if not len(cols):
+            continue
+        xc[y] = cols.max()
+        dx[y] = np.interp(y + hp['y'], tgt[:, 1], tgt[:, 0]) - hp['x'] - xc[y]
+    rows = np.arange(H_)
+    on = (rows >= y0) & (rows < y1) & (xc > 0)
+    # Smooth over rows and fade in/out over 40 rows at both ends of the bridge.
+    dx = ndi.gaussian_filter1d(np.where(on, dx, 0.0), 6)
+    fade = np.clip(np.minimum(rows - y0, y1 - rows) / 40.0, 0, 1)
+    dx *= fade
+    xc = np.where(on, xc, np.interp(rows, rows[on], xc[on]) if on.any() else 0)
+    Wz = 130.0  # stretch zone inside the outline
+    xs = np.arange(W_, dtype=np.float32)[None, :].repeat(H_, 0)
+    mx = xs.copy()
+    for y in range(H_):
+        if abs(dx[y]) < 0.3:
+            continue
+        a0 = xc[y] - Wz
+        e1 = xc[y] + dx[y]
+        z = (xs[y] >= a0) & (xs[y] <= e1)
+        mx[y, z] = a0 + (xs[y, z] - a0) * Wz / max(1.0, Wz + dx[y])
+        mx[y, xs[y] > e1] = xs[y, xs[y] > e1] - dx[y]
+    my = np.arange(H_, dtype=np.float32)[:, None].repeat(W_, 1)
+    pm = premul(img)
+    out = cv2.remap(pm, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    al = out[:, :, 3:4]
+    out[:, :, :3] = np.where(al > 0, out[:, :, :3] * 255 / np.maximum(al, 1e-3), 0)
+    img = np.clip(out, 0, 255).astype(np.uint8)
+    cv2.imwrite(os.path.join(OUT, 'head.webp'), img, [cv2.IMWRITE_WEBP_QUALITY, 92])
+    META['parts']['head']['w'] = int(W_)
+    _a = cv2.erode((img[:, :, 3] > 128).astype(np.uint8), np.ones((9, 9), np.uint8))
+    _cs, _ = cv2.findContours(_a, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    _c = cv2.approxPolyDP(max(_cs, key=cv2.contourArea), 2.0, True).reshape(-1, 2)
+    META['headClip'] = [[round(float(x + hp['x']), 1), round(float(y + hp['y']), 1)] for x, y in _c]
+    print('snout bridge: max stretch', round(float(np.abs(dx).max()), 1), 'rig px')
+
+if RESTYLED_HEAD and 'TORSO_HOLE' in globals():
+    # The head (and every mouth) tucks under the shirt: below the top of the collar opening, head pixels
+    # survive only inside the opening, so the ruff goes INTO the collar instead of over the shirt.
+    tp = META['parts']['torso']
+    tor = cv2.imread(os.path.join(OUT, 'torso.webp'), cv2.IMREAD_UNCHANGED)
+    hole_r = cv2.resize(TORSO_HOLE.astype(np.uint8) * 255, (0, 0), fx=1, fy=1)
+    # TORSO_HOLE is in 4x torso-crop px; map it into rig px with the same warp as the torso.
+    hole_img = np.zeros(TORSO_HOLE.shape + (4,), np.uint8)
+    hole_img[..., 3] = TORSO_HOLE.astype(np.uint8) * 255
+    himg, ho = warp(hole_img, at4(to_rig(T_ref), o1_torso))
+    hole_rig = np.zeros((int(tp['h']) + 400, int(tp['w']) + 400), np.float32)
+    def paste(dst, img, ox, oy):
+        h, w = img.shape[:2]
+        dst[oy:oy + h, ox:ox + w] = np.maximum(dst[oy:oy + h, ox:ox + w], img)
+    OXr, OYr = int(tp['x']) - 200, int(tp['y']) - 200
+    paste(hole_rig, himg[..., 3].astype(np.float32) / 255, int(ho[0]) - OXr, int(ho[1]) - OYr)
+    torso_a = np.zeros_like(hole_rig)
+    paste(torso_a, tor[..., 3].astype(np.float32) / 255, int(tp['x']) - OXr, int(tp['y']) - OYr)
+    top_y = np.nonzero(hole_rig.max(1) > 0.5)[0].min() + OYr + 18
+    inside = cv2.dilate((hole_rig > 0.5).astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32)
+    # Only the SHIRT collar goes over the fur (the ruff keeps hanging over the coat as in the master):
+    # the white shirt pixels of the torso, grown a little to take their ink outline.
+    tor_hsv = cv2.cvtColor(tor[:, :, :3], cv2.COLOR_BGR2HSV).astype(int)
+    shirt_t = ((tor_hsv[..., 2] > 165) & (tor_hsv[..., 1] < 70) & (tor[..., 3] > 128)).astype(np.uint8)
+    shirt_t = cv2.dilate(shirt_t, np.ones((11, 11), np.uint8))
+    shirt = np.zeros_like(hole_rig)
+    paste(shirt, shirt_t.astype(np.float32), int(tp['x']) - OXr, int(tp['y']) - OYr)
+    covered = (torso_a > 0.5).astype(np.float32) * (1 - inside) * shirt
+    covered = cv2.GaussianBlur(covered, (0, 0), 2)
+    for name in [n for n in META['parts'] if n == 'head' or n.startswith('mouth_')]:
+        pp = META['parts'][name]
+        im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
+        if im is None:
+            continue
+        h, w = im.shape[:2]
+        ys, xs = np.mgrid[0:h, 0:w]
+        gy = ys + int(pp['y']) - OYr
+        gx = xs + int(pp['x']) - OXr
+        ok = (gy >= 0) & (gy < covered.shape[0]) & (gx >= 0) & (gx < covered.shape[1])
+        cov = np.zeros((h, w), np.float32)
+        cov[ok] = covered[gy[ok], gx[ok]]
+        below = ((ys + pp['y']) > top_y).astype(np.float32)
+        im[..., 3] = (im[..., 3] * (1 - cov * below)).astype(np.uint8)
+        cv2.imwrite(os.path.join(OUT, name + '.webp'), im, [cv2.IMWRITE_WEBP_QUALITY, 92])
 
 json.dump(META, open(os.path.join(OUT, 'rig.json'), 'w'), indent=1)
 files = sorted(f for f in os.listdir(OUT) if f.endswith('.webp'))

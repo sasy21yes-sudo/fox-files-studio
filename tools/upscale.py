@@ -1,7 +1,10 @@
-"""4x anime-style upscaler (Real-ESRGAN x4plus_anime_6B weights, RRDBNet), CPU.
+"""4x anime-style upscaler (Real-ESRGAN x4plus_anime_6B weights, RRDBNet), on the GPU when torch has CUDA, else CPU.
 Usage: python3 upscale.py WEIGHTS in.png out.png"""
 import sys, numpy as np, torch, torch.nn as nn, torch.nn.functional as F
-import cv2
+try:
+    import cv2
+except ImportError:  # e.g. ComfyUI's embedded python (torch + CUDA, no OpenCV)
+    cv2 = None
 
 
 class RDB(nn.Module):
@@ -53,6 +56,7 @@ class RRDBNet(nn.Module):
 
 
 _net = None
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 
 def load(weights):
@@ -63,7 +67,7 @@ def load(weights):
         sd = sd.get('params_ema', sd.get('params', sd))
         net.load_state_dict(sd, strict=True)
         net.eval()
-        _net = net
+        _net = net.to(DEVICE)
     return _net
 
 
@@ -78,7 +82,7 @@ def upscale_bgr(weights, bgr, tile=192, pad=12):
             for x in range(0, w, tile):
                 y0, x0 = max(y - pad, 0), max(x - pad, 0)
                 y1, x1 = min(y + tile + pad, h), min(x + tile + pad, w)
-                o = net(t[:, :, y0:y1, x0:x1]).clamp(0, 1)[0].numpy().transpose(1, 2, 0)
+                o = net(t[:, :, y0:y1, x0:x1].to(DEVICE)).clamp(0, 1)[0].cpu().numpy().transpose(1, 2, 0)
                 oy, ox = (y - y0) * 4, (x - x0) * 4
                 th, tw = min(tile, h - y) * 4, min(tile, w - x) * 4
                 out[y * 4:y * 4 + th, x * 4:x * 4 + tw] = o[oy:oy + th, ox:ox + tw]
@@ -87,5 +91,9 @@ def upscale_bgr(weights, bgr, tile=192, pad=12):
 
 if __name__ == '__main__':
     torch.set_num_threads(max(1, torch.get_num_threads()))
-    src = cv2.imread(sys.argv[2])
-    cv2.imwrite(sys.argv[3], upscale_bgr(sys.argv[1], src))
+    if cv2 is not None:
+        cv2.imwrite(sys.argv[3], upscale_bgr(sys.argv[1], cv2.imread(sys.argv[2])))
+    else:
+        from PIL import Image
+        rgb = np.asarray(Image.open(sys.argv[2]).convert('RGB'))
+        Image.fromarray(upscale_bgr(sys.argv[1], rgb[:, :, ::-1].copy())[:, :, ::-1]).save(sys.argv[3])

@@ -1,0 +1,80 @@
+{
+ "tail": {
+  "anchor": [
+   955,
+   150
+  ],
+  "rot": 58,
+  "why": "restyled tail (rig_legs9/p4 v6, fitted 1.15:right): base measured at (962,150), tip direction -160.5 deg vs -179.5 originally; rot 40 so the tip rises up-left beside the back (as in the master) instead of straight up behind it"
+ },
+ "joints": {
+  "shoulderFront": [
+   -3,
+   14
+  ],
+  "shoulderBack": [
+   3,
+   15
+  ],
+  "tailBase": [
+   22,
+   48
+  ]
+ },
+ "mirror": [
+  "sleeve_back"
+ ],
+ "ear_over": [
+  [
+   0,
+   0
+  ],
+  [
+   62,
+   0
+  ],
+  [
+   104,
+   78
+  ],
+  [
+   101,
+   96
+  ],
+  [
+   72,
+   124
+  ],
+  [
+   40,
+   140
+  ],
+  [
+   0,
+   140
+  ]
+ ],
+ "notes": "joints: shoulders lowered ~48 rig px so the sleeve cap starts at the coat shoulder (it stood ~30-40 px above); mirror: the far (right) sleeve texture; ear_over: far ear polygon in restyled head crop px, drawn over the hat; tailBase lowered/inward so the tail comes from the lower back under the coat, not beside the arm; hat_erase: polygons (baked hat sprite px) cut off the hat: the olive lip under the back of the brim ended in a vertical cut that showed as a small triangle",
+ "new_gloves": true,
+ "far_shoe_from_near": true,
+ "hat_erase": [
+  [
+   [
+    28,
+    305
+   ],
+   [
+    100,
+    309
+   ],
+   [
+    104,
+    330
+   ],
+   [
+    24,
+    330
+   ]
+  ]
+ ]
+}

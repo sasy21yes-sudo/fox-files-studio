@@ -9,3 +9,7 @@ __pycache__/
 .DS_Store
 qa-out/
 voice/cache/
+.env
+.env.*
+art/parts_v4/up/
+art/parts_v4/compare_*.jpg
