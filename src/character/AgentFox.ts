@@ -1652,6 +1652,10 @@ interface RigArm {
   hand: V2;
   handName: string;
   handRot: number | null;
+  /** Glove angles of the two poses being blended (null = along the forearm) and the blend. */
+  rotFrom: number | null;
+  rotTo: number | null;
+  b: number;
   flip: boolean;
   layer: Layer;
   prop: ArmMode;
@@ -1721,11 +1725,18 @@ function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
     hand: [lerp(A[0], B[0], b), lerp(A[1], B[1], b)],
     handName: D.hand,
     handRot: D.rot ?? null,
+    rotFrom: armDef(phys, st.from).rot ?? null,
+    rotTo: armDef(phys, st.to).rot ?? null,
+    b,
     flip: !!D.flip,
     layer: D.layer,
     prop: mode,
   };
 }
+
+const wrapAngle = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+/** Most a wrist bends away from the forearm: beyond this a glove looks stuck on a stick (puppet). */
+const WRIST_MAX = 0.55;
 
 /** Where the glove goes and how it turns, for an arm drawn as a rubber hose.
  *  The elbow always bows down and outward, like a real arm. */
@@ -1754,11 +1765,33 @@ function hoseHand(A: RigArm) {
   const elbow: V2 = score(e1) >= score(e2) ? e1 : e2;
   // One continuous sleeve that bends smoothly THROUGH the elbow (quadratic control point chosen so the
   // curve passes the elbow at its middle): no joint seam, the elbow sits where a real one would.
-  const c: V2 = [2 * elbow[0] - (S[0] + A.hand[0]) / 2, 2 * elbow[1] - (S[1] + A.hand[1]) / 2];
+  const cIK: V2 = [2 * elbow[0] - (S[0] + A.hand[0]) / 2, 2 * elbow[1] - (S[1] + A.hand[1]) / 2];
+  const angIK = Math.atan2(A.hand[1] - cIK[1], A.hand[0] - cIK[0]);
+  // The glove leads: its angle turns continuously between the two poses (null = along the forearm), and
+  // the forearm continues it (the elbow sits behind the wrist along the hand's axis), so the hand never
+  // sits on a straight arm like a puppet's hand on a stick.
+  const bc = Math.max(0, Math.min(1, A.b));
+  const r0 = A.rotFrom ?? angIK;
+  const r1 = A.rotTo ?? angIK;
+  const want = r0 + wrapAngle(r1 - r0) * A.b;
+  const lead = (A.rotFrom === null ? 0 : 1 - bc) + (A.rotTo === null ? 0 : bc);
+  let E: V2 = elbow;
+  if (lead > 0) {
+    let eh: V2 = [A.hand[0] - Math.cos(want) * L2 * scale, A.hand[1] - Math.sin(want) * L2 * scale];
+    const ex = eh[0] - S[0];
+    const ey = eh[1] - S[1];
+    const ed = Math.hypot(ex, ey) || 1;
+    const reach = L1 * scale;
+    if (ed > reach) eh = [S[0] + (ex / ed) * reach, S[1] + (ey / ed) * reach];
+    E = [lerp(elbow[0], eh[0], lead), lerp(elbow[1], eh[1], lead)];
+  }
+  const c: V2 = [2 * E[0] - (S[0] + A.hand[0]) / 2, 2 * E[1] - (S[1] + A.hand[1]) / 2];
   const ang = Math.atan2(A.hand[1] - c[1], A.hand[0] - c[0]);
+  // The wrist bends only so far from the forearm.
+  const rot = ang + Math.max(-WRIST_MAX, Math.min(WRIST_MAX, wrapAngle((lead > 0 ? want : ang) - ang)));
   const hx = A.hand[0] + Math.cos(ang) * 10;
   const hy = A.hand[1] + Math.sin(ang) * 10;
-  return { S, c, ang, hx, hy, rot: A.handRot ?? ang };
+  return { S, c, ang, hx, hy, rot };
 }
 
 /** Per-frame wrist motion (set by drawFoxSheetRig): walk drag and idle breathing of the gloves. */

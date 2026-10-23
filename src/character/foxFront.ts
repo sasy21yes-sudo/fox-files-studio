@@ -15,7 +15,7 @@ import FRONT_JSON from './rig/front/front.json';
 import { FRONT_ASSETS } from './rig/front/assets';
 import { FRONT_FACE } from './rig/frontFace';
 import { makeFaceRig, type Face, type TracedFace } from './rig/faceRig';
-import { RIG, anchoredFlex, noodle, part as rigPart, type V2 } from './rig/rigPuppet';
+import { RIG, anchoredFlex, ik, noodle, part as rigPart, type V2 } from './rig/rigPuppet';
 
 type G = CanvasRenderingContext2D;
 
@@ -182,34 +182,98 @@ export interface FrontInput {
   time: number;
 }
 
-function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolean) {
+const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+const smooth = (x: number) => x * x * (3 - 2 * x);
+const wrapA = (a: number) => Math.atan2(Math.sin(a), Math.cos(a));
+const mixV = (a: V2, b: V2, t: number): V2 => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+/** Glove angle of a pose for the viewer-right arm; hanging hands point down, a little outward. */
+const restRot = Math.PI / 2 - 0.12;
+const poseRot = (P: ArmPose) => P.rot ?? restRot;
+/** Most a wrist bends away from the forearm: beyond this a glove looks stuck on a stick (puppet). */
+const WRIST_MAX = 0.55;
+
+/**
+ * One rubber-hose arm. The glove leads: its angle comes from the pose, the forearm continues it (the
+ * elbow sits behind the wrist along the hand's axis) so the hand never sits on the arm like a puppet's
+ * hand on a stick. Changes of pose: the hand travels on an arc out to the side when the arm changes
+ * layer (it passes the coat's edge outside the coat, where the layer switches unseen), the glove turns
+ * continuously and trails the move (wrist drag), then settles with the blend's overshoot.
+ */
+function armState(side: Side, A: FrontArm, time: number) {
   const P0 = armPose(A.from);
   const P1 = armPose(A.to);
-  const P = A.b >= 0.5 ? P1 : P0;
-  if (P.front !== layerFront) return;
+  const b = A.b;
+  const bc = clamp01(b);
   const dir = side === 'right' ? 1 : -1;
   const S0 = side === 'right' ? FRONT.shoulders.right : FRONT.shoulders.left;
-  // Hanging arms come out from under the coat's shoulder (drawn behind it); arms gesturing in front of
-  // the chest start on the shoulder corner, the sleeve's round top over it (rubber hose: no joint).
-  const S: V2 = layerFront ? [S0[0] + dir * 36, S0[1] + 25] : [S0[0] + dir * 22, S0[1] + 60];
-  const t: V2 = [P0.t[0] + (P1.t[0] - P0.t[0]) * A.b, P0.t[1] + (P1.t[1] - P0.t[1]) * A.b];
-  // Hanging hands sway a little and breathe; gestures keep a small life of their own.
-  const sway = Math.sin(time * 1.3 + (side === 'right' ? 0 : 1.7)) * 8;
-  const H: V2 = [S[0] + dir * t[0] + sway * 0.4, S[1] + t[1] + Math.sin(time * 1.6) * 4 + (P.hand === 'n_fist_tremble' ? Math.sin(time * 41) * 6 : 0)];
-  // Rubber hose: one sleeve bending smoothly, the elbow bowing outward and down.
+  // Hanging arms come out from under the coat's shoulder (drawn behind it); arms in front of the chest
+  // start on the shoulder corner, the sleeve's round top over it (rubber hose: no joint).
+  const shoulder = (front: boolean): V2 => (front ? [S0[0] + dir * 36, S0[1] + 25] : [S0[0] + dir * 22, S0[1] + 60]);
+  const f0 = P0.front ? 1 : 0;
+  const f1 = P1.front ? 1 : 0;
+  const frontness = f0 + (f1 - f0) * smooth(clamp01((bc - 0.3) / 0.4));
+  const S = mixV(shoulder(false), shoulder(true), frontness);
+  const handAt = (P: ArmPose): V2 => {
+    const Sp = shoulder(P.front);
+    return [Sp[0] + dir * P.t[0], Sp[1] + P.t[1]];
+  };
+  const H = mixV(handAt(P0), handAt(P1), b);
+  // Arc: out to the side when the layer changes (round the coat's edge), a gentle swing otherwise.
+  const swing = Math.sin(Math.PI * bc);
+  H[0] += dir * swing * (f0 !== f1 ? 150 : 40);
+  H[1] += swing * (f0 !== f1 ? -40 : 0);
+  // Life at rest: hanging hands sway a little, out of step with each other; gestures breathe.
+  const ph = side === 'right' ? 0 : 1.7;
+  H[0] += Math.sin(time * 1.3 + ph) * 3;
+  H[1] += Math.sin(time * 1.6 + ph) * 4;
+  const P = b >= 0.5 ? P1 : P0;
+  if (P.hand === 'n_fist_tremble') {
+    H[0] += Math.sin(time * 41) * 5;
+    H[1] += Math.sin(time * 37) * 4;
+  }
+  // Glove angle (viewer-right terms, then mirrored): turns continuously, a beat behind the hand (drag).
+  const r0 = poseRot(P0);
+  const turn = wrapA(poseRot(P1) - r0);
+  const lag = clamp01(b - 0.18 * swing);
+  const rotR = r0 + turn * lag;
+  const rot0 = side === 'right' ? rotR : Math.PI - rotR;
+  // Elbow behind the wrist along the hand's axis; the upper arm reaches it from the shoulder.
   const L = rigPart('sleeve_front').len! * F;
-  const d = Math.hypot(H[0] - S[0], H[1] - S[1]);
-  const slack = Math.max(0, L - d);
-  const mid: V2 = [(S[0] + H[0]) / 2, (S[1] + H[1]) / 2];
-  const c: V2 = [mid[0] + dir * slack * 0.55, mid[1] + slack * 0.35];
-  const ang = Math.atan2(H[1] - c[1], H[0] - c[0]);
-  const rot = P.rot === null ? ang : side === 'right' ? P.rot : Math.PI - P.rot;
+  const L1 = L * 0.53;
+  const L2 = L * 0.47;
+  let E: V2 = [H[0] - Math.cos(rot0) * L2, H[1] - Math.sin(rot0) * L2];
+  const dx = E[0] - S[0];
+  const dy = E[1] - S[1];
+  const d = Math.hypot(dx, dy) || 1;
+  if (d > L1) E = [S[0] + (dx / d) * L1, S[1] + (dy / d) * L1];
+  else if (d < L1 * 0.45) E = [E[0] + dir * (L1 * 0.45 - d), E[1]];
+  // Mid-move the elbow is a plain IK elbow bowing outward and down (no loops while the glove turns).
+  if (swing > 0.01) {
+    const e1 = ik(S, H, L1, L2, 1).e;
+    const e2 = ik(S, H, L1, L2, -1).e;
+    const score = (e: V2) => dir * (e[0] - S[0]) + 0.6 * (e[1] - S[1]);
+    E = mixV(E, score(e1) >= score(e2) ? e1 : e2, smooth(swing) * (f0 !== f1 ? 1 : 0.25));
+  }
+  // One smooth sleeve passing through the elbow at its middle.
+  const c: V2 = [2 * E[0] - (S[0] + H[0]) / 2, 2 * E[1] - (S[1] + H[1]) / 2];
+  // The wrist bends only so far from the forearm's direction at the hand.
+  const fore = Math.atan2(H[1] - c[1], H[0] - c[0]);
+  const rot = fore + Math.max(-WRIST_MAX, Math.min(WRIST_MAX, wrapA(rot0 - fore)));
+  // Follow-through: the fingers trail the turn, then curl back.
+  const drag = -Math.sign(turn) * (side === 'right' ? 1 : -1) * swing * 0.35;
+  const bend = drag + Math.sin(time * 1.7 + ph) * 0.05;
+  return { S, c, H, rot, fore, bend, glove: P.hand, front: frontness >= 0.5 };
+}
+
+function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolean) {
+  const st = armState(side, A, time);
+  if (st.front !== layerFront) return;
   g.save();
   g.scale(F, F);
   const s = (p: V2): V2 => [p[0] / F, p[1] / F];
   // Glove first, the cuff of the sleeve over its wrist; the left glove is the right one mirrored.
-  anchoredFlex(g, `hand_${P.hand}${side === 'right' ? '_back' : ''}`, H[0] / F + Math.cos(ang) * 10, H[1] / F + Math.sin(ang) * 10, rot, {
-    bend: Math.sin(time * 1.7 + (side === 'right' ? 0 : 1.3)) * 0.05,
+  anchoredFlex(g, `hand_${st.glove}${side === 'right' ? '_back' : ''}`, st.H[0] / F + Math.cos(st.fore) * 10, st.H[1] / F + Math.sin(st.fore) * 10, st.rot, {
+    bend: st.bend,
     pivot: 0.42,
     scale: 1.12,
     sx: 1,
@@ -217,7 +281,7 @@ function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolea
     flipY: side === 'left',
   });
   // Seen from the front the hose reads thinner than in the 3/4 view.
-  noodle(g, side === 'right' ? 'sleeve_back' : 'sleeve_front', s(S), s(c), s(H), 0, 1, () => SLEEVE_W);
+  noodle(g, side === 'right' ? 'sleeve_back' : 'sleeve_front', s(st.S), s(st.c), s(st.H), 0, 1, () => SLEEVE_W);
   g.restore();
 }
 
