@@ -9,6 +9,7 @@
 import rigJson from './rig.json';
 import { RIG_ASSETS } from './assets';
 import { MASTER_FACE } from './masterFace';
+import faceLayoutJson from './faceLayout.json';
 import { makeFaceRig, inside, poly, EYE_INK, type EyeShape, type Face, type TracedFace } from './faceRig';
 
 type G = CanvasRenderingContext2D;
@@ -446,6 +447,91 @@ export function drawFace(g: G, f: Face) {
   g.restore();
 }
 
+/**
+ * The cheek tuft on the far side (master look): a spike of fur sticking out of the head's outline where
+ * the forehead meets the snout bridge, right of the far eye. Fur-coloured, inked only outside the head,
+ * so it grows out of the outline. Its shape is set in the eye editor (faceLayout.json "tuft", rig px).
+ */
+export function drawCheekTuft(g: G) {
+  const P = cheekTuft();
+  const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
+  if (P.length < 3) return;
+  const path = () => {
+    g.beginPath();
+    g.moveTo(P[0][0], P[0][1]);
+    for (const q of P) g.lineTo(q[0], q[1]);
+    g.closePath();
+  };
+  g.save();
+  g.lineJoin = 'round';
+  if (clip) {
+    // Ink only outside the head: everything but the head's inside (even-odd).
+    g.beginPath();
+    g.rect(-1e5, -1e5, 2e5, 2e5);
+    g.moveTo(clip[0][0], clip[0][1]);
+    for (const q of clip) g.lineTo(q[0], q[1]);
+    g.closePath();
+    g.clip('evenodd');
+  }
+  path();
+  g.strokeStyle = EYE_INK;
+  g.lineWidth = TUFT_INK * 2;
+  g.stroke();
+  g.restore();
+  const [r, gg, b] = RIG.furColor;
+  g.fillStyle = `rgb(${Math.round(r * TUFT_SHADE)}, ${Math.round(gg * TUFT_SHADE)}, ${Math.round(b * TUFT_SHADE)})`;
+  path();
+  g.fill();
+}
+/** Half the tuft's outline width (rig px, like the head's own outline) and its fur colour vs the base fur. */
+const TUFT_INK = 4.5;
+const TUFT_SHADE = 0.96;
+/** Default tuft (face units): its height above the muzzle line's end, how far it juts out, its tip's lift. */
+const TUFT_H = 0.5;
+const TUFT_REACH = 0.24;
+const TUFT_TIP_UP = 0.03;
+
+/** The tuft as set in the eye editor, else one shaped like the master's, grown from the head's outline. */
+let TUFT: V2[] | null = null;
+function cheekTuft(): V2[] {
+  if (TUFT) return TUFT;
+  if (FACE_LAYOUT.tuft?.length) return (TUFT = FACE_LAYOUT.tuft.map((p): V2 => [p[0], p[1]]));
+  const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
+  const k = FACE_UNIT;
+  const c = SIDE_FACE.centre('far', k);
+  // Where the head's outline is at a height (the first crossing right of the eye).
+  const edgeAt = (y: number): number => {
+    let best = Infinity;
+    if (clip)
+      for (let i = 0; i < clip.length; i++) {
+        const [x0, y0] = clip[i];
+        const [x1, y1] = clip[(i + 1) % clip.length];
+        if ((y0 - y) * (y1 - y) <= 0 && y0 !== y1) {
+          const x = x0 + ((x1 - x0) * (y - y0)) / (y1 - y0);
+          if (x > c[0] && x < best) best = x;
+        }
+      }
+    return Number.isFinite(best) ? best : c[0] + 0.3 * k;
+  };
+  // As in the master: a wedge of fur whose lower edge is the line under the far eye (the muzzle line):
+  // it leaves the outline under the eye, juts out to a point and comes back to that line's end.
+  const ul = underlinePoints().map(([x, y]): V2 => [c[0] + x * k, c[1] + y * k]);
+  const end = ul.length ? ul.reduce((a, p) => (p[0] > a[0] ? p : a)) : ([edgeAt(c[1] + 0.5 * k), c[1] + 0.5 * k] as V2);
+  const B: V2 = [Math.min(end[0], edgeAt(end[1])) - 4, end[1]];
+  const ay = end[1] - TUFT_H * k;
+  const A: V2 = [edgeAt(ay) - 8, ay];
+  const T: V2 = [Math.max(A[0], B[0]) + TUFT_REACH * k, end[1] - TUFT_TIP_UP * k];
+  const mid = (a: V2, b: V2, t: number, bow: number): V2 => {
+    const x = a[0] + (b[0] - a[0]) * t;
+    const y = a[1] + (b[1] - a[1]) * t;
+    const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
+    return [x + ((b[1] - a[1]) / l) * bow, y - ((b[0] - a[0]) / l) * bow];
+  };
+  // Slightly concave sides (a flick of fur); the inner side closes over the head.
+  const inner: V2 = [Math.min(A[0], B[0]) - 0.12 * k, (A[1] + B[1]) / 2];
+  return (TUFT = [A, mid(A, T, 0.5, -0.03 * k), T, mid(T, B, 0.5, -0.025 * k), B, inner]);
+}
+
 /** Brows, drawn after the hat so the brim never hides them (as in the master drawing). */
 export function drawFaceBrows(g: G, f: Face) {
   SIDE_FACE.drawBrows(g, f);
@@ -497,25 +583,54 @@ const SIDE_FACE = makeFaceRig({
   traced: MASTER_FACE as unknown as TracedFace,
   roll: MASTER_ROLL,
   unit: FACE_UNIT,
-  // The near eye where the head was drawn for it, the far one at the master's spacing.
+  // The near eye where the head was drawn for it, the far one at the master's spacing; each moved by
+  // the offset set in the eye editor (tracer.html?part=eyes, faceLayout.json; brows follow).
   centre: (side, k, eyes) => {
     const n = RIG.eyes.near.white;
-    if (side === 'near') return [n[0], n[1]];
-    return [n[0] + eyes.far.centre[0] * k - farFit(k, eyes.far), n[1] + eyes.far.centre[1] * k];
+    const o = side === 'near' ? FACE_LAYOUT.nearOffset : FACE_LAYOUT.farOffset;
+    if (side === 'near') return [n[0] + o[0], n[1] + o[1]];
+    return [n[0] + eyes.far.centre[0] * k - farFit(k, eyes.far) + o[0], n[1] + eyes.far.centre[1] * k + o[1]];
   },
 });
 
+/** Eye positions and the muzzle line as set in the eye editor (rig px offsets; the line in face units from the far eye). */
+const FACE_LAYOUT = faceLayoutJson as unknown as {
+  nearOffset: [number, number];
+  farOffset: [number, number];
+  underline: [number, number][] | null;
+  tuft?: [number, number][] | null;
+};
+
+/** For the eye editor: where the eyes and the muzzle line are now on the rig (rig px, at eyeScale 1). */
+export function faceLayout() {
+  const k = FACE_UNIT;
+  const at = (side: 'near' | 'far') => {
+    const c = SIDE_FACE.centre(side, k);
+    return { centre: c, outline: SIDE_FACE.eyes[side].silhouette.map(([x, y]): V2 => [c[0] + x * k, c[1] + y * k]) };
+  };
+  const far = at('far');
+  const line = underlinePoints().map(([x, y]): V2 => [far.centre[0] + x * k, far.centre[1] + y * k]);
+  return { near: at('near'), far, underline: line, tuft: cheekTuft(), unit: k, offsets: { near: FACE_LAYOUT.nearOffset, far: FACE_LAYOUT.farOffset } };
+}
+
 /** The line under the far eye (traced from the master): a tapered ink stroke that moves with the eye. */
 let UNDERLINE: V2[] | null = null;
+/** The muzzle line in face units from the far eye: the eye editor's, else the master's trace. */
+function underlinePoints(): V2[] {
+  UNDERLINE ??=
+    FACE_LAYOUT.underline?.map((p): V2 => [p[0], p[1]]) ??
+    ((MASTER_FACE as unknown as { underline?: [number, number][] }).underline ?? []).map((p): V2 => {
+      const q = SIDE_FACE.unroll(p);
+      return [q[0] - SIDE_FACE.eyes.far.centre[0], q[1] - SIDE_FACE.eyes.far.centre[1]];
+    });
+  return UNDERLINE;
+}
 function drawUnderline(g: G, f: Face) {
-  UNDERLINE ??= ((MASTER_FACE as unknown as { underline?: [number, number][] }).underline ?? []).map((p): V2 => {
-    const q = SIDE_FACE.unroll(p);
-    return [q[0] - SIDE_FACE.eyes.far.centre[0], q[1] - SIDE_FACE.eyes.far.centre[1]];
-  });
-  if (UNDERLINE.length < 2) return;
+  const UL = underlinePoints();
+  if (UL.length < 2) return;
   const k = FACE_UNIT * f.eyeScale;
   const [ex, ey] = SIDE_FACE.centre('far', k);
-  const P = UNDERLINE.map(([x, y]): V2 => [ex + x * k, ey + y * k]);
+  const P = UL.map(([x, y]): V2 => [ex + x * k, ey + y * k]);
   const w = 0.05 * k;
   const L: V2[] = [];
   const R: V2[] = [];

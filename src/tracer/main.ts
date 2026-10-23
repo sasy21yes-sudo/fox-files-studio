@@ -12,8 +12,8 @@
  * Shift+click: add to selection, arrows: nudge, Delete: remove. Move (V) — drag the whole shape.
  * Space+drag or middle button: pan; wheel: zoom; Ctrl+Z / Ctrl+Shift+Z: undo / redo.
  */
-import { drawFox } from '../character/AgentFox';
-import { loadRig } from '../character/rig/rigPuppet';
+import { drawFox, drawHeadStill } from '../character/AgentFox';
+import { faceLayout, loadRig } from '../character/rig/rigPuppet';
 
 type Pt = [number, number];
 interface Anchor {
@@ -29,8 +29,8 @@ interface Path {
 }
 type Tool = 'pen' | 'direct' | 'move';
 
-type Part = 'face' | 'neck';
-const part: Part = new URLSearchParams(location.search).get('part') === 'neck' ? 'neck' : 'face';
+type Part = 'face' | 'neck' | 'eyes';
+const part: Part = (['neck', 'eyes'] as const).find((x) => x === new URLSearchParams(location.search).get('part')) ?? 'face';
 const q = `?part=${part}`;
 
 const NECK_DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
@@ -51,7 +51,47 @@ const FACE_DEFS: { key: string; label: string; color: string; closed: boolean }[
   { key: 'brow.far', label: 'Right brow', color: '#ffe23d', closed: true },
   { key: 'far.underline', label: 'Line under the right eye', color: '#ff9a2e', closed: false },
 ];
-const DEFS = part === 'neck' ? NECK_DEFS : FACE_DEFS;
+const EYES_DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
+  { key: 'eye.near', label: 'Left eye — drag it with Move (V)', color: '#3dfcff', closed: true },
+  { key: 'eye.far', label: 'Right eye — drag it with Move (V)', color: '#ff3df5', closed: true },
+  { key: 'muzzle.line', label: 'Muzzle line (under the right eye)', color: '#ffe23d', closed: false },
+  { key: 'cheek.tuft', label: 'Cheek tuft (right cheek, master look)', color: '#ff9a2e', closed: true },
+];
+const DEFS = part === 'neck' ? NECK_DEFS : part === 'eyes' ? EYES_DEFS : FACE_DEFS;
+
+// The eye editor works over the rig's head: image px = (rig px - EYES_ORIGIN) * EYES_SCALE.
+const EYES_ORIGIN: Pt = [1640, 250];
+const EYES_SIZE: Pt = [560, 440];
+const EYES_SCALE = 2;
+const rigToImg = ([x, y]: readonly [number, number]): Pt => [(x - EYES_ORIGIN[0]) * EYES_SCALE, (y - EYES_ORIGIN[1]) * EYES_SCALE];
+const imgToRig = ([x, y]: Pt): Pt => [x / EYES_SCALE + EYES_ORIGIN[0], y / EYES_SCALE + EYES_ORIGIN[1]];
+/** Points along a pen path (cubic segments sampled). */
+function samplePath(P: Path, per = 10): Pt[] {
+  const out: Pt[] = [];
+  const n = P.a.length;
+  const segs = P.closed ? n : n - 1;
+  for (let s = 0; s < segs; s++) {
+    const A = P.a[s];
+    const B = P.a[(s + 1) % n];
+    const p0 = A.p;
+    const c1 = A.o ?? A.p;
+    const c2 = B.i ?? B.p;
+    const p3 = B.p;
+    for (let k = 0; k < per; k++) {
+      const t = k / per;
+      const u = 1 - t;
+      out.push([
+        u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p3[0],
+        u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p3[1],
+      ]);
+    }
+  }
+  if (!P.closed && n) out.push(P.a[n - 1].p);
+  return out;
+}
+const mean = (P: Pt[]): Pt => [P.reduce((a, p) => a + p[0], 0) / P.length, P.reduce((a, p) => a + p[1], 0) / P.length];
+/** The eye layout when the editor opened (to turn moved shapes into offsets). */
+let eyesStart: ReturnType<typeof faceLayout> | null = null;
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const g = canvas.getContext('2d')!;
@@ -662,15 +702,18 @@ document.getElementById('save')!.addEventListener('click', async () => {
   status.className = 'help';
   status.textContent = part === 'neck' ? 'Saving and re-baking the rig with these masks (about 30 s)…' : 'Saving and rebuilding the face…';
   try {
-    const r = await fetch(`/api/trace/save${q}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shapes: paths }) });
+    const body = part === 'eyes' ? { layout: eyesLayout() } : { shapes: paths };
+    const r = await fetch(`/api/trace/save${q}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error);
     status.textContent =
-      part === 'neck'
+      part === 'eyes'
+        ? 'Saved: the rig uses these eye positions and this muzzle line (the page reloads with them).'
+        : part === 'neck'
         ? 'Saved: the rig is re-baked with these masks (the page reloads with it).'
         : 'Saved. The face is rebuilt (the page reloads with it).';
     // The bake rewrote the sprites one by one: load the finished rig once it is all there.
-    if (part === 'neck') window.setTimeout(() => location.reload(), 800);
+    if (part === 'neck' || part === 'eyes') window.setTimeout(() => location.reload(), 800);
   } catch (err) {
     status.className = 'help err';
     status.textContent = `Not saved: ${err instanceof Error ? err.message : String(err)}`;
@@ -690,7 +733,79 @@ async function preview() {
   } else drawFox(pg, { x: 250, y: 1560, scale: 2.9, time: 1, noShadow: true, armFront: 'rest', armBack: 'rest', lookX: 0.25, lookY: 0.45 });
 }
 
+/** The new eye offsets (rig px) and muzzle line (face units from the far eye) from the shapes as moved. */
+function eyesLayout() {
+  const S = eyesStart!;
+  const moved = (key: string, was: Pt[]): Pt => {
+    const now = mean(samplePath(paths[key]).map(imgToRig));
+    const before = mean(was);
+    return [now[0] - before[0], now[1] - before[1]];
+  };
+  const dn = moved('eye.near', S.near.outline);
+  const df = moved('eye.far', S.far.outline);
+  const r1 = (v: number) => Math.round(v * 10) / 10;
+  const farC: Pt = [S.far.centre[0] + df[0], S.far.centre[1] + df[1]];
+  const line = paths['muzzle.line']?.a.length >= 2 ? samplePath(paths['muzzle.line'], 6).map(imgToRig) : null;
+  return {
+    nearOffset: [r1(S.offsets.near[0] + dn[0]), r1(S.offsets.near[1] + dn[1])],
+    farOffset: [r1(S.offsets.far[0] + df[0]), r1(S.offsets.far[1] + df[1])],
+    underline: line ? line.map(([x, y]) => [Math.round(((x - farC[0]) / S.unit) * 1e4) / 1e4, Math.round(((y - farC[1]) / S.unit) * 1e4) / 1e4]) : null,
+    tuft: paths['cheek.tuft']?.a.length >= 3 ? samplePath(paths['cheek.tuft'], 6).map(imgToRig).map(([x, y]) => [r1(x), r1(y)]) : null,
+  };
+}
+
+/** The eye editor's picture: the rig's head without eyes; its shapes: the eye outlines and the muzzle line. */
+async function eyesImage(): Promise<string> {
+  await loadRig();
+  eyesStart = faceLayout();
+  const c = document.createElement('canvas');
+  c.width = EYES_SIZE[0] * EYES_SCALE;
+  c.height = EYES_SIZE[1] * EYES_SCALE;
+  const g2 = c.getContext('2d')!;
+  g2.fillStyle = '#5d7a8c';
+  g2.fillRect(0, 0, c.width, c.height);
+  g2.scale(EYES_SCALE, EYES_SCALE);
+  g2.translate(-EYES_ORIGIN[0], -EYES_ORIGIN[1]);
+  g2.imageSmoothingQuality = 'high';
+  drawHeadStill(g2, false);
+  const S = eyesStart;
+  const step = (P: Pt[], n: number) => P.filter((_, i) => i % Math.max(1, Math.floor(P.length / n)) === 0);
+  auto = {
+    'eye.near': fromPoints(step(S.near.outline as Pt[], 16).map(rigToImg), true, 16),
+    'eye.far': fromPoints(step(S.far.outline as Pt[], 16).map(rigToImg), true, 16),
+    'muzzle.line': fromPoints((S.underline as Pt[]).map(rigToImg), false, 8),
+    // Its corners are corners (a spike of fur), not smooth anchors.
+    'cheek.tuft': { closed: true, a: (S.tuft as Pt[]).map((p) => ({ p: rigToImg(p), i: null, o: null, smooth: false })) },
+  };
+  paths = structuredClone(auto);
+  return c.toDataURL('image/png');
+}
+
 async function start() {
+  if (part === 'eyes') {
+    img.onload = () => {
+      if (!view.fitted) {
+        const rr = canvas.getBoundingClientRect();
+        view.s = Math.min(rr.width / img.naturalWidth, rr.height / img.naturalHeight) * 0.95;
+        view.x = (rr.width - img.naturalWidth * view.s) / 2;
+        view.y = (rr.height - img.naturalHeight * view.s) / 2;
+        view.fitted = true;
+        saveView();
+      }
+      draw();
+    };
+    img.src = await eyesImage();
+    setTool('move');
+    document.title = 'Eye Editor';
+    document.querySelector('h1')!.textContent = 'Eye editor';
+    document.querySelector('aside .help')!.textContent =
+      'Move the eyes on the rig with Move (V) — the brows follow them — and reshape the muzzle line with the pen. Save applies them to Agent Fox.';
+    document.querySelector('aside.right h2:nth-of-type(2)')!.textContent = 'Agent Fox with these eyes';
+    status.textContent = 'The eyes and the line where they are now on the rig.';
+    renderUI();
+    void preview();
+    return;
+  }
   const r = await fetch(`/api/trace/shapes${q}`);
   const j = (await r.json()) as { shapes: Record<string, unknown>; auto: Record<string, unknown>; source: string };
   for (const d of DEFS) {

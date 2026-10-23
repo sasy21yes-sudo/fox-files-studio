@@ -5,6 +5,8 @@
  *   ?part=face (default): eyes, brows, lines -> manual.json -> tools/trace_face.py -> masterFace.ts
  *   ?part=neck: the side rig's neck masks, drawn over the rig's own sprites -> neck.json ->
  *               tools/rig_masks.py --apply (re-bakes the rig with them, ~30 s)
+ *   ?part=eyes: the eye editor: eye positions and the muzzle line over the rig's head (the page builds
+ *               its own image) -> src/character/rig/faceLayout.json
  *
  *   GET  /api/trace/image?part=   -> the master crop, 4x
  *   GET  /api/trace/shapes?part=  -> { shapes, auto, source }
@@ -53,7 +55,23 @@ export function tracer(): Plugin {
 
       s.middlewares.use('/api/trace', async (req, res) => {
         try {
-          const P = new URL(req.url ?? '/', 'http://x').searchParams.get('part') === 'neck' ? PARTS.neck : PARTS.face;
+          const part = new URL(req.url ?? '/', 'http://x').searchParams.get('part');
+          if (part === 'eyes') {
+            // The eye editor sends the finished layout; the rig reads it (Vite reloads the module).
+            if (req.method === 'GET' && req.url?.startsWith('/shapes')) return json(res, 200, { shapes: {}, auto: {}, source: 'rig' });
+            if (req.method === 'POST' && req.url?.startsWith('/save')) {
+              const body = JSON.parse(await readBody(req)) as { layout: { nearOffset: number[]; farOffset: number[]; underline: number[][] | null; tuft?: number[][] | null } };
+              const L = body.layout;
+              const ok = (v: unknown) => Array.isArray(v) && v.length === 2 && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+              const list = (v: unknown) => v === null || v === undefined || (Array.isArray(v) && v.every(ok));
+              if (!L || !ok(L.nearOffset) || !ok(L.farOffset) || !list(L.underline) || !list(L.tuft))
+                return json(res, 400, { error: 'bad layout' });
+              fs.writeFileSync(path.join(rig, 'faceLayout.json'), JSON.stringify(L, null, 1) + '\n');
+              return json(res, 200, { ok: true, log: 'faceLayout.json written' });
+            }
+            return json(res, 404, { error: 'not found' });
+          }
+          const P = part === 'neck' ? PARTS.neck : PARTS.face;
           if (req.method === 'GET' && req.url?.startsWith('/image')) {
             res.setHeader('Content-Type', 'image/png');
             return res.end(fs.readFileSync(path.join(dir, P.image)));

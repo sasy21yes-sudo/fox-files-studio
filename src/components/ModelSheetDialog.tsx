@@ -68,6 +68,9 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
             <a className="btn small ghost" href="tracer.html?part=neck" target="_blank" rel="noreferrer">
               Neck masks
             </a>
+            <a className="btn small ghost" href="tracer.html?part=eyes" target="_blank" rel="noreferrer">
+              Eye editor
+            </a>
             <button className="btn icon ghost" onClick={onClose} aria-label="Close">
               ✕
             </button>

@@ -1,6 +1,6 @@
 import { TAU, clamp, easeOut, hash, lerp } from '../animation/math';
 import { face as faceTweak, motion, tweaks } from './rig/tweaks';
-import { RIG, anchored, anchoredFlex, placedClip, placedHatBend, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
+import { RIG, anchored, anchoredFlex, drawCheekTuft, placedClip, placedHatBend, anchoredWarp, drawFace as drawRigFace, drawFaceBrows, hoseControl, ik, noodle, part as rigPart, placed, placedWarp, rigReady, type Face, type MouthId, type V2 } from './rig/rigPuppet';
 import { loadRig } from './rig/rigPuppet';
 import { gloveFlip } from './rig/gloves';
 import { drawFoxFront, frontReady, loadFront, type FrontMouth } from './foxFront';
@@ -1862,6 +1862,41 @@ function mark(g: G, name: string, p: V2) {
   debugSink.joints[name] = [q.x, q.y];
 }
 
+/**
+ * The 3/4 head at rest in rig px, for the eye editor (tracer.html?part=eyes): head, rest mouth, the worn
+ * hat and the ear over it; the eyes and brows only when asked (the editor draws its own eye outlines).
+ */
+export function drawHeadStill(g: G, withEyes: boolean) {
+  const face: Face = {
+    lookX: 0.3,
+    lookY: 0,
+    lid: [0.04, 0.04],
+    lidTilt: 0,
+    squint: 0,
+    happy: false,
+    wink: false,
+    eyeScale: 1,
+    pupil: 1,
+    brows: { raise: 0, worry: 0, angry: 0, skeptic: 0 },
+    mouth: 3,
+  };
+  placed(g, 'head');
+  // (the editor draws the tuft, the eyes and the line as shapes of its own)
+  if (withEyes) drawCheekTuft(g);
+  if (withEyes) drawRigFace(g, face);
+  else placed(g, 'mouth_3');
+  const hp = rigPart('hat');
+  const pivot: V2 = [hp.x + hp.w * 0.5, hp.y + hp.h * 0.85];
+  g.save();
+  g.translate(pivot[0], pivot[1] - HAT_RAISE + HAT_SEAT);
+  g.rotate(HAT_TIP);
+  g.translate(-pivot[0], -pivot[1]);
+  placedHatBend(g, 'hat', HAT_DROOP, HAT_CURL);
+  g.restore();
+  if (RIG.parts.ear_over) placedClip(g, 'ear_over', EAR_OVER_CLIP);
+  if (withEyes) drawFaceBrows(g, face);
+}
+
 /** Rig px the hat sits above its baked place (master look: brows clear of the brim). */
 const HAT_RAISE = 34;
 /** Where the near ear drawn over the hat ends (rig px): just past its rim, before the skull. */
@@ -2130,6 +2165,7 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   g.scale(1 + hsq * 0.7, 1 - hsq);
   g.translate(-N[0], -N[1]);
   placed(g, 'head');
+  drawCheekTuft(g);
   mark(g, 'neck', RIG.neckPivot);
   mark(g, 'eye_near', RIG.eyes.near.white);
   mark(g, 'eye_far', RIG.eyes.far.white);
