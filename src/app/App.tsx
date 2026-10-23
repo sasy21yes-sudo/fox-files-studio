@@ -186,6 +186,24 @@ export function App() {
     const id = window.setTimeout(() => persist(project), 500);
     return () => window.clearTimeout(id);
   }, [project, persist]);
+  // Reloading or closing the tab inside the autosave delay must not lose the last edit: save now.
+  const latest = useRef(project);
+  latest.current = project;
+  useEffect(() => {
+    const flush = () => {
+      try {
+        if (storage()) saveProject(latest.current);
+      } catch {
+        /* storage full: the header already says so */
+      }
+    };
+    window.addEventListener('pagehide', flush);
+    window.addEventListener('beforeunload', flush);
+    return () => {
+      window.removeEventListener('pagehide', flush);
+      window.removeEventListener('beforeunload', flush);
+    };
+  }, []);
 
   /** Switch to another episode: save this one now, then load the other with a fresh history. */
   const openProject = useCallback(
