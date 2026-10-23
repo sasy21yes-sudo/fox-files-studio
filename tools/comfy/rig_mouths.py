@@ -122,10 +122,39 @@ def main():
     # so a mouth sprite must not bring the render's orange neck back.
     ry_lim = int((262 + o_old[1] - cy0) / sy_h)
     mask[ry_lim:] = False
-    feather = cv2.GaussianBlur(mask.astype(np.float32), (0, 0), 6)
-    fade = np.clip((ry_lim - np.arange(mask.shape[0])) / 40.0, 0, 1)[:, None]  # soft lower edge, no seam
-    feather = feather * fade
-    ys, xs = np.nonzero(mask)
+    # ...but an open mouth hangs below the ruff line (a dropped jaw, a tongue, the bottom of an "O"):
+    # below it each mouth keeps its OWN shape (where that render differs from the blank head), down
+    # to JAW_DEPTH, so the jaw is never cut flat and no neck comes back with it.
+    JAW_DEPTH = 280
+    mx = np.nonzero(mask.any(0))[0]
+    jaws = []
+    for k, own in enumerate(owns):
+        j = ndi.binary_fill_holes(ndi.binary_closing(own, iterations=4))
+        j[:ry_lim] = False
+        j[ry_lim + JAW_DEPTH:] = False
+        j[:, : mx.min()] = False  # only under the muzzle
+        j[:, mx.max() + 1:] = False
+        # Column by column, down to the jaw's own outline (the lowest dark ink of this mouth) plus a margin
+        # for the bake's feather: whatever the render draws under the jaw is neck, and stays out.
+        ink = (renders[k].max(2) < 90) & j
+        R = renders[k]
+        inkc = np.median(R[ink], 0) if ink.any() else np.array([20, 20, 30])
+        for x in np.nonzero(j.any(0))[0]:
+            ys_ = np.nonzero(ink[:, x])[0]
+            if len(ys_):
+                y = ys_.max()
+                j[y + 12:, x] = False
+                # The margin under the outline is the render's neck: ink-coloured instead, so the bake's
+                # feather fades it into a soft shadow under the jaw, never an orange smear.
+                R[y + 1: y + 12, x][j[y + 1: y + 12, x]] = inkc
+            else:
+                j[:, x] = False
+        j = ndi.binary_closing(j, iterations=3)
+        jaws.append(j)
+        deep = np.nonzero(j.any(1))[0]
+        if len(deep):
+            print(f'mouth {k}: jaw below the ruff line by {deep.max() - ry_lim} px')
+    ys, xs = np.nonzero(mask | np.logical_or.reduce(jaws))
     rb = (int(xs.min()), int(ys.min()), int(xs.max()) + 1, int(ys.max()) + 1)
 
     # Sprites on a fresh mouth sheet, in a 4x3 grid with room between them; the bake reads the points from fits.json.
@@ -143,7 +172,8 @@ def main():
     for k in range(len(sources)):
         R = renders[k][rb[1]:rb[3], rb[0]:rb[2]].astype(np.float32)
         # Hard edge on the green sheet (a soft one would mix in green); bake_rig.py feathers it after keying.
-        al = ((mask[rb[1]:rb[3], rb[0]:rb[2]] * alpha_of(renders[k][rb[1]:rb[3], rb[0]:rb[2]])) > 0.5).astype(np.float32)[..., None]
+        mk = (mask | jaws[k])[rb[1]:rb[3], rb[0]:rb[2]]
+        al = ((mk * alpha_of(renders[k][rb[1]:rb[3], rb[0]:rb[2]])) > 0.5).astype(np.float32)[..., None]
         R[..., 1] = np.minimum(R[..., 1], np.maximum(R[..., 0], R[..., 2]))  # de-spill
         spr = cv2.resize(R, (sw, sh_), interpolation=cv2.INTER_AREA)
         sal = (cv2.resize(al, (sw, sh_), interpolation=cv2.INTER_AREA) > 0.5).astype(np.float32)[..., None]
