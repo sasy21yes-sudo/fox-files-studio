@@ -50,6 +50,8 @@ To change a video from a remote Claude Code session: edit the episode JSON, comm
 - Format: `Project` in `src/types.ts`; each `scenes[i].spec` is a `SceneSpec` (`src/scene/spec.ts`) — the same data the in-app "Ask Claude" edits, whose rules are spelled out in `systemPrompt()` in `tools/vite/claudeScene.ts` (read it before editing a spec). Times in a spec are the scene's authored seconds.
 - Keep `id` unchanged. MKUltra episodes take their titles from the script (`src/i18n/scripts.ts`): edit narration/beats there or in `scenes[i].narrations[lang]` / `beatsByLang[lang]`. A beat's `cue` must be an exact phrase of that scene's narration. Facts only from `src/data/sources.ts`.
 - An invalid spec is replaced by the scene's default when the page loads it (`restoreProject`), so keep to the types exactly; pictures must be listed in `media` and exist in `episodes/media/`.
+- Sound effects: `spec.sfx` = `[{at, sound, gain?, pan?, count?, every?}]` in authored seconds; sounds and their use in `src/audio/sfx.ts` (`SFX_SOUNDS`), synthesised and mixed by the studio.
+- Narration: change `scenes[i].narration` freely (facts from the sources only). When the local editor opens the episode, the dev server re-records the missing lines with the episode's studio voice (`tools/vite/voiceRecord.ts`: Kokoro on the CPU, Qwen3 on the GPU) and commits the new pack in `public/voice/` — a remote session never needs audio tools.
 - `.env`: `FOX_EPISODE_GIT=off` (files only), `FOX_EPISODE_PUSH=off` (commit, never push).
 
 ## Verifying changes
