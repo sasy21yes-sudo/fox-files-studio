@@ -104,7 +104,7 @@ const WRAP_UP = 0.3;
  * lower outline across the middle 80% of the eye, so it keeps the eye's own tilt and the curve of the
  * eyeball but not the side walls, which would bend it into hooks at the corners.
  */
-function wrapLine(E: EyeShape): (x: number) => number {
+function wrapLine(E: EyeShape, flipTilt = false): (x: number) => number {
   const n = E.silTop.length;
   let s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, t0 = 0, t1 = 0, t2 = 0;
   for (let j = Math.floor(n * 0.1); j <= Math.ceil(n * 0.9) - 1; j++) {
@@ -120,7 +120,11 @@ function wrapLine(E: EyeShape): (x: number) => number {
   const a = det([t0, s1, s2, t1, s2, s3, t2, s3, s4]) / D;
   const b = det([s0, t0, s2, s1, t1, s3, s2, t2, s4]) / D;
   const c = det([s0, s1, t0, s1, s2, t1, s2, s3, t2]) / D;
-  return (x: number) => a + b * x + c * x * x;
+  if (!flipTilt) return (x: number) => a + b * x + c * x * x;
+  // The same arc tilted the other way, about the eye's middle (same height there, same curve).
+  const xm = (E.silTop[0][0] + E.silTop[n - 1][0]) / 2;
+  const slope = b + 2 * c * xm;
+  return (x: number) => a + b * x + c * x * x - 2 * slope * (x - xm);
 }
 
 /** Eye and brow ink of the master look: a warm near-black brown. */
@@ -287,16 +291,18 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
     const close: V2[] = [];
     const edge: V2[] = [];
     const bottom: V2[] = [];
-    const wrapY = wrap ? wrapLine(E) : null;
+    // (the far eye's closed lid rises toward its outer corner, the other way from its open outline)
+    const wrapY = wrap ? wrapLine(E, side === 'far') : null;
     for (let j = 0; j < n; j++) {
       const u = j / (n - 1);
       const x = E.silTop[j][0];
+      // (3/4: the arc is not pinned inside the outline; the eye drawing is clipped by its own outline)
       const cy = wrapY
-        ? Math.min(E.silBot[j][1], Math.max(E.silTop[j][1], wrapY(x)))
+        ? wrapY(x)
         : Math.min(E.silBot[j][1], Math.max(E.silTop[j][1], c0[1] + (c1[1] - c0[1]) * u + sag * 4 * u * (1 - u)));
       const t = ((inward * x) / Math.max(1e-6, E.width)) * 2; // -1 outer .. +1 inner
       const top = E.silTop[j][1] + tilt * t * 0.3 * E.height * (1 - lid);
-      const ye = Math.min(cy, Math.max(E.silTop[j][1], top + (cy - top) * lid));
+      const ye = wrapY ? top + (cy - top) * lid : Math.min(cy, Math.max(E.silTop[j][1], top + (cy - top) * lid));
       const yb = Math.max(ye, E.silBot[j][1] + (cy - E.silBot[j][1]) * (lid >= 0.98 ? 1 : lowLid));
       close.push([x, cy]);
       edge.push([x, ye]);
