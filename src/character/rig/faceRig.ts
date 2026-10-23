@@ -79,6 +79,12 @@ export interface FaceRigConfig {
   centre(side: Side, k: number, eyes: Record<Side, EyeShape>): V2;
   /** Share of the skeptic raise the near brow takes (the far one takes all of it, the other way). */
   skepticNear?: number;
+  /**
+   * How a closed eye lies. 'level' (front view): one nearly level arc across the eye. 'wrap' (3/4 view):
+   * the lid wraps the eyeball, so it closes LOW in the eye and its line follows the eye's lower outline
+   * (its tilt and curve), heavier at the inner corner, the far eye's tail running a little past it.
+   */
+  closeStyle?: 'level' | 'wrap';
 }
 
 export interface FaceRig {
@@ -88,6 +94,33 @@ export interface FaceRig {
   centre(side: Side, k: number): V2;
   drawEye(g: G, side: Side, i: number, f: Face): void;
   drawBrows(g: G, f: Face): void;
+}
+
+/** 'wrap' closing: how far up the eye (from its lower outline, as a share of its height) the lid closes. */
+const WRAP_UP = 0.3;
+
+/**
+ * The 3/4 closing line of an eye: a parabola fitted (least squares) to the points WRAP_UP above its
+ * lower outline across the middle 80% of the eye, so it keeps the eye's own tilt and the curve of the
+ * eyeball but not the side walls, which would bend it into hooks at the corners.
+ */
+function wrapLine(E: EyeShape): (x: number) => number {
+  const n = E.silTop.length;
+  let s0 = 0, s1 = 0, s2 = 0, s3 = 0, s4 = 0, t0 = 0, t1 = 0, t2 = 0;
+  for (let j = Math.floor(n * 0.1); j <= Math.ceil(n * 0.9) - 1; j++) {
+    const x = E.silTop[j][0];
+    const y = E.silBot[j][1] - (E.silBot[j][1] - E.silTop[j][1]) * WRAP_UP;
+    const x2 = x * x;
+    s0 += 1; s1 += x; s2 += x2; s3 += x2 * x; s4 += x2 * x2;
+    t0 += y; t1 += x * y; t2 += x2 * y;
+  }
+  // Normal equations [s0 s1 s2; s1 s2 s3; s2 s3 s4] [a b c] = [t0 t1 t2] (Cramer's rule).
+  const det = (m: number[]) => m[0] * (m[4] * m[8] - m[5] * m[7]) - m[1] * (m[3] * m[8] - m[5] * m[6]) + m[2] * (m[3] * m[7] - m[4] * m[6]);
+  const D = det([s0, s1, s2, s1, s2, s3, s2, s3, s4]) || 1;
+  const a = det([t0, s1, s2, t1, s2, s3, t2, s3, s4]) / D;
+  const b = det([s0, t0, s2, s1, t1, s3, s2, t2, s4]) / D;
+  const c = det([s0, s1, t0, s1, s2, t1, s2, s3, t2]) / D;
+  return (x: number) => a + b * x + c * x * x;
 }
 
 /** Eye and brow ink of the master look: a warm near-black brown. */
@@ -250,13 +283,17 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
     const c0: V2 = [m0[0], lvl + (m0[1] - lvl) * 0.3];
     const c1: V2 = [m1[0], lvl + (m1[1] - lvl) * 0.3];
     const sag = E.height * 0.14;
+    const wrap = cfg.closeStyle === 'wrap';
     const close: V2[] = [];
     const edge: V2[] = [];
     const bottom: V2[] = [];
+    const wrapY = wrap ? wrapLine(E) : null;
     for (let j = 0; j < n; j++) {
       const u = j / (n - 1);
       const x = E.silTop[j][0];
-      const cy = Math.min(E.silBot[j][1], Math.max(E.silTop[j][1], c0[1] + (c1[1] - c0[1]) * u + sag * 4 * u * (1 - u)));
+      const cy = wrapY
+        ? Math.min(E.silBot[j][1], Math.max(E.silTop[j][1], wrapY(x)))
+        : Math.min(E.silBot[j][1], Math.max(E.silTop[j][1], c0[1] + (c1[1] - c0[1]) * u + sag * 4 * u * (1 - u)));
       const t = ((inward * x) / Math.max(1e-6, E.width)) * 2; // -1 outer .. +1 inner
       const top = E.silTop[j][1] + tilt * t * 0.3 * E.height * (1 - lid);
       const ye = Math.min(cy, Math.max(E.silTop[j][1], top + (cy - top) * lid));
@@ -294,7 +331,8 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
       const pr = E.pupil.rx * k * f.pupil;
       const pry = E.pupil.ry * k * f.pupil;
       const px = ex + f.lookX * (w / 2 - pr) * 0.85;
-      const py = ey + h * 0.06 + f.lookY * (h / 2 - pry) * 0.7;
+      // The iris is pulled down a little by the closing lid.
+      const py = ey + h * 0.06 + f.lookY * (h / 2 - pry) * 0.7 + (wrap ? lid * h * 0.12 : 0);
       g.fillStyle = '#2a160b';
       g.beginPath();
       g.ellipse(px, py, pr, pry, 0, 0, Math.PI * 2);
@@ -316,9 +354,19 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
     }
     // The lids' own ink: a tapered stroke riding each lid edge, thickening in as the lid moves (at rest
     // the drawing's outline is the lid). Closed, the upper one lies on the closing arc.
-    const band = (P: V2[], thick: number, below: boolean) => {
+    const band = (P: V2[], thick: number, below: boolean, tail = 0) => {
       if (thick < 0.4) return;
       const S = P.map(at);
+      // The far eye's lid wraps on round the eyeball: its tail runs on past the outline, tapering out.
+      if (tail > 0 && S.length > 2) {
+        const outerLast = inward < 0;
+        const e = outerLast ? S[S.length - 1] : S[0];
+        const b = outerLast ? S[S.length - 3] : S[2];
+        const d = Math.hypot(e[0] - b[0], e[1] - b[1]) || 1;
+        const ext: V2[] = [1, 2, 3].map((m): V2 => [e[0] + ((e[0] - b[0]) / d) * tail * (m / 3), e[1] + ((e[1] - b[1]) / d) * tail * (m / 3) + tail * 0.12 * (m / 3) ** 2]);
+        if (outerLast) S.push(...ext);
+        else S.unshift(...ext.reverse());
+      }
       const L: V2[] = [];
       const R: V2[] = [];
       S.forEach((p, j) => {
@@ -328,7 +376,11 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
         const dy = b[1] - a[1];
         const l = Math.hypot(dx, dy) || 1;
         const tt = j / (S.length - 1);
-        const half = (thick / 2) * Math.max(0.25, Math.sin(Math.PI * tt) ** 0.45);
+        // 3/4: heavier at the inner corner, fading to a fine tail at the outer one.
+        const toInner = inward > 0 ? tt : 1 - tt;
+        const half = wrap
+          ? (thick / 2) * Math.max(0.12, Math.sin(Math.PI * Math.min(1, 0.5 + toInner * 0.62)) ** 0.5) * (0.55 + 0.6 * toInner)
+          : (thick / 2) * Math.max(0.25, Math.sin(Math.PI * tt) ** 0.45);
         // The band hangs from the edge into the visible eye (below the upper lid, above the lower one).
         const off = below ? half : -half;
         const nx = -dy / l;
@@ -340,7 +392,9 @@ export function makeFaceRig(cfg: FaceRigConfig): FaceRig {
       poly(g, [...L, ...R.reverse()]);
       g.fill();
     };
-    if (lid >= 0.98) band(close, lidThick, false);
+    // (3/4: the corners, where the outline pinches the arc, are left to the stroke's taper)
+    const closed = wrap ? close.filter((_, j) => E.silBot[j][1] - E.silTop[j][1] > E.height * 0.3) : close;
+    if (lid >= 0.98) band(closed, lidThick, false, wrap && side === 'far' ? w * 0.22 : 0);
     else {
       band(edge, lidThick * Math.min(1, lid * 4), true);
       band(bottom, rimThick * Math.min(1, lowLid * 4), false);

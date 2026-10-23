@@ -493,6 +493,7 @@ function farFit(k: number, far: EyeShape): number {
 
 /** Eyes and brows traced from the master drawing (masterFace.ts, made by tools/trace_face.py). */
 const SIDE_FACE = makeFaceRig({
+  closeStyle: 'wrap',
   traced: MASTER_FACE as unknown as TracedFace,
   roll: MASTER_ROLL,
   unit: FACE_UNIT,
