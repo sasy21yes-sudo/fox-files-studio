@@ -359,6 +359,22 @@ function drawScreenLayer(spec: SceneSpec, s: Stage, light: number, visible: (el:
   for (const o of spec.overlays ?? []) if (o.kind === 'title') drawTitleOverlay(s, o);
 }
 
+/** The front shot's out-of-focus set is drawn at 1/BG_DOWN of the frame's resolution. */
+const BG_DOWN = 4;
+const scratchCtx: (CanvasRenderingContext2D | null)[] = [];
+function scratch(i: number, w: number, h: number): CanvasRenderingContext2D | null {
+  let c = scratchCtx[i];
+  if (!c) {
+    const cv = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(w, h) : Object.assign(document.createElement('canvas'), { width: w, height: h });
+    c = scratchCtx[i] = cv.getContext('2d') as CanvasRenderingContext2D | null;
+  }
+  if (c && (c.canvas.width !== w || c.canvas.height !== h)) {
+    c.canvas.width = w;
+    c.canvas.height = h;
+  }
+  return c;
+}
+
 /**
  * The front-view shot ("stacco di camera"): the room behind the fox in a tight, out-of-focus close-up,
  * then Agent Fox's bust in the foreground looking into the lens. In 16:9 he sits left of centre so
@@ -378,9 +394,30 @@ function frontShot(
   const bg = resolveCam(s, [{ at: 0, zoom: 2.1, ax: place.x, ay: place.y - 380 * place.S, sx: 0.5, sy: 0.42, drift: 0.008 }]);
   withShot(s, bg, () => {
     if (s.probe) s.probe.matrix = g.getTransform();
-    g.filter = `blur(${Math.max(1, 5 * u).toFixed(1)}px)`;
-    for (const el of spec.elements) if (visible(el) && !onScreen(el) && !isFox(el)) drawElement({ ...s, probe: undefined }, light, el);
-    g.filter = 'none';
+    // Out of focus, cheaply: the set is drawn at a quarter of the resolution, blurred there, and scaled
+    // back up (a full-size canvas blur on every element cost over a second per frame).
+    const W = g.canvas.width;
+    const H = g.canvas.height;
+    const sw = Math.max(1, Math.round(W / BG_DOWN));
+    const sh = Math.max(1, Math.round(H / BG_DOWN));
+    const small = scratch(0, sw, sh);
+    const soft = scratch(1, sw, sh);
+    if (!small || !soft) return;
+    small.setTransform(1, 0, 0, 1, 0, 0);
+    small.clearRect(0, 0, sw, sh);
+    small.setTransform(new DOMMatrix().scale(sw / W, sh / H).multiply(g.getTransform()));
+    for (const el of spec.elements) if (visible(el) && !onScreen(el) && !isFox(el)) drawElement({ ...s, g: small, probe: undefined }, light, el);
+    soft.setTransform(1, 0, 0, 1, 0, 0);
+    soft.clearRect(0, 0, sw, sh);
+    soft.filter = `blur(${Math.max(0.6, (5 * u) / BG_DOWN).toFixed(2)}px)`;
+    soft.drawImage(small.canvas, 0, 0);
+    soft.filter = 'none';
+    g.save();
+    g.setTransform(1, 0, 0, 1, 0, 0);
+    g.imageSmoothingEnabled = true;
+    g.imageSmoothingQuality = 'high';
+    g.drawImage(soft.canvas, 0, 0, W, H);
+    g.restore();
   });
   // The bust: ~1.2 frame heights tall, the coat running off the bottom, the hat ~13% from the top.
   const S = (h * 1.2) / 600;
