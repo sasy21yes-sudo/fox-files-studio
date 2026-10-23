@@ -139,6 +139,7 @@ Agent Fox (type "fox", at most one): x = his feet (frame fraction), y = ground l
 - "face": {"<name>": number keys} for ${cat.FACE_KEYS.join(', ')} (about -1..1.5).
 - "mouth": keys of ${cat.MOUTHS.filter(Boolean).join(', ')} or "" (only while he is not speaking; while the narration plays the mouth lip-syncs by itself).
 - "eyes": keys of "open" | "happy". "facing": -1 to face left.
+- "view": keys of "side" | "front" (always cuts). "front" is a camera cut to Agent Fox talking into the lens: his bust fills the frame (left of centre in 16:9, centred in 9:16) over a blurred close-up of the set; his x/y/scale, walk and camera shots are ignored meanwhile. Use it for lines he says straight to the viewer (a reveal, a question to the audience), a few seconds at a time, then cut back to "side". Front arm poses that read best: rest, one, two, three, stop, chin, point, shake, knock, pinch, hips.
 
 Camera: [{"at", "kind": "wide"|"medium"|"close"|"extreme"|"insert", "target"?: "fox"|elementId, "enter"?: "cut"|"push"|"whip", "sx"?, "sy"? (where the target lands on screen 0..1), "zoom"?, "drift"?, "locked"?, "foxX"?}]. The first shot is at 0. Wide shots ignore target.
 

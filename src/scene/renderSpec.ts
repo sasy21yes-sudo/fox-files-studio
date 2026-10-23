@@ -323,6 +323,9 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
 
   const visible = (el: SceneElement) => !(el.hidden || (el.from !== undefined && k < el.from) || (el.to !== undefined && k >= el.to));
   const onScreen = (el: SceneElement) => el.params?.layer === 'screen';
+  // Camera cut to the front view: the talking bust fills the frame (see frontShot).
+  const front = fox && place && visible(fox) && evalStep(fox.view, k, 'side') === 'front';
+  if (front) return frontShot(spec, s, light, fox, place, visible, onScreen);
   withShot(s, cam, () => {
     if (s.probe) s.probe.matrix = g.getTransform();
     for (const el of spec.elements) {
@@ -339,11 +342,7 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
 
   // Screen-layer elements (cutaway pictures): above the scene, outside the camera.
   if (s.probe) s.probe.screen = g.getTransform();
-  const anchors = s.probe?.anchors.length ?? 0;
-  for (const el of spec.elements) if (visible(el) && onScreen(el) && !isFox(el)) drawElement(s, light, el);
-  if (s.probe) for (const a of s.probe.anchors.slice(anchors)) a.screen = true;
-
-  for (const o of spec.overlays ?? []) if (o.kind === 'title') drawTitleOverlay(s, o);
+  drawScreenLayer(spec, s, light, visible, onScreen);
 
   const centre = { x: w / 2, y: h * 0.45 };
   const focus =
@@ -351,3 +350,48 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
   return { focus, gloom: (spec.gloom ?? 0) * (1 - light), sepia: spec.sepia ?? 1 };
 }
 
+/** Screen-layer elements (cutaway pictures) and title overlays: above the scene, outside the camera. */
+function drawScreenLayer(spec: SceneSpec, s: Stage, light: number, visible: (el: SceneElement) => boolean, onScreen: (el: SceneElement) => boolean) {
+  if (s.probe) s.probe.screen = s.g.getTransform();
+  const anchors = s.probe?.anchors.length ?? 0;
+  for (const el of spec.elements) if (visible(el) && onScreen(el) && !isFox(el)) drawElement(s, light, el);
+  if (s.probe) for (const a of s.probe.anchors.slice(anchors)) a.screen = true;
+  for (const o of spec.overlays ?? []) if (o.kind === 'title') drawTitleOverlay(s, o);
+}
+
+/**
+ * The front-view shot ("stacco di camera"): the room behind the fox in a tight, out-of-focus close-up,
+ * then Agent Fox's bust in the foreground looking into the lens. In 16:9 he sits left of centre so
+ * the pop-ups have the right side; in 9:16 he is centred. The fox's own x/y/scale belong to the
+ * side-view staging and are not used here.
+ */
+function frontShot(
+  spec: SceneSpec,
+  s: Stage,
+  light: number,
+  fox: FoxElement,
+  place: FoxPlace,
+  visible: (el: SceneElement) => boolean,
+  onScreen: (el: SceneElement) => boolean,
+): SceneOutput {
+  const { g, w, h, u, vertical: V } = s;
+  const bg = resolveCam(s, [{ at: 0, zoom: 2.1, ax: place.x, ay: place.y - 380 * place.S, sx: 0.5, sy: 0.42, drift: 0.008 }]);
+  withShot(s, bg, () => {
+    if (s.probe) s.probe.matrix = g.getTransform();
+    g.filter = `blur(${Math.max(1, 5 * u).toFixed(1)}px)`;
+    for (const el of spec.elements) if (visible(el) && !onScreen(el) && !isFox(el)) drawElement({ ...s, probe: undefined }, light, el);
+    g.filter = 'none';
+  });
+  // The bust: ~1.2 frame heights tall, the coat running off the bottom, the hat ~13% from the top.
+  const S = (h * 1.2) / 600;
+  const x = (V ? 0.5 : 0.34) * w;
+  const y = h * 1.33;
+  const pose = { ...foxPose(spec, s, light, fox, place), x, y, scale: S, facing: 1 as const, walk: 0, jump: 0, lean: 0, speedLines: 0, skid: 0 };
+  if (s.probe) {
+    s.probe.screen = g.getTransform();
+    s.probe.anchors.push({ id: fox.id, x, y, screen: true, bbox: s.probe.measure ? measureDraw(g, (o) => drawFox(o, pose)) : undefined });
+  }
+  drawFox(g, pose);
+  drawScreenLayer(spec, s, light, visible, onScreen);
+  return { focus: { x, y: y - 470 * S }, gloom: (spec.gloom ?? 0) * (1 - light), sepia: spec.sepia ?? 1 };
+}

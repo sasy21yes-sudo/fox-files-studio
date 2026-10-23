@@ -1870,7 +1870,8 @@ function foxExpression(pose: FoxPose, lookX: number) {
 /** The talking bust, looking into the camera (character/foxFront.ts). */
 function drawFoxFrontRig(g: G, pose: FoxPose): void {
   const time = pose.time;
-  const { face, shape, speaking, surprise, angry, happy } = foxExpression(pose, 0);
+  // Talking to the lens: the scene's gaze targets (staged for the side view) only nudge the eyes.
+  const { face, shape, speaking, surprise, angry, happy } = foxExpression({ ...pose, lookX: (pose.lookX ?? 0) * 0.3, lookY: (pose.lookY ?? 0) * 0.3 }, 0);
   const bounceAmt = (pose.bounce ?? 1) * motion('bounce');
   const lift = beatLift(time);
   const landing = Math.pow(1 - lift, 6);
