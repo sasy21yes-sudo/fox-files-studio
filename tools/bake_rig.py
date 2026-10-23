@@ -207,6 +207,27 @@ headA, oA = cut('head', 260, 190)    # head with hat (for the hat and alignment)
 # Restyled sheets come with art/parts_v4/rig_params.json: tail anchor/turn, joint offsets, mirrored
 # sprites and the polygon of the ear drawn over the hat (head crop px of the restyled sheet).
 PARAMS = json.load(open(os.path.join(ALT, 'rig_params.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_params.json')) else {}
+# Neck masks drawn by hand in the tracer (tools/rig_masks.py), rig px polygons; and the automatic ones.
+RIG_MASKS = json.load(open(os.path.join(ALT, 'rig_masks.json'))) if ALT and os.path.exists(os.path.join(ALT, 'rig_masks.json')) else {}
+AUTO_MASKS = {}
+
+
+def poly_mask(poly, ox, oy, shape, feather=1.2):
+    """A rig px polygon rasterised into an image whose top-left is (ox, oy) rig px: 0..1, soft edge."""
+    m = np.zeros(shape[:2], np.float32)
+    pts = np.round((np.array(poly, np.float64) - (ox, oy)) * 4).astype(np.int32)
+    cv2.fillPoly(m, [pts], 1.0, cv2.LINE_AA, shift=2)
+    return cv2.GaussianBlur(m, (0, 0), feather)
+
+
+def mask_contour(m, ox, oy, rank=0):
+    """The rank-th largest region of a mask as a rig px polygon (a starting shape for the tracer)."""
+    cs, _ = cv2.findContours(m.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    cs = sorted([c for c in cs if cv2.contourArea(c) > 30], key=cv2.contourArea, reverse=True)
+    if len(cs) <= rank:
+        return []
+    c = cv2.approxPolyDP(cs[rank], 2.5, True).reshape(-1, 2)
+    return [[float(x + ox), float(y + oy)] for x, y in c]
 FITS = os.path.join(ALT, 'fits.json') if ALT and os.path.exists(os.path.join(ALT, 'fits.json')) else os.path.join(ART, 'fits.json')
 fits = json.load(open(FITS))
 A_to_B = np.array(fits['a_to_b'])     # headA crop px -> headB crop px (1x)
@@ -793,6 +814,18 @@ if RESTYLED_HEAD and 'TORSO_HOLE' in globals():
     paste(shirt, shirt_t.astype(np.float32), int(tp['x']) - OXr, int(tp['y']) - OYr)
     covered = (torso_a > 0.5).astype(np.float32) * (1 - inside) * shirt
     covered = cv2.GaussianBlur(covered, (0, 0), 2)
+    # The mask as the bake made it (below the top of the collar opening), for the neck tracer to start from.
+    _rows = (np.arange(covered.shape[0])[:, None] + OYr) > top_y
+    # (the shirt collar has two sides: two shapes)
+    AUTO_MASKS['shirt'] = mask_contour(covered * _rows > 0.5, OXr, OYr)
+    AUTO_MASKS['shirt2'] = mask_contour(covered * _rows > 0.5, OXr, OYr, rank=1)
+    if 'shirt' in RIG_MASKS or 'shirt2' in RIG_MASKS:
+        # Drawn by hand (tools/rig_masks.py): exactly this area of the torso goes over the head.
+        covered = np.zeros_like(covered)
+        for _k in ('shirt', 'shirt2'):
+            if RIG_MASKS.get(_k):
+                covered = np.maximum(covered, poly_mask(RIG_MASKS[_k], OXr, OYr, covered.shape))
+        top_y = -10 ** 6
     for name in [n for n in META['parts'] if n == 'head' or n.startswith('mouth_')]:
         pp = META['parts'][name]
         im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
@@ -808,6 +841,29 @@ if RESTYLED_HEAD and 'TORSO_HOLE' in globals():
         below = ((ys + pp['y']) > top_y).astype(np.float32)
         im[..., 3] = (im[..., 3] * (1 - cov * below)).astype(np.uint8)
         cv2.imwrite(os.path.join(OUT, name + '.webp'), im, [cv2.IMWRITE_WEBP_QUALITY, 92])
+
+# Hand-drawn neck masks (tools/rig_masks.py, tracer.html?part=neck): the neck piece shows only inside
+# mask.neck; mask.headErase is cut out of the head and every mouth.
+if 'neck' in META['parts']:
+    _np = META['parts']['neck']
+    _im = cv2.imread(os.path.join(OUT, 'neck.webp'), cv2.IMREAD_UNCHANGED)
+    AUTO_MASKS['neck'] = mask_contour(_im[..., 3] > 128, int(_np['x']), int(_np['y']))
+    if 'neck' in RIG_MASKS:
+        _m = poly_mask(RIG_MASKS['neck'], int(_np['x']), int(_np['y']), _im.shape[:2])
+        _im[..., 3] = (_im[..., 3] * _m).astype(np.uint8)
+        cv2.imwrite(os.path.join(OUT, 'neck.webp'), _im, [cv2.IMWRITE_WEBP_QUALITY, 92])
+if 'headErase' in RIG_MASKS:
+    for name in [n for n in META['parts'] if n == 'head' or n.startswith('mouth_')]:
+        _pp = META['parts'][name]
+        _im = cv2.imread(os.path.join(OUT, name + '.webp'), cv2.IMREAD_UNCHANGED)
+        if _im is None:
+            continue
+        _m = poly_mask(RIG_MASKS['headErase'], int(_pp['x']), int(_pp['y']), _im.shape[:2])
+        _im[..., 3] = (_im[..., 3] * (1 - _m)).astype(np.uint8)
+        cv2.imwrite(os.path.join(OUT, name + '.webp'), _im, [cv2.IMWRITE_WEBP_QUALITY, 92])
+if ALT:
+    json.dump(AUTO_MASKS, open(os.path.join(ALT, 'rig_masks_auto.json'), 'w'))
+print('neck masks:', ', '.join(sorted(RIG_MASKS)) or 'automatic')
 
 json.dump(META, open(os.path.join(OUT, 'rig.json'), 'w'), indent=1)
 files = sorted(f for f in os.listdir(OUT) if f.endswith('.webp'))
