@@ -61,6 +61,13 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
                 Save PNG
               </button>
             )}
+            {/* Pen tools over the drawings (dev server only): the traced face, the neck masks. */}
+            <a className="btn small ghost" href="tracer.html" target="_blank" rel="noreferrer">
+              Face tracer
+            </a>
+            <a className="btn small ghost" href="tracer.html?part=neck" target="_blank" rel="noreferrer">
+              Neck masks
+            </a>
             <button className="btn icon ghost" onClick={onClose} aria-label="Close">
               ✕
             </button>

@@ -1,7 +1,10 @@
 /**
- * Face tracer (tracer.html, dev server only): a Photoshop-style pen for Agent Fox's eye, brow and
- * line shapes, drawn over the master drawing. Shapes are cubic Bézier paths (anchors with in/out
- * handles); tools/trace_face.py samples them when it rebuilds src/character/rig/masterFace.ts.
+ * Tracer (tracer.html, dev server only): a Photoshop-style pen over the master drawing. Shapes are
+ * cubic Bézier paths (anchors with in/out handles).
+ *   tracer.html: Agent Fox's eye, brow and line shapes; tools/trace_face.py samples them when it
+ *     rebuilds src/character/rig/masterFace.ts.
+ *   tracer.html?part=neck: the side rig's neck masks, drawn over the rig's own sprites; tools/rig_masks.py
+ *     re-bakes the rig with them (the preview here shows the result).
  *
  * Tools: Pen (P) — click: corner anchor, click-drag: smooth anchor, click the first anchor: close,
  * click a segment: add an anchor, click an anchor: delete it, Alt+click/drag an anchor: convert.
@@ -26,7 +29,18 @@ interface Path {
 }
 type Tool = 'pen' | 'direct' | 'move';
 
-const DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
+type Part = 'face' | 'neck';
+const part: Part = new URLSearchParams(location.search).get('part') === 'neck' ? 'neck' : 'face';
+const q = `?part=${part}`;
+
+const NECK_DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
+  { key: 'mask.shirt', label: 'Shirt over the fur — left side (covers head and mouths)', color: '#ff7a2e', closed: true },
+  { key: 'mask.shirt2', label: 'Shirt over the fur — right side', color: '#ffb02e', closed: true },
+  { key: 'mask.neck', label: 'Neck piece — where it shows', color: '#3dfcff', closed: true },
+  { key: 'mask.headErase', label: 'Erase from the head (and mouths)', color: '#ff3d6e', closed: true },
+];
+
+const FACE_DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
   { key: 'near.silhouette', label: 'Left eye — outer black outline', color: '#ff3df5', closed: true },
   { key: 'near.white', label: 'Left eye — white', color: '#3dfcff', closed: true },
   { key: 'near.pupil', label: 'Left eye — pupil', color: '#ff4040', closed: true },
@@ -37,6 +51,7 @@ const DEFS: { key: string; label: string; color: string; closed: boolean }[] = [
   { key: 'brow.far', label: 'Right brow', color: '#ffe23d', closed: true },
   { key: 'far.underline', label: 'Line under the right eye', color: '#ff9a2e', closed: false },
 ];
+const DEFS = part === 'neck' ? NECK_DEFS : FACE_DEFS;
 
 const canvas = document.getElementById('c') as HTMLCanvasElement;
 const g = canvas.getContext('2d')!;
@@ -44,11 +59,13 @@ const status = document.getElementById('status')!;
 const img = new Image();
 let paths: Record<string, Path> = {};
 let auto: Record<string, Path> = {};
-let sel = sessionStorage.getItem('tracer.sel') ?? DEFS[0].key;
-let tool: Tool = (sessionStorage.getItem('tracer.tool') as Tool) ?? 'pen';
+const KEY = (k: string) => `tracer.${part}.${k}`;
+let sel = sessionStorage.getItem(KEY('sel')) ?? DEFS[0].key;
+if (!DEFS.some((d) => d.key === sel)) sel = DEFS[0].key;
+let tool: Tool = (sessionStorage.getItem(KEY('tool')) as Tool) ?? 'pen';
 let picked = new Set<number>();
 let space = false;
-const view = JSON.parse(sessionStorage.getItem('tracer.view') ?? 'null') ?? { s: 1, x: 0, y: 0, fitted: false };
+const view = JSON.parse(sessionStorage.getItem(KEY('view')) ?? 'null') ?? { s: 1, x: 0, y: 0, fitted: false };
 const undo: string[] = [];
 const redo: string[] = [];
 
@@ -56,7 +73,7 @@ const def = (k: string) => DEFS.find((d) => d.key === k)!;
 const cur = (): Path => (paths[sel] ??= { closed: false, a: [] });
 const toScreen = ([x, y]: Pt): Pt => [x * view.s + view.x, y * view.s + view.y];
 const toImage = (x: number, y: number): Pt => [(x - view.x) / view.s, (y - view.y) / view.s];
-const saveView = () => sessionStorage.setItem('tracer.view', JSON.stringify(view));
+const saveView = () => sessionStorage.setItem(KEY('view'), JSON.stringify(view));
 const r1 = (v: number) => Math.round(v * 10) / 10;
 const pt = (x: number, y: number): Pt => [r1(x), r1(y)];
 const sub = (a: Pt, b: Pt): Pt => [a[0] - b[0], a[1] - b[1]];
@@ -257,13 +274,13 @@ function renderUI() {
 function select(k: string) {
   sel = k;
   picked = new Set();
-  sessionStorage.setItem('tracer.sel', k);
+  sessionStorage.setItem(KEY('sel'), k);
   renderUI();
   draw();
 }
 function setTool(t: Tool) {
   tool = t;
-  sessionStorage.setItem('tracer.tool', t);
+  sessionStorage.setItem(KEY('tool'), t);
   renderUI();
   draw();
 }
@@ -643,12 +660,17 @@ document.getElementById('clear')!.addEventListener('click', () => {
 });
 document.getElementById('save')!.addEventListener('click', async () => {
   status.className = 'help';
-  status.textContent = 'Saving and rebuilding the face…';
+  status.textContent = part === 'neck' ? 'Saving and re-baking the rig with these masks (about 30 s)…' : 'Saving and rebuilding the face…';
   try {
-    const r = await fetch('/api/trace/save', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shapes: paths }) });
+    const r = await fetch(`/api/trace/save${q}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ shapes: paths }) });
     const j = await r.json();
     if (!r.ok) throw new Error(j.error);
-    status.textContent = 'Saved. The face is rebuilt (the page reloads with it).';
+    status.textContent =
+      part === 'neck'
+        ? 'Saved: the rig is re-baked with these masks (the page reloads with it).'
+        : 'Saved. The face is rebuilt (the page reloads with it).';
+    // The bake rewrote the sprites one by one: load the finished rig once it is all there.
+    if (part === 'neck') window.setTimeout(() => location.reload(), 800);
   } catch (err) {
     status.className = 'help err';
     status.textContent = `Not saved: ${err instanceof Error ? err.message : String(err)}`;
@@ -662,11 +684,14 @@ async function preview() {
   const pg = c.getContext('2d')!;
   pg.fillStyle = '#18e018';
   pg.fillRect(0, 0, c.width, c.height);
-  drawFox(pg, { x: 250, y: 1560, scale: 2.9, time: 1, noShadow: true, armFront: 'rest', armBack: 'rest', lookX: 0.25, lookY: 0.45 });
+  if (part === 'neck') {
+    // Head, neck and collar of the rig as the masks leave them.
+    drawFox(pg, { x: 230, y: 980, scale: 2.2, time: 1, bounce: 0, noShadow: true, armFront: 'rest', armBack: 'rest', lookX: 0.25, lookY: 0.45 });
+  } else drawFox(pg, { x: 250, y: 1560, scale: 2.9, time: 1, noShadow: true, armFront: 'rest', armBack: 'rest', lookX: 0.25, lookY: 0.45 });
 }
 
 async function start() {
-  const r = await fetch('/api/trace/shapes');
+  const r = await fetch(`/api/trace/shapes${q}`);
   const j = (await r.json()) as { shapes: Record<string, unknown>; auto: Record<string, unknown>; source: string };
   for (const d of DEFS) {
     if (j.shapes[d.key]) paths[d.key] = asPath(j.shapes[d.key], d.closed);
@@ -684,7 +709,14 @@ async function start() {
     }
     draw();
   };
-  img.src = '/api/trace/image';
+  img.src = `/api/trace/image${q}`;
+  if (part === 'neck') {
+    document.title = 'Neck Masks';
+    document.querySelector('h1')!.textContent = 'Neck masks';
+    document.querySelector('aside .help')!.textContent =
+      "Shape the rig's neck masks over its own pieces: where the shirt covers the fur, where the neck piece shows, what to erase from the head. They start from the bake's automatic masks; Save re-bakes the rig.";
+    document.querySelector('aside.right h2:nth-of-type(2)')!.textContent = 'The rig with these masks';
+  }
   renderUI();
   void preview();
 }

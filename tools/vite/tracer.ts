@@ -1,12 +1,14 @@
 /**
- * Dev-server side of the face tracer page (tracer.html): Salvatore draws Agent Fox's eye, brow and
- * line shapes over the master drawing; on save they go to art/reference/trace/manual.json in the
- * assets repo and tools/trace_face.py rebuilds src/character/rig/masterFace.ts, so the rig shows
- * them at once (Vite reloads the module).
+ * Dev-server side of the tracer page (tracer.html): Salvatore draws over the master drawing with a
+ * Photoshop-style pen; on save the shapes go to art/reference/trace/ in the assets repo and a script
+ * rebuilds a module of the rig, so the rig shows them at once (Vite reloads the module).
+ *   ?part=face (default): eyes, brows, lines -> manual.json -> tools/trace_face.py -> masterFace.ts
+ *   ?part=neck: the side rig's neck masks, drawn over the rig's own sprites -> neck.json ->
+ *               tools/rig_masks.py --apply (re-bakes the rig with them, ~30 s)
  *
- *   GET  /api/trace/image   -> the master face, 4x (face_4x.png)
- *   GET  /api/trace/shapes  -> { shapes: manual.json or auto.json, source }
- *   POST /api/trace/save    -> writes manual.json, runs trace_face.py -> { ok, log } | { error }
+ *   GET  /api/trace/image?part=   -> the master crop, 4x
+ *   GET  /api/trace/shapes?part=  -> { shapes, auto, source }
+ *   POST /api/trace/save?part=    -> writes the shapes, runs the script -> { ok, log } | { error }
  *
  * FOX_ASSETS_DIR in .env points at the assets checkout (default: ../fox-files-studio).
  */
@@ -43,26 +45,31 @@ export function tracer(): Plugin {
       const env = loadEnv(s.config.mode, s.config.root, '');
       const assets = path.resolve(s.config.root, env.FOX_ASSETS_DIR || '../fox-files-studio');
       const dir = path.join(assets, 'art', 'reference', 'trace');
-      const out = path.join(s.config.root, 'src', 'character', 'rig', 'masterFace.ts');
+      const rig = path.join(s.config.root, 'src', 'character', 'rig');
+      const PARTS = {
+        face: { image: 'face_4x.png', manual: 'manual.json', auto: 'auto.json', script: 'trace_face.py', args: ['--ts', path.join(rig, 'masterFace.ts')] },
+        neck: { image: 'neck_rig.png', manual: 'neck.json', auto: 'neck_auto.json', script: 'rig_masks.py', args: ['--apply', '--rig', rig] },
+      };
 
       s.middlewares.use('/api/trace', async (req, res) => {
         try {
+          const P = new URL(req.url ?? '/', 'http://x').searchParams.get('part') === 'neck' ? PARTS.neck : PARTS.face;
           if (req.method === 'GET' && req.url?.startsWith('/image')) {
             res.setHeader('Content-Type', 'image/png');
-            return res.end(fs.readFileSync(path.join(dir, 'face_4x.png')));
+            return res.end(fs.readFileSync(path.join(dir, P.image)));
           }
           if (req.method === 'GET' && req.url?.startsWith('/shapes')) {
-            const manual = path.join(dir, 'manual.json');
-            const auto = path.join(dir, 'auto.json');
+            const manual = path.join(dir, P.manual);
+            const auto = path.join(dir, P.auto);
             const own = fs.existsSync(manual);
             const auto_ = fs.existsSync(auto) ? JSON.parse(fs.readFileSync(auto, 'utf8')) : {};
             return json(res, 200, { shapes: { ...auto_, ...(own ? JSON.parse(fs.readFileSync(manual, 'utf8')) : {}) }, auto: auto_, source: own ? 'manual' : 'auto' });
           }
           if (req.method === 'POST' && req.url?.startsWith('/save')) {
             const body = JSON.parse(await readBody(req)) as { shapes: Record<string, [number, number][]> };
-            fs.writeFileSync(path.join(dir, 'manual.json'), JSON.stringify(body.shapes, null, 1));
+            fs.writeFileSync(path.join(dir, P.manual), JSON.stringify(body.shapes, null, 1));
             const log = await new Promise<string>((resolve, reject) => {
-              const p = spawn('python', [path.join(assets, 'tools', 'trace_face.py'), '--ts', out], { cwd: assets, windowsHide: true });
+              const p = spawn('python', [path.join(assets, 'tools', P.script), ...P.args], { cwd: assets, windowsHide: true });
               let text = '';
               p.stdout.on('data', (c) => (text += c));
               p.stderr.on('data', (c) => (text += c));
