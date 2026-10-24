@@ -1,4 +1,5 @@
 import type { MediaItem, Project } from '../types';
+import { loadProjectClips } from './clips';
 
 /**
  * Images used by scenes ("picture" elements). The project only lists them
@@ -54,6 +55,8 @@ const changed = () => {
   version++;
   listeners.forEach((fn) => fn());
 };
+/** Something drawable finished loading elsewhere (animation clips): redraw like for a new image. */
+export const bumpMedia = changed;
 
 function decode(id: string): Promise<void> {
   if (cache.has(id)) return Promise.resolve();
@@ -75,7 +78,7 @@ function decode(id: string): Promise<void> {
 
 /** Decode every image the project lists. Resolves when all are drawable (missing ones are skipped). */
 export async function loadProjectMedia(project: Project): Promise<void> {
-  await Promise.all((project.media ?? []).map((m) => decode(m.id)));
+  await Promise.all([...(project.media ?? []).map((m) => decode(m.id)), loadProjectClips(project)]);
 }
 
 const rid = () => Math.random().toString(36).slice(2, 10);

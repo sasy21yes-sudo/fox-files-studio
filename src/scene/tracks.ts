@@ -5,8 +5,39 @@ import type { Ease, Key, Num, Track } from './spec';
 export const num = (n: Num | undefined, vertical: boolean, fallback = 0): number =>
   n === undefined ? fallback : typeof n === 'number' ? n : vertical ? n.v : n.h;
 
+/** Cubic Bézier timing curve (x1, y1, x2, y2), solved for x = p by Newton steps then bisection. */
+export function bezier(c: readonly [number, number, number, number], p: number): number {
+  const [x1, y1, x2, y2] = c;
+  const bx = (t: number) => 3 * (1 - t) * (1 - t) * t * x1 + 3 * (1 - t) * t * t * x2 + t * t * t;
+  const by = (t: number) => 3 * (1 - t) * (1 - t) * t * y1 + 3 * (1 - t) * t * t * y2 + t * t * t;
+  const dx = (t: number) => 3 * (1 - t) * (1 - t) * x1 + 6 * (1 - t) * t * (x2 - x1) + 3 * t * t * (1 - x2);
+  let t = p;
+  for (let i = 0; i < 6; i++) {
+    const d = dx(t);
+    if (Math.abs(d) < 1e-6) break;
+    t -= (bx(t) - p) / d;
+  }
+  if (t < 0 || t > 1 || Math.abs(bx(t) - p) > 1e-4) {
+    let lo = 0;
+    let hi = 1;
+    t = p;
+    for (let i = 0; i < 40; i++) {
+      if (bx(t) < p) lo = t;
+      else hi = t;
+      t = (lo + hi) / 2;
+    }
+  }
+  return by(t);
+}
+
+/** After Effects' "Easy Ease" (both handles at 33% influence), "Easy Ease In" and "Easy Ease Out". */
+export const EASY_EASE: [number, number, number, number] = [0.33, 0, 0.67, 1];
+
 export function ease(e: Ease | undefined, p: number): number {
+  if (Array.isArray(e)) return bezier(e as [number, number, number, number], p);
   switch (e ?? 'smooth') {
+    case 'hold':
+      return p >= 1 ? 1 : 0;
     case 'linear':
       return p;
     case 'smooth':

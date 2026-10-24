@@ -18,7 +18,8 @@ import {
 } from '../animation/props';
 import { drawMotes, drawMug, drawWallClock } from '../effects/cartoon';
 import { mediaImage } from '../media/store';
-import { FONT_SANS } from '../animation/stage';
+import { clipFrameAt, getClip } from '../media/clips';
+import { FONT_SANS, FONT_TITLE, FONT_TYPE } from '../animation/stage';
 import type { ElementType, Num } from './spec';
 import { num } from './tracks';
 
@@ -55,8 +56,8 @@ export interface ParamInfo {
   default: unknown;
   /** Allowed values of a text parameter (the inspector shows a menu). */
   options?: readonly string[];
-  /** 'media' = the id of an image in the project library. */
-  kind?: 'media';
+  /** 'media' = the id of an image in the project library; 'clip' = an animation clip of the library. */
+  kind?: 'media' | 'clip';
 }
 
 export interface ElementDef {
@@ -334,7 +335,188 @@ export const ELEMENTS: Record<Exclude<ElementType, 'fox'>, ElementDef> = {
     },
     draw: drawPicture,
   },
+  text: {
+    label: 'Text',
+    category: 'effect',
+    description:
+      'Animated title text (AE text animators): each character comes in one after another (typewriter, fade, pop, rise, wave, drop) from "start", "stagger" seconds apart. x,y is the anchor of the line ("align"). Use \n for more lines. Only words supported by the narration or sources.',
+    params: {
+      text: { desc: 'the words', default: 'TOP SECRET' },
+      size: { desc: `letter height ${U}`, default: 72 },
+      font: { desc: 'display (1930s title serif), type (typewriter), sans', default: 'display', options: ['display', 'type', 'sans'] },
+      weight: { desc: 'normal or bold', default: 'bold', options: ['normal', 'bold'] },
+      color: { desc: 'fill colour (CSS)', default: '#f3e2b8' },
+      outline: { desc: 'outline colour (CSS); empty = none', default: '#1c120b' },
+      outlineWidth: { desc: `outline thickness ${U}`, default: 6 },
+      align: { desc: 'left, center or right of x', default: 'center', options: ['left', 'center', 'right'] },
+      tracking: { desc: `extra space between letters ${U}`, default: 2 },
+      animator: {
+        desc: 'how each letter arrives',
+        default: 'typewriter',
+        options: ['none', 'typewriter', 'fade', 'pop', 'rise', 'drop', 'wave'],
+      },
+      start: { desc: 'authored second the first letter arrives (0 = when the element appears)', default: 0 },
+      stagger: { desc: 'seconds between two letters', default: 0.05 },
+      charDur: { desc: 'seconds one letter takes to arrive', default: 0.25 },
+      waveAmp: { desc: `wave animator: height ${U}`, default: 10 },
+    },
+    bounds: (c) => {
+      const lines = ps(c, 'text', '').split('\n');
+      const size = pn(c, 'size', 72) * c.u * c.scale;
+      return { w: Math.max(...lines.map((l) => l.length)) * size * 0.62, h: lines.length * size * 1.15, rot: c.rot };
+    },
+    draw: drawText,
+  },
+  null: {
+    label: 'Null (parent)',
+    category: 'effect',
+    description:
+      'Invisible point that other elements follow when they name it as their "parent" (AE null object): animate its dx, dy, rot, scaleBy or wiggle to move a whole group together.',
+    params: {},
+    bounds: (c) => ({ w: 40 * c.u, h: 40 * c.u, rot: c.rot }),
+    draw: () => undefined,
+  },
+  sprite: {
+    label: 'Animation clip',
+    category: 'character',
+    description:
+      'A frame-by-frame animation from the clip library (full drawings, Cuphead style), played on its own timing. x,y is the clip\'s anchor (usually between the feet). "start" = authored second its first drawing shows; speed, loop and flip change how it plays; "frame" >= 0 holds one drawing (time remap).',
+    params: {
+      clip: { desc: 'animation clip id from the library', default: '', kind: 'clip' },
+      start: { desc: 'authored second the clip starts (0 = when the element appears)', default: 0 },
+      speed: { desc: 'playback speed (1 = as drawn)', default: 1 },
+      loop: { desc: 'clip = as the clip says; once (holds the last drawing), loop, pingpong', default: 'clip', options: ['clip', 'once', 'loop', 'pingpong'] },
+      flip: { desc: 'mirror left-right', default: false },
+      frame: { desc: 'hold this drawing (0-based); -1 = play', default: -1 },
+      height: { desc: `drawn height of the clip's canvas ${U}; 0 = as built`, default: 0 },
+    },
+    bounds: (c) => {
+      const C = getClip(ps(c, 'clip', ''))?.clip;
+      const s = C ? spriteScale(c, C) : 1;
+      return C ? { w: C.width * s, h: C.height * s, rot: c.rot } : { w: 200 * c.u, h: 300 * c.u, rot: c.rot };
+    },
+    base: (c) => ({ x: c.x, y: c.y }),
+    draw: drawSprite,
+  },
 };
+
+const FONTS: Record<string, string> = { display: FONT_TITLE, type: FONT_TYPE, sans: FONT_SANS };
+
+/**
+ * Text with per-character animators (After Effects' text animators, simplified): characters are laid
+ * out once with their real widths, then each one's opacity, scale and offset follow its own clock
+ * (start + index x stagger). Deterministic: the same k always gives the same frame.
+ */
+function drawText(c: ElCtx) {
+  const { g } = c;
+  const text = ps(c, 'text', '');
+  if (!text) return;
+  const size = pn(c, 'size', 72) * c.u * c.scale;
+  const font = `${ps(c, 'weight', 'bold') === 'bold' ? '700' : '400'} ${Math.round(size)}px ${FONTS[ps(c, 'font', 'display')] ?? FONT_TITLE}`;
+  const tracking = pn(c, 'tracking', 2) * c.u * c.scale;
+  const anim = ps(c, 'animator', 'typewriter');
+  const start = (pn(c, 'start', 0) || c.from) as number;
+  const stagger = pn(c, 'stagger', 0.05);
+  const dur = Math.max(0.01, pn(c, 'charDur', 0.25));
+  const outline = ps(c, 'outline', '#1c120b');
+  const ow = pn(c, 'outlineWidth', 6) * c.u * c.scale;
+  const align = ps(c, 'align', 'center');
+  g.save();
+  g.translate(c.x, c.y);
+  if (c.rot) g.rotate(c.rot);
+  g.font = font;
+  g.textBaseline = 'alphabetic';
+  g.textAlign = 'left';
+  g.lineJoin = 'round';
+  const lines = text.split('\n');
+  let idx = 0;
+  lines.forEach((line, li) => {
+    const chars = [...line];
+    const widths = chars.map((ch) => g.measureText(ch).width + tracking);
+    const total = widths.reduce((a, b) => a + b, 0) - tracking;
+    let x = align === 'left' ? 0 : align === 'right' ? -total : -total / 2;
+    const y = (li - (lines.length - 1) / 2) * size * 1.15 + size * 0.35;
+    chars.forEach((ch, i) => {
+      const t0 = start + idx * stagger;
+      idx++;
+      const p = anim === 'none' ? 1 : Math.min(1, Math.max(0, (c.k - t0) / dur));
+      const w = widths[i];
+      if (p > 0 && ch.trim()) {
+        let a = 1;
+        let sc = 1;
+        let dy = 0;
+        if (anim === 'typewriter') a = p > 0 ? 1 : 0;
+        else if (anim === 'fade') a = p;
+        else if (anim === 'pop') {
+          a = Math.min(1, p * 3);
+          sc = p < 1 ? 1 + 0.6 * Math.sin(Math.PI * p) * (1 - p) + (p < 0.3 ? -0.5 * (1 - p / 0.3) : 0) : 1;
+        } else if (anim === 'rise') {
+          a = p;
+          dy = (1 - (1 - (1 - p) ** 3)) * size * 0.6;
+        } else if (anim === 'drop') {
+          a = Math.min(1, p * 2);
+          const b = 1 - p;
+          dy = -b * b * size * 1.2 + (p > 0.7 ? Math.sin((p - 0.7) * Math.PI * 3.3) * size * 0.06 * (1 - p) : 0);
+        }
+        if (anim === 'wave') dy += Math.sin(c.time * 4 - idx * 0.5) * pn(c, 'waveAmp', 10) * c.u * c.scale * p;
+        g.save();
+        g.globalAlpha *= a;
+        g.translate(x + w / 2, y + dy);
+        if (sc !== 1) g.scale(sc, sc);
+        if (outline && ow > 0) {
+          g.strokeStyle = outline;
+          g.lineWidth = ow;
+          g.strokeText(ch, -w / 2 + tracking / 2, 0);
+        }
+        g.fillStyle = ps(c, 'color', '#f3e2b8');
+        g.fillText(ch, -w / 2 + tracking / 2, 0);
+        g.restore();
+      }
+      x += w;
+    });
+  });
+  g.restore();
+}
+
+/** Screen px per clip canvas px. */
+function spriteScale(c: ElCtx, clip: { height: number; pxPerU: number }): number {
+  const hu = pn(c, 'height', 0);
+  return (hu > 0 ? (hu * c.u) / clip.height : c.u / clip.pxPerU) * c.scale;
+}
+
+/** One drawing of a clip, its anchor on x, y. */
+function drawSprite(c: ElCtx) {
+  const { g } = c;
+  const id = ps(c, 'clip', '');
+  const got = id ? getClip(id) : undefined;
+  if (!got) {
+    g.save();
+    g.strokeStyle = '#c9a66b';
+    g.setLineDash([10 * c.u, 8 * c.u]);
+    g.lineWidth = 3 * c.u;
+    g.strokeRect(c.x - 100 * c.u, c.y - 300 * c.u, 200 * c.u, 300 * c.u);
+    g.restore();
+    return;
+  }
+  const { clip, atlas } = got;
+  const start = pn(c, 'start', 0) || c.from;
+  const held = pn(c, 'frame', -1);
+  const loopP = ps(c, 'loop', 'clip');
+  const i =
+    held >= 0
+      ? Math.min(clip.frames.length - 1, Math.floor(held))
+      : clipFrameAt(clip, (c.k - start) * pn(c, 'speed', 1), loopP === 'clip' ? clip.loop : (loopP as 'once' | 'loop' | 'pingpong'));
+  const f = clip.frames[i];
+  const s = spriteScale(c, clip);
+  g.save();
+  g.translate(c.x, c.y);
+  if (c.rot) g.rotate(c.rot);
+  g.scale(ps(c, 'flip', '') === 'true' || c.params.flip === true ? -s : s, s);
+  g.imageSmoothingEnabled = true;
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(atlas, f.x, f.y, f.w, f.h, f.ox - clip.anchor[0], f.oy - clip.anchor[1], f.w, f.h);
+  g.restore();
+}
 
 const smooth = (p: number) => p * p * (3 - 2 * p);
 
@@ -439,4 +621,7 @@ export const ELEMENT_PLACE: Record<keyof typeof ELEMENTS, { x: Num; y: Num }> = 
   puff: { x: 0.5, y: { h: 0.79, v: 0.58 } },
   stamp: { x: 0.5, y: 0.45 },
   picture: { x: 0.5, y: 0.5 },
+  text: { x: 0.5, y: 0.3 },
+  null: { x: 0.5, y: 0.5 },
+  sprite: { x: { h: 0.4, v: 0.5 }, y: { h: 0.92, v: 0.75 } },
 };

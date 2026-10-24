@@ -18,7 +18,8 @@ import type { SfxCue } from '../audio/sfx';
 
 export type Num = number | { h: number; v: number };
 
-export type Ease = 'linear' | 'smooth' | 'in' | 'out' | 'inOut' | 'back' | 'bounce';
+/** A named curve, or a cubic Bézier [x1, y1, x2, y2] like After Effects' speed graph / CSS (y may overshoot). */
+export type Ease = 'linear' | 'smooth' | 'in' | 'out' | 'inOut' | 'back' | 'bounce' | 'hold' | [number, number, number, number];
 
 export interface Key<T> {
   at: number;
@@ -60,6 +61,9 @@ export type ElementType =
   | 'puff'
   | 'stamp'
   | 'picture'
+  | 'text'
+  | 'null'
+  | 'sprite'
   | 'fox';
 
 export type EnterKind = 'none' | 'drop' | 'pop' | 'fade' | 'slideLeft' | 'slideRight';
@@ -94,7 +98,79 @@ export interface ElementBase {
   opacity?: Track<number>;
   /** Hidden in the editor (kept in the document). */
   hidden?: boolean;
+
+  // ---- After Effects-style layer features (scene/layers.ts) ----
+  /** Follows another element's animated move, turn, scale and wiggle (AE parenting); a 'null' element is an invisible parent. */
+  parent?: string;
+  /** Animated scale multiplier on top of `scale` (AE Scale keyframes), around the element's position. */
+  scaleBy?: Track<number>;
+  /** Deterministic jitter (AE wiggle(freq, amp)): x, y in frame fractions, rot in radians, scale as a fraction. */
+  wiggle?: Wiggle;
+  /** Loop the element's own keyed values every `every` authored seconds from `from` (AE loopOut cycle / pingpong). */
+  repeat?: { every: number; from?: number; mode?: 'cycle' | 'pingpong' };
+  /** How the element mixes with what is under it (AE blending modes). */
+  blend?: BlendMode;
+  /** Effects, applied in order (AE effects stack). */
+  fx?: Effect[];
+  /** Shown only through another element (AE track matte). */
+  matte?: { source: string; mode?: MatteMode };
+  /** Used only as another element's matte: not drawn by itself. */
+  isMatte?: boolean;
+  /** Shape mask (AE mask): a closed path of world points (frame fractions), softened by `feather` (u). */
+  mask?: { points: Point[]; feather?: number; invert?: boolean; expand?: number };
+  /** Motion blur (AE): the element averaged over `shutter` authored seconds before each frame, in `samples` steps. */
+  motionBlur?: { shutter?: number; samples?: number };
 }
+
+export interface Wiggle {
+  /** Wiggles per second. */
+  freq: number;
+  x?: number;
+  y?: number;
+  rot?: number;
+  scale?: number;
+  seed?: number;
+}
+
+export type BlendMode =
+  | 'normal'
+  | 'multiply'
+  | 'screen'
+  | 'overlay'
+  | 'darken'
+  | 'lighten'
+  | 'add'
+  | 'colorDodge'
+  | 'colorBurn'
+  | 'hardLight'
+  | 'softLight'
+  | 'difference'
+  | 'exclusion'
+  | 'hue'
+  | 'saturation'
+  | 'color'
+  | 'luminosity';
+
+export type MatteMode = 'alpha' | 'alphaInverted' | 'luma' | 'lumaInverted';
+
+/** One effect. Number fields may be keyed (tracks). Sizes in u, colours as CSS colours. */
+export type Effect =
+  | { type: 'blur'; amount: Track<number> }
+  | { type: 'glow'; radius: Track<number>; intensity?: Track<number>; color?: string }
+  | { type: 'shadow'; x?: Track<number>; y?: Track<number>; blur?: Track<number>; color?: string; opacity?: Track<number> }
+  | {
+      type: 'color';
+      brightness?: Track<number>;
+      contrast?: Track<number>;
+      saturation?: Track<number>;
+      hue?: Track<number>;
+      sepia?: Track<number>;
+      grayscale?: Track<number>;
+      invert?: Track<number>;
+    }
+  | { type: 'tint'; color: string; amount?: Track<number> }
+  | { type: 'stroke'; width: Track<number>; color?: string }
+  | { type: 'opacityFlicker'; amount: Track<number>; freq?: number };
 
 // ------------------------------------------------------------------ Agent Fox
 

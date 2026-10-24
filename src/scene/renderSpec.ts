@@ -9,6 +9,7 @@ import { lookAt, pointAt, pulse } from '../animation/scenes/helpers';
 import { ELEMENTS, type ElCtx } from './elements';
 import type { ElementBase, FoxElement, Key, LookTarget, SceneElement, SceneSpec, ShotSpec, TitleOverlay } from './spec';
 import { evalBlend, evalNum, evalStep, num } from './tracks';
+import { drawLayer, type Paint } from './layers';
 
 /** Scene light 0..1 at `k` (with an optional flickering stretch, as the lamp in scene 1). */
 export function sceneLight(spec: SceneSpec, k: number): number {
@@ -326,16 +327,12 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
   // Camera cut to the front view: the talking bust fills the frame (see frontShot).
   const front = fox && place && visible(fox) && evalStep(fox.view, k, 'side') === 'front';
   if (front) return frontShot(spec, s, light, fox, place, visible, onScreen);
+  const paint = painter(spec, light);
   withShot(s, cam, () => {
     if (s.probe) s.probe.matrix = g.getTransform();
     for (const el of spec.elements) {
       if (!visible(el) || onScreen(el)) continue;
-      if (isFox(el)) {
-        const p = el === fox && place ? place : foxPlace(el, s);
-        const pose = foxPose(spec, s, light, el, p);
-        if (s.probe) s.probe.anchors.push({ id: el.id, x: p.x, y: p.y, bbox: s.probe.measure ? measureDraw(g, (o) => drawFox(o, pose)) : undefined });
-        drawFox(g, pose);
-      } else drawElement(s, light, el);
+      drawLayer(spec, s, el, paint);
     }
   });
   drawWhip(s, cam);
@@ -350,11 +347,24 @@ export function renderSpec(spec: SceneSpec, s: Stage): SceneOutput {
   return { focus, gloom: (spec.gloom ?? 0) * (1 - light), sepia: spec.sepia ?? 1 };
 }
 
+/** How an element is drawn (by the layer engine, onto the stage it is given). */
+function painter(spec: SceneSpec, light: number): Paint {
+  return (el, st, first) => {
+    if (isFox(el)) {
+      const p = foxPlace(el, st);
+      const pose = foxPose(spec, st, light, el, p);
+      if (first && st.probe) st.probe.anchors.push({ id: el.id, x: p.x, y: p.y, bbox: st.probe.measure ? measureDraw(st.g, (o) => drawFox(o, pose)) : undefined });
+      drawFox(st.g, pose);
+    } else drawElement(st, light, el);
+  };
+}
+
 /** Screen-layer elements (cutaway pictures) and title overlays: above the scene, outside the camera. */
 function drawScreenLayer(spec: SceneSpec, s: Stage, light: number, visible: (el: SceneElement) => boolean, onScreen: (el: SceneElement) => boolean) {
   if (s.probe) s.probe.screen = s.g.getTransform();
   const anchors = s.probe?.anchors.length ?? 0;
-  for (const el of spec.elements) if (visible(el) && onScreen(el) && !isFox(el)) drawElement(s, light, el);
+  const paint = painter(spec, light);
+  for (const el of spec.elements) if (visible(el) && onScreen(el) && !isFox(el)) drawLayer(spec, s, el, paint);
   if (s.probe) for (const a of s.probe.anchors.slice(anchors)) a.screen = true;
   for (const o of spec.overlays ?? []) if (o.kind === 'title') drawTitleOverlay(s, o);
 }
@@ -406,7 +416,8 @@ function frontShot(
     small.setTransform(1, 0, 0, 1, 0, 0);
     small.clearRect(0, 0, sw, sh);
     small.setTransform(new DOMMatrix().scale(sw / W, sh / H).multiply(g.getTransform()));
-    for (const el of spec.elements) if (visible(el) && !onScreen(el) && !isFox(el)) drawElement({ ...s, g: small, probe: undefined }, light, el);
+    const paint = painter(spec, light);
+    for (const el of spec.elements) if (visible(el) && !onScreen(el) && !isFox(el)) drawLayer(spec, { ...s, g: small, probe: undefined }, el, paint);
     soft.setTransform(1, 0, 0, 1, 0, 0);
     soft.clearRect(0, 0, sw, sh);
     soft.filter = `blur(${Math.max(0.6, (5 * u) / BG_DOWN).toFixed(2)}px)`;

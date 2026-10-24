@@ -19,6 +19,10 @@ import {
   type Selection,
 } from './model';
 import { Check, Field, Group, NumField, NumberInput, Select, Text } from './fields';
+import { EaseField } from './EaseField';
+import { LayerPanel } from './LayerPanel';
+import { clipIndex, loadClipIndex } from '../media/clips';
+import { useEffect, useState } from 'react';
 
 type Change = (fn: (p: Project) => Project, key?: string) => void;
 
@@ -134,6 +138,7 @@ function ElementPanel({ el, scene, vertical, onChange, onSelect, specLen, media 
                   </select>
                 </Field>
               );
+            if (info.kind === 'clip') return <ClipField key={name} value={String(v ?? '')} hint={info.desc} onChange={(id) => setParam(name, id)} />;
             if (info.options)
               return (
                 <Field key={name} label={name} hint={info.desc}>
@@ -214,6 +219,27 @@ function ElementPanel({ el, scene, vertical, onChange, onSelect, specLen, media 
         </button>
       </div>
     </>
+  );
+}
+
+/** Animation clip picker (the clip library, public/clips/index.json). */
+function ClipField({ value, hint, onChange }: { value: string; hint: string; onChange(id: string): void }) {
+  const [list, setList] = useState(clipIndex());
+  useEffect(() => {
+    void loadClipIndex().then(setList);
+  }, []);
+  return (
+    <Field label="Animation clip" hint={hint}>
+      <select className="isel" value={value} onChange={(e) => onChange(e.target.value)}>
+        <option value="">— choose —</option>
+        {list.map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.label} · {c.frames} drawings · {c.duration.toFixed(2)} s
+          </option>
+        ))}
+        {value && !list.some((c) => c.id === value) ? <option value={value}>missing clip ({value})</option> : null}
+      </select>
+    </Field>
   );
 }
 
@@ -408,7 +434,7 @@ function KeyPanel({ fox, track, index, scene, onChange, onSelect, ids }: { fox: 
             <NumberInput value={key.dur ?? (track.startsWith('face.') ? 0.4 : 0.38)} step={0.05} min={0} onChange={(dur) => write({ ...key, dur }, 'dur')} />
           </Field>
           <Field label="Easing">
-            <Select value={key.ease ?? (track.startsWith('face.') ? 'smooth' : 'back')} options={['linear', 'smooth', 'in', 'out', 'inOut', 'back', 'bounce'] as const} onChange={(ease) => write({ ...key, ease }, 'ease')} />
+            <EaseField value={key.ease ?? (track.startsWith('face.') ? 'smooth' : 'back')} onChange={(ease) => write({ ...key, ease }, 'ease')} />
           </Field>
         </>
       )}
@@ -549,6 +575,13 @@ export function Inspector({ project, timeline, time, selection, onSelect, onChan
     const el = spec.elements.find((e) => e.id === selection.id);
     if (el?.type === 'fox') body = <FoxPanel fox={el as FoxElement} scene={selection.scene} vertical={vertical} onChange={onChange} onSelect={onSelect} kNow={kNow} ids={ids} />;
     else if (el) body = <ElementPanel el={el} scene={selection.scene} vertical={vertical} onChange={onChange} onSelect={onSelect} specLen={scene.authoredDuration} media={project.media ?? []} />;
+    if (el)
+      body = (
+        <>
+          {body}
+          <LayerPanel el={el} spec={spec} scene={selection.scene} onChange={onChange} />
+        </>
+      );
   } else if (selection.kind === 'shot' && spec?.camera[selection.index]) {
     body = <ShotPanel shot={spec.camera[selection.index]} index={selection.index} scene={selection.scene} vertical={vertical} ids={ids} onChange={onChange} onSelect={onSelect} />;
   } else if (selection.kind === 'action' && fox?.actions?.[selection.index]) {

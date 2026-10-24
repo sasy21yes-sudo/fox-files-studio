@@ -35,7 +35,9 @@ export function LeftPanel({ project, timeline, time, selection, current, onSelec
     const def = ELEMENTS[type];
     const k = Math.max(0, Math.min(scene.authoredDuration, toAuthored(span, time)));
     const id = uniqueId(scene.spec, type);
-    const params: Record<string, unknown> = type === 'puff' || type === 'stamp' ? { at: Math.round(k * 100) / 100 } : {};
+    const now = Math.round(k * 100) / 100;
+    // Things that play from a moment start at the playhead.
+    const params: Record<string, unknown> = type === 'puff' || type === 'stamp' ? { at: now } : type === 'text' || type === 'sprite' ? { start: now } : {};
     const el: SceneElement = { id, type, label: def.label, ...ELEMENT_PLACE[type], ...(Object.keys(params).length ? { params } : {}) };
     onChange((p) =>
       updateSpec(p, si, (spec) => {
