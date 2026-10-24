@@ -1830,11 +1830,96 @@ function drawRigArm(g: G, A: RigArm) {
   if (A.prop === 'hold' && A.phys === 'near') drawHeldPaper(g, h.hx + 60, h.hy - 120);
   drawGloveRig(g, A);
   // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
-  // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
-  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, (t) => 1 + 0.24 * Math.pow(Math.max(0, 1 - t / 0.45), 1.6));
+  drawSleeve(g, A, h);
   // The far arm comes out from under the coat's shoulder; the near arm's rounded top IS the shoulder (master).
   if (A.phys === 'far' && A.layer !== 'behind') placed(g, CAP.far);
   if (A.prop === 'notebook' && A.phys === 'near') anchored(g, 'prop_notebook', h.hx + 95, h.hy - 75, -0.12);
+}
+
+/** The coat of the figure being drawn (set by drawFoxSheetRig once the torso is down), in device px
+ *  minus (ox, oy): what a raised sleeve's root tucks behind. */
+let torsoUnder: ((o: G, ox: number, oy: number) => void) | null = null;
+let SLEEVE_LAYER: CanvasRenderingContext2D | null = null;
+
+/**
+ * The sleeve. Its top is a rounded cap facing away from the hand: on a hanging arm that cap IS the shoulder
+ * (master look), but on a raised arm it would sit on the chest like a sausage end. So, the more the arm is
+ * raised, the more of the sleeve's root behind the shoulder joint goes BEHIND the coat: it is cut away
+ * where the coat itself is painted (its own pixels, soft edges included), and what sticks out beyond the
+ * coat's outline stays as the round of the shoulder. The upper arm's fullness eases off as it rises.
+ */
+function drawSleeve(g: G, A: RigArm, h: ReturnType<typeof hoseHand>) {
+  const tx = h.c[0] - h.S[0];
+  const ty = h.c[1] - h.S[1];
+  const tl = Math.hypot(tx, ty) || 1;
+  const t0: V2 = [tx / tl, ty / tl];
+  // How much the cap lies on the coat: 0 while the arm hangs (the cap faces up: it is the shoulder), 1 once
+  // the arm reaches sideways or up (the cap faces the chest).
+  const up = Math.max(0, Math.min(1, (0.75 - t0[1]) / 0.6));
+  // (the far arm comes out from under the coat's shoulder: a fuller root there reads as a lump)
+  const full = (A.phys === 'far' ? 0.07 : 0.24) * (1 - 0.6 * up);
+  const widen = (t: number) => 1 + full * Math.pow(Math.max(0, 1 - t / 0.45), 1.6);
+  const tuck = torsoUnder;
+  const layer = up > 0.01 && tuck && A.layer !== 'behind' && typeof document !== 'undefined';
+  if (!layer) {
+    noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, widen);
+    return;
+  }
+  const P = rigPart(SLEEVE[A.phys]);
+  const M = g.getTransform();
+  const sc = Math.hypot(M.a, M.b) || 1;
+  const pad = (P.w + (P.ay ?? 0)) * 1.4 * sc + 8;
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  for (const [x, y] of [h.S, h.c, A.hand]) {
+    const q = M.transformPoint({ x, y });
+    x0 = Math.min(x0, q.x);
+    y0 = Math.min(y0, q.y);
+    x1 = Math.max(x1, q.x);
+    y1 = Math.max(y1, q.y);
+  }
+  x0 = Math.floor(x0 - pad);
+  y0 = Math.floor(y0 - pad);
+  const w = Math.ceil(x1 + pad) - x0;
+  const hh = Math.ceil(y1 + pad) - y0;
+  if (!SLEEVE_LAYER) SLEEVE_LAYER = document.createElement('canvas').getContext('2d');
+  const o = SLEEVE_LAYER;
+  if (!o || w <= 0 || hh <= 0 || w * hh > 16e6) {
+    noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, widen);
+    return;
+  }
+  if (o.canvas.width < w || o.canvas.height < hh) {
+    o.canvas.width = Math.max(o.canvas.width, w);
+    o.canvas.height = Math.max(o.canvas.height, hh);
+  }
+  o.setTransform(1, 0, 0, 1, 0, 0);
+  o.globalCompositeOperation = 'source-over';
+  o.clearRect(0, 0, w, hh);
+  o.setTransform(M.a, M.b, M.c, M.d, M.e - x0, M.f - y0);
+  noodle(o, SLEEVE[A.phys], h.S, h.c, A.hand, 0, 1, widen);
+  // Behind the joint (the cap's side), shifted back along the arm by the part of the cap that still shows.
+  const back = (P.ay ?? 0) * (1 - up);
+  const P0: V2 = [h.S[0] - t0[0] * back, h.S[1] - t0[1] * back];
+  const n: V2 = [-t0[1], t0[0]];
+  const F = 1e4;
+  o.save();
+  o.beginPath();
+  o.moveTo(P0[0] + n[0] * F, P0[1] + n[1] * F);
+  o.lineTo(P0[0] - n[0] * F, P0[1] - n[1] * F);
+  o.lineTo(P0[0] - n[0] * F - t0[0] * F, P0[1] - n[1] * F - t0[1] * F);
+  o.lineTo(P0[0] + n[0] * F - t0[0] * F, P0[1] + n[1] * F - t0[1] * F);
+  o.closePath();
+  o.clip();
+  o.globalCompositeOperation = 'destination-out';
+  o.globalAlpha = up;
+  tuck(o, x0, y0);
+  o.restore();
+  g.save();
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(o.canvas, 0, 0, w, hh, x0, y0, w, hh);
+  g.restore();
 }
 
 /** Old-cartoon "multiples": ghost gloves trailing a fast change of pose. */
@@ -1997,6 +2082,7 @@ function drawFoxFrontRig(g: G, pose: FoxPose): void {
 }
 
 function drawFoxSheetRig(g: G, pose: FoxPose): void {
+  torsoUnder = null;
   const time = pose.time;
   const facing = pose.facing ?? 1;
   const walk = clamp(pose.walk ?? 0);
@@ -2146,6 +2232,14 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
   }
   placedWarp(g, 'neck', spineDX);
   placedWarp(g, 'torso', spineDX, 3);
+  {
+    // The coat as drawn, for the arms in front of it: a raised sleeve's root goes behind it.
+    const Mt = g.getTransform();
+    torsoUnder = (o, ox, oy) => {
+      o.setTransform(Mt.a, Mt.b, Mt.c, Mt.d, Mt.e - ox, Mt.f - oy);
+      placedWarp(o, 'torso', spineDX, 3);
+    };
+  }
   if (near.layer === 'front') {
     drawMultiples(g, ps.near, 'near', pose);
     drawRigArm(g, near);
