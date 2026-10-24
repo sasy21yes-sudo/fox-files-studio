@@ -1600,17 +1600,21 @@ interface ArmDef {
   rot?: number;
   flip?: boolean;
   layer: Layer;
+  /** Draw the glove on another layer than the sleeve (e.g. sleeve under the head, hand over the hat). */
+  glove?: Layer;
 }
 const NEAR_MODES: ArmMode[] = ['chin', 'hatChest', 'hold', 'scratch'];
 const FAR_T: Partial<Record<ArmMode, ArmDef>> = {
   rest: { t: [604, 350], hand: 'relaxed', layer: 'behind' },
   point: { t: [0, 0], hand: 'point', layer: 'behind' },
-  magnify: { t: [646, 246], hand: 'fist', rot: -0.55, layer: 'over' },
+  // (gloves drawn with what they hold: no separate prop to interpenetrate the fingers)
+  magnify: { t: [646, 246], hand: 'n_magnifier', rot: -0.55, layer: 'over' },
   wave: { t: [656, 74], hand: 'wave', rot: -0.2, layer: 'behind' },
   shield: { t: [640, 124], hand: 'flat', rot: -1.5, layer: 'over' },
   hips: { t: [604, 322], hand: 'fist', rot: 2.6, layer: 'behind' },
-  tiphat: { t: [612, 118], hand: 'fist', rot: -1.2, layer: 'over' },
-  pencil: { t: [566, 276], hand: 'fist', rot: -2.3, layer: 'front' },
+  // The raised arm passes under the muzzle; only the hand at the brim is in front of the head.
+  tiphat: { t: [612, 118], hand: 'n_fist_tremble', rot: -1.2, layer: 'front', glove: 'over' },
+  pencil: { t: [566, 276], hand: 'n_pencil', rot: -2.3, layer: 'front' },
   notebook: { t: [604, 350], hand: 'relaxed', layer: 'behind' },
   // New gloves (hand_n_*): counting and gestures in front of the chest, master look.
   one: { t: [700, 178], hand: 'n_one', rot: -1.35, layer: 'over' },
@@ -1623,11 +1627,12 @@ const FAR_T: Partial<Record<ArmMode, ArmDef>> = {
 };
 const NEAR_T: Partial<Record<ArmMode, ArmDef>> = {
   rest: { t: [452, 354], hand: 'relaxed', flip: true, layer: 'front' },
-  notebook: { t: [500, 296], hand: 'fist', rot: -0.6, layer: 'front' },
+  // Closed hands in front of the body show the back of the hand (knuckles), not the palm.
+  notebook: { t: [500, 296], hand: 'n_knock', rot: -0.6, layer: 'front' },
   hips: { t: [452, 325], hand: 'fist', rot: 0.5, flip: true, layer: 'front' },
-  chin: { t: [574, 228], hand: 'fist', rot: -1.9, layer: 'over' },
-  hatChest: { t: [540, 300], hand: 'fist', rot: -0.4, layer: 'front' },
-  hold: { t: [512, 300], hand: 'fist', rot: -0.3, layer: 'front' },
+  chin: { t: [574, 228], hand: 'n_chin', rot: -1.9, layer: 'over' },
+  hatChest: { t: [540, 300], hand: 'n_knock', rot: -0.4, layer: 'front' },
+  hold: { t: [512, 300], hand: 'n_knock', rot: -0.3, layer: 'front' },
   scratch: { t: [500, 64], hand: 'open', rot: -2.4, layer: 'over' },
 };
 const SHOULDER: Record<Phys, V2> = { near: J.shoulderBack, far: J.shoulderFront };
@@ -1659,6 +1664,8 @@ interface RigArm {
   b: number;
   flip: boolean;
   layer: Layer;
+  /** The glove's own layer when it differs from the sleeve's. */
+  gloveLayer: Layer | null;
   prop: ArmMode;
 }
 
@@ -1731,6 +1738,7 @@ function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
     b,
     flip: !!D.flip,
     layer: D.layer,
+    gloveLayer: D.glove && D.glove !== D.layer ? D.glove : null,
     prop: mode,
   };
 }
@@ -1825,8 +1833,8 @@ function drawRigArm(g: G, A: RigArm) {
   const h = hoseHand(A);
   const gx = h.hx + Math.cos(h.rot) * 70;
   const gy = h.hy + Math.sin(h.rot) * 70;
-  if (A.prop === 'magnify' && A.phys === 'far') anchored(g, 'prop_magnifier', gx, gy, 0.15);
-  if (A.prop === 'pencil' && A.phys === 'far') anchored(g, 'prop_pencil', gx, gy, -0.9);
+  if (A.prop === 'magnify' && A.phys === 'far' && !A.handName.startsWith('n_magnifier')) anchored(g, 'prop_magnifier', gx, gy, 0.15);
+  if (A.prop === 'pencil' && A.phys === 'far' && !A.handName.startsWith('n_pencil')) anchored(g, 'prop_pencil', gx, gy, -0.9);
   if (A.prop === 'hold' && A.phys === 'near') drawHeldPaper(g, h.hx + 60, h.hy - 120);
   drawGloveRig(g, A);
   // Master look: the upper arm is fuller where it leaves the coat's shoulder, tapering to the forearm.
@@ -1920,6 +1928,30 @@ function drawSleeve(g: G, A: RigArm, h: ReturnType<typeof hoseHand>) {
   g.setTransform(1, 0, 0, 1, 0, 0);
   g.drawImage(o.canvas, 0, 0, w, hh, x0, y0, w, hh);
   g.restore();
+}
+
+/**
+ * The hat taken off (q 0 = on the head, 1 = at the chest): it travels in an arc from the head to the near
+ * hand, turning a little, held by one end of its brim (that point lands under the glove).
+ */
+function drawHatOff(g: G, q: number, hand: V2) {
+  const hp = rigPart('hat');
+  // (by the brim's back end: the hat then hangs in front of the belly, clear of the arm that holds it)
+  const brim: V2 = [hp.x + hp.w * 0.14, hp.y + hp.h * 0.8];
+  const at: V2 = [lerp(brim[0], hand[0] + 4, q), lerp(brim[1], hand[1] + 10, q) - Math.sin(q * Math.PI) * 140];
+  g.save();
+  g.translate(at[0], at[1]);
+  g.rotate(lerp(0, 0.42, q));
+  g.translate(-brim[0], -brim[1]);
+  placed(g, 'hat');
+  g.restore();
+}
+
+/** The part of an arm drawn on the glove's own layer: the glove again, and the sleeve's cuff over its wrist. */
+function drawRigArmGloveLayer(g: G, A: RigArm) {
+  const h = hoseHand(A);
+  drawGloveRig(g, A);
+  noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0.82, 1);
 }
 
 /** Old-cartoon "multiples": ghost gloves trailing a fast change of pose. */
@@ -2240,6 +2272,10 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
       placedWarp(o, 'torso', spineDX, 3);
     };
   }
+  // Hat off: once at the chest it is held by the front of its brim, under the hand that holds it.
+  const hatQ = hatOff > 0 ? easeOut(clamp(hatOff)) : 0;
+  const hatAtChest = hatQ >= 0.6;
+  if (hatAtChest) drawHatOff(g, hatQ, near.hand);
   if (near.layer === 'front') {
     drawMultiples(g, ps.near, 'near', pose);
     drawRigArm(g, near);
@@ -2310,24 +2346,14 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     drawMultiples(g, ps.far, 'far', pose);
     drawRigArm(g, far);
   }
+  if (far.gloveLayer === 'over') drawRigArmGloveLayer(g, far);
+  if (near.gloveLayer === 'over') drawRigArmGloveLayer(g, near);
   if (near.layer === 'over') {
     drawMultiples(g, ps.near, 'near', pose);
     drawRigArm(g, near);
   }
-  if (hatOff > 0) {
-    // The hat travels from the head to the hand at the chest.
-    const q = easeOut(clamp(hatOff));
-    const hp = rigPart('hat');
-    const from: V2 = [hp.x + hp.w / 2, hp.y + hp.h / 2];
-    const to: V2 = [near.hand[0] + 30, near.hand[1] + 40];
-    g.save();
-    g.translate(lerp(from[0], to[0], q), lerp(from[1], to[1], q) - Math.sin(q * Math.PI) * 140);
-    g.rotate(lerp(0, -0.6, q));
-    g.translate(-from[0], -from[1]);
-    placed(g, 'hat');
-    g.restore();
-    if (q > 0.6) anchored(g, 'hand_fist', near.hand[0], near.hand[1], -0.4);
-  }
+  // (on its way from the head it flies over everything)
+  if (hatOff > 0 && !hatAtChest) drawHatOff(g, hatQ, near.hand);
   g.restore();
   g.restore();
 
