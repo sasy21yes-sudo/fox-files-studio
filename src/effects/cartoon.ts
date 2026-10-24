@@ -345,7 +345,9 @@ export function drawCaseHud(g: G, w: number, h: number, u: number, k: number, ke
   g.textBaseline = 'middle';
   g.fillStyle = '#20140b';
   g.font = `700 ${15 * u}px ${FONT_SANS}`;
-  const nl = wrapText(g, key.note.toUpperCase(), pw - ww - 40 * u).slice(0, 3);
+  // (the note changes with the year, halfway through its roll: "1953 / PROGRAM ENDS" was on screen mid-flip)
+  const noteOf = prev && roll < 0.5 ? prev : key;
+  const nl = wrapText(g, noteOf.note.toUpperCase(), pw - ww - 40 * u).slice(0, 3);
   nl.forEach((l, j) => g.fillText(l, wx + ww + 12 * u, ph / 2 + (j - (nl.length - 1) / 2) * 18 * u));
   g.restore();
 }

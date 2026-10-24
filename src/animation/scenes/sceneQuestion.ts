@@ -118,8 +118,9 @@ export const sceneQuestion: SceneRenderer = (s) => {
   });
 
   const yA = V ? h * 0.17 : h * 0.24;
-  const xA = V ? w * 0.28 : w * 0.54;
-  const xB = V ? w * 0.72 : w * 0.82;
+  // (9:16: further apart and a size smaller - the two stamps' captions overlapped, reading "1953 ... PROGRAM ENDS")
+  const xA = V ? w * 0.22 : w * 0.54;
+  const xB = V ? w * 0.78 : w * 0.82;
   const yearsOut = 1 - easeInOut(seg(k, 6.45, 0.3));
   if (yearsOut > 0) {
     g.save();
@@ -136,8 +137,8 @@ export const sceneQuestion: SceneRenderer = (s) => {
       g.strokeStyle = '#f0d38a';
       g.stroke();
     }
-    drawSlamNumber(g, xA, yA, u, '1953', 'PROGRAM BEGINS', k, 4.4, V ? 96 : 104);
-    drawSlamNumber(g, xB, yA, u, '1964', 'PROGRAM ENDS', k, 5.3, V ? 96 : 104);
+    drawSlamNumber(g, xA, yA, u, '1953', 'PROGRAM BEGINS', k, 4.4, V ? 82 : 104);
+    drawSlamNumber(g, xB, yA, u, '1964', 'PROGRAM ENDS', k, 5.3, V ? 82 : 104);
     g.restore();
   }
   const countsOut = 1 - easeInOut(seg(k, 10.0, 0.4));

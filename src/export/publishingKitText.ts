@@ -47,7 +47,7 @@ export const KIT_TEXT: Record<Lang, KitText> = {
     ],
     descriptionHead: 'DESCRIPTION',
     description:
-      'In August 1977, CIA Director Stansfield Turner testified to the U.S. Senate about MKUltra, a CIA research program in behavioral modification that ran from 1953 to 1964. The surviving financial records listed 149 subprojects at 80 institutions, and six subprojects tested drugs on people who did not know. MKUltra files had been destroyed in 1973.',
+      'In August 1977, CIA Director Stansfield Turner testified to the U.S. Senate about MKUltra, a CIA research program in behavioral modification that ran from 1953 to 1964. The surviving financial records listed 149 subprojects and named 80 institutions, and six subprojects tested drugs on people who did not know. MKUltra files had been destroyed in 1973.',
     tagline: 'Agent Fox walks through what the record shows, and what it does not.',
     chapters: 'CHAPTERS',
     sources: 'SOURCES',
@@ -85,7 +85,7 @@ export const KIT_TEXT: Record<Lang, KitText> = {
     ],
     descriptionHead: 'DESCRIZIONE',
     description:
-      "Nell'agosto 1977 il direttore della CIA Stansfield Turner testimoniò davanti al Senato degli Stati Uniti su MKUltra, un programma di ricerca della CIA sulla modifica del comportamento attivo dal 1953 al 1964. I documenti finanziari sopravvissuti elencavano 149 sottoprogetti in 80 istituzioni, e sei sottoprogetti testarono droghe su persone che non lo sapevano. I file di MKUltra erano stati distrutti nel 1973.",
+      "Nell'agosto 1977 il direttore della CIA Stansfield Turner testimoniò davanti al Senato degli Stati Uniti su MKUltra, un programma di ricerca della CIA sulla modifica del comportamento attivo dal 1953 al 1964. I documenti finanziari sopravvissuti elencavano 149 sottoprogetti e citavano 80 istituzioni, e sei sottoprogetti testarono droghe su persone che non lo sapevano. I file di MKUltra erano stati distrutti nel 1973.",
     tagline: "Agent Fox ripercorre ciò che gli atti mostrano, e ciò che non mostrano.",
     chapters: 'CAPITOLI',
     sources: 'FONTI',
@@ -123,7 +123,7 @@ export const KIT_TEXT: Record<Lang, KitText> = {
     ],
     descriptionHead: 'DESCRIPCIÓN',
     description:
-      'En agosto de 1977, el director de la CIA Stansfield Turner declaró ante el Senado de Estados Unidos sobre MKUltra, un programa de investigación de la CIA sobre modificación de la conducta que funcionó de 1953 a 1964. Los registros financieros que sobrevivieron enumeraban 149 subproyectos en 80 instituciones, y seis subproyectos probaron drogas en personas que no lo sabían. Los archivos de MKUltra se habían destruido en 1973.',
+      'En agosto de 1977, el director de la CIA Stansfield Turner declaró ante el Senado de Estados Unidos sobre MKUltra, un programa de investigación de la CIA sobre modificación de la conducta que funcionó de 1953 a 1964. Los registros financieros que sobrevivieron enumeraban 149 subproyectos y nombraban 80 instituciones, y seis subproyectos probaron drogas en personas que no lo sabían. Los archivos de MKUltra se habían destruido en 1973.',
     tagline: 'Agent Fox recorre lo que muestran las actas, y lo que no.',
     chapters: 'CAPÍTULOS',
     sources: 'FUENTES',
@@ -161,7 +161,7 @@ export const KIT_TEXT: Record<Lang, KitText> = {
     ],
     descriptionHead: 'DESCRIPTION',
     description:
-      "En août 1977, le directeur de la CIA Stansfield Turner a témoigné devant le Sénat des États-Unis sur MKUltra, un programme de recherche de la CIA sur la modification du comportement mené de 1953 à 1964. Les dossiers financiers rescapés recensaient 149 sous-projets dans 80 institutions, et six sous-projets ont testé des drogues sur des personnes qui ne le savaient pas. Les dossiers de MKUltra avaient été détruits en 1973.",
+      "En août 1977, le directeur de la CIA Stansfield Turner a témoigné devant le Sénat des États-Unis sur MKUltra, un programme de recherche de la CIA sur la modification du comportement mené de 1953 à 1964. Les dossiers financiers rescapés recensaient 149 sous-projets et citaient 80 institutions, et six sous-projets ont testé des drogues sur des personnes qui ne le savaient pas. Les dossiers de MKUltra avaient été détruits en 1973.",
     tagline: 'Agent Fox parcourt ce que montrent les archives, et ce qu’elles ne montrent pas.',
     chapters: 'CHAPITRES',
     sources: 'SOURCES',
@@ -199,7 +199,7 @@ export const KIT_TEXT: Record<Lang, KitText> = {
     ],
     descriptionHead: 'DESCRIÇÃO',
     description:
-      'Em agosto de 1977, o diretor da CIA Stansfield Turner depôs no Senado dos Estados Unidos sobre o MKUltra, um programa de pesquisa da CIA sobre modificação de comportamento que funcionou de 1953 a 1964. Os registros financeiros que sobreviveram listavam 149 subprojetos em 80 instituições, e seis subprojetos testaram drogas em pessoas que não sabiam. Arquivos do MKUltra tinham sido destruídos em 1973.',
+      'Em agosto de 1977, o diretor da CIA Stansfield Turner depôs no Senado dos Estados Unidos sobre o MKUltra, um programa de pesquisa da CIA sobre modificação de comportamento que funcionou de 1953 a 1964. Os registros financeiros que sobreviveram listavam 149 subprojetos e citavam 80 instituições, e seis subprojetos testaram drogas em pessoas que não sabiam. Arquivos do MKUltra tinham sido destruídos em 1973.',
     tagline: 'Agent Fox percorre o que os registros mostram, e o que não mostram.',
     chapters: 'CAPÍTULOS',
     sources: 'FONTES',

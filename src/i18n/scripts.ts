@@ -51,7 +51,7 @@ const italian: LocalizedScript = {
       title: 'Il fascicolo',
       narration:
         "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA. I suoi documenti erano stati distrutti anni prima. Ma non tutti. Il programma si chiamava MKUltra. Quindi, che cos'era? E come facciamo a saperlo?",
-      keywords: ['1977', 'programma segreto della CIA', 'distrutta', 'MKUltra'],
+      keywords: ['1977', 'programma segreto della CIA', 'distrutti', 'MKUltra'],
       beats: [
         { cue: 'Ma non tutti', kind: 'statement', lines: ['DOCUMENTI: DISTRUTTI NEL 1973', 'ALCUNI: RITROVATI NEL 1977'] },
         { cue: 'come facciamo a saperlo?', kind: 'question', text: "Cos'era? Come lo sappiamo?" },
@@ -323,7 +323,7 @@ const portuguese: LocalizedScript = {
       title: 'O arquivo',
       narration:
         'Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA. Seus arquivos tinham sido destruídos anos antes. Mas não todos. O programa se chamava MKUltra. Então, o que era? E como a gente sabe?',
-      keywords: ['1977', 'programa secreto da CIA', 'destruída', 'MKUltra'],
+      keywords: ['1977', 'programa secreto da CIA', 'destruídos', 'MKUltra'],
       beats: [
         { cue: 'Mas não todos', kind: 'statement', lines: ['ARQUIVOS: DESTRUÍDOS EM 1973', 'ALGUNS: ENCONTRADOS EM 1977'] },
         { cue: 'como a gente sabe?', kind: 'question', text: 'O que era? Como a gente sabe?' },
