@@ -5,7 +5,7 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "pt-pf_dora.mp3",
-"duration": 162.665,
+"duration": 162.75,
 "sentences": {
 "A CIA drogou pessoas que nunca souberam.": [
 0.35,
@@ -21,7 +21,7 @@
 4.5273,
 5.76,
 [
-2.6773
+2.6757
 ]
 ],
 "Seus arquivos tinham sido destruídos anos antes.": [
@@ -58,7 +58,7 @@
 22.3373,
 6.2933,
 [
-2.9172
+2.9155
 ]
 ],
 "São onze anos.": [
@@ -185,21 +185,21 @@
 95.386,
 5.7813,
 [
-3.5065
+3.5045
 ]
 ],
 "A missão dele era descobrir se as agências de inteligência dos Estados Unidos tinham feito algo ilegal, impróprio ou antiético.": [
 101.5173,
 6.2507,
 [
-2.8246
+2.823
 ]
 ],
 "Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do MKUltra num centro de arquivos inativos.": [
 108.118,
 7.616,
 [
-3.6918
+3.6897
 ]
 ],
 "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.": [
@@ -209,65 +209,65 @@
 ],
 "O senador Edward Kennedy disse que a CIA tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.": [
 120.466,
-6.1653,
+6.2933,
 [
-2.5131
+2.9071
 ]
 ],
 "Mas essas caixas nunca foram a história toda.": [
-126.9813,
+127.1093,
 2.176,
 []
 ],
 "Um relatório de 1963 do Inspetor-Geral da CIA levou ao fim dos testes em pessoas desavisadas em 1964.": [
-129.5073,
+129.6353,
 7.4453,
 [
-3.7507
+3.7486
 ]
 ],
 "E em 1973, arquivos do MKUltra foram destruídos com a autorização do então diretor da CIA.": [
-137.3027,
+137.4307,
 5.8453,
 [
-3.1866
+3.1848
 ]
 ],
 "O senador Kennedy disse o nome dele: Richard Helms.": [
-143.498,
-2.5387,
+143.626,
+2.496,
 []
 ],
 "O que sobreviveu foram, principalmente, pastas financeiras.": [
-146.3867,
+146.472,
 2.944,
 []
 ],
 "Adiantamentos, comprovantes, prestações de contas.": [
-149.6807,
+149.766,
 2.56,
 []
 ],
 "Então, o que a gente sabe de verdade?": [
-152.5907,
+152.676,
 1.8773,
 []
 ],
 "O suficiente para mostrar que aconteceu.": [
-154.818,
+154.9033,
 1.9413,
 []
 ],
 "Não o suficiente para saber tudo o que aconteceu.": [
-157.1093,
+157.1947,
 2.304,
 []
 ],
 "Boa parte da história completa talvez nunca seja conhecida.": [
-159.7633,
+159.8487,
 2.9013,
 []
 ]
 },
-"pace": 1.1878
+"pace": 1.1885
 }
