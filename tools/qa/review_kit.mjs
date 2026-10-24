@@ -43,9 +43,11 @@ const kit = await p.evaluate(
     const R = await import('/src/character/rig/rigPuppet.ts');
     await R.loadRig();
     await loadCanvasFonts();
-    const pr = await (await fetch(`/episodes/${EPISODE}.foxproj.json`)).json();
-    const lang = LANG || pr.settings.language;
-    pr.settings.language = lang;
+    const { switchLanguage } = await import('/src/data/project.ts');
+    const saved = await (await fetch(`/episodes/${EPISODE}.foxproj.json`)).json();
+    const lang = LANG || saved.settings.language;
+    // The episode in another language exactly as the studio switches it (narration, titles, pop-ups, voice).
+    const pr = switchLanguage(saved, lang);
     if (ASPECT) pr.settings.aspect = ASPECT;
     await loadProjectMedia(pr);
     const voice = pr.settings.studioVoice?.[lang] ?? STUDIO_VOICES[lang][0].id;
