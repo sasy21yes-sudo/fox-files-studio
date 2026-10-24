@@ -143,7 +143,8 @@ const kit = await p.evaluate(
 );
 
 const out = pos[2] ?? `qa-out/review/${kit.timeline.language}_${kit.timeline.aspect.replace(':', 'x')}`;
-fs.rmSync(out, { recursive: true, force: true });
+// Replace the material, never the team's reports (a whole-folder wipe once deleted round 1's reports).
+for (const f of ['frames', 'sheets', 'mix.wav', 'narration.wav', 'music.wav', 'timeline.json']) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'frames'), { recursive: true });
 fs.mkdirSync(path.join(out, 'sheets'), { recursive: true });
 for (const f of kit.frames) fs.writeFileSync(path.join(out, 'frames', f.name), Buffer.from(f.data.split(',')[1], 'base64'));
