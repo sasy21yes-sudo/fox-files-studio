@@ -5,6 +5,7 @@ import { projectHook, sceneBeats } from '../data/projectText';
 import { SOURCES } from '../data/sources';
 import { STUDIO_VOICES } from '../audio/studioVoices';
 import { IMAGE_STYLES, imageStatus } from './localImage';
+import { loadClipIndex } from '../media/clips';
 import type { Timeline } from '../animation/timeline';
 import { toAuthored } from '../editor/model';
 
@@ -153,6 +154,7 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
     scenes,
     sources,
     media: (project.media ?? []).map((m) => ({ id: m.id, name: m.name, prompt: m.prompt ?? '', width: m.width, height: m.height })),
+    clips: (await loadClipIndex()).map((c) => ({ id: c.id, label: c.label, frames: c.frames, fps: c.fps, duration: c.duration })),
   };
   const r = await fetch('/api/claude/edit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
   const j = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));

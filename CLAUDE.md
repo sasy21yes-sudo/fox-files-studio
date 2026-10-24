@@ -54,6 +54,11 @@ To change a video from a remote Claude Code session: edit the episode JSON, comm
 - Narration: change `scenes[i].narration` freely (facts from the sources only). When the local editor opens the episode, the dev server re-records the missing lines with the episode's studio voice (`tools/vite/voiceRecord.ts`: Kokoro on the CPU, Qwen3 on the GPU) and commits the new pack in `public/voice/` — a remote session never needs audio tools.
 - `.env`: `FOX_EPISODE_GIT=off` (files only), `FOX_EPISODE_PUSH=off` (commit, never push).
 
+## Layers (After Effects features) and frame-by-frame clips
+
+- `src/scene/layers.ts` draws every data-scene element through a layer engine: `parent` (+ invisible `null` elements), `scaleBy`, `wiggle`, `repeat` (loopOut), `blend` modes, `fx` (blur, glow, shadow, color, tint, stroke, opacityFlicker), `mask` (feathered path), `matte` (alpha/luma, inverted; source has `isMatte`), `motionBlur`. Elements without them take the old direct path (pixel-identical). Keys accept Bézier eases `[x1,y1,x2,y2]` and `hold`. New elements: `text` (per-letter animators), `null`, `sprite`. Claude's prompt (`tools/vite/claudeScene.ts`) documents all of it; the Inspector has a Layer panel, an effects stack and a JSON editor.
+- Frame-by-frame clips ("sprite" element): full drawings in `public/clips/<id>/` (atlas.webp + clip.json, index.json), built by `python tools/clips/build_clip.py <frames dir|sheet> --id ...` or from the model sheet → Clips tab. Every drawing is registered to the first on a locked region (default: the feet) with sub-pixel ECC; the build refuses a clip whose residual exceeds `--max-error` (0.25 px). QA sheets in `qa-out/clips/<id>/`. Playback counts exact ticks (fps + per-drawing holds; on twos by default). `demo_wave` is a pipeline test made from rig drawings, not hand-drawn art.
+
 ## Verifying changes
 
 ```bash

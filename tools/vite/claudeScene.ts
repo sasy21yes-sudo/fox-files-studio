@@ -72,6 +72,8 @@ interface EditRequest {
   sources: { id: string; title: string; publisher?: string; date?: string; claims: string[] }[];
   /** The episode's image library (picture elements may only use these ids). */
   media?: { id: string; name: string; prompt: string; width: number; height: number }[];
+  /** The animation clip library (sprite elements may only use these ids). */
+  clips?: { id: string; label: string; frames: number; fps: number; duration: number }[];
 }
 
 interface SceneOut {
@@ -237,7 +239,7 @@ Conventions:
 - Times are "authored seconds" from 0 to the scene's authoredDuration; the studio stretches them to the real scene length. Keep every time inside that range. When a scene lists "Spoken" lines, they say when each subtitle cue is heard in those same authored seconds: use them to land actions, cuts and pictures on words.
 - Positions are fractions of the WIDE frame: x 0 = left edge, 1 = right edge; y 0 = top, 1 = bottom. Sizes marked "u" are layout units (1 u = 1 px at 1080 px on the short side).
 - The scene renders both as 16:9 (YouTube) and 9:16 (Short). Any number may be a plain number (same in both) or {"h": <16:9 value>, "v": <9:16 value>}. In 9:16 the useful area is the central part of the composition: place important things so they work in both, using {h,v} values like the reference.
-- Tracks are lists of keys {"at": t, "value": v, "dur"?: seconds, "ease"?: "linear"|"smooth"|"in"|"out"|"inOut"|"back"|"bounce"}: the value holds until "at", then moves to the new value over "dur" (0 = cut). Keys sorted by "at".
+- Tracks are lists of keys {"at": t, "value": v, "dur"?: seconds, "ease"?: "linear"|"smooth"|"in"|"out"|"inOut"|"back"|"bounce"|"hold"|[x1, y1, x2, y2]}: the value holds until "at", then moves to the new value over "dur" (0 = cut). Keys sorted by "at". A 4-number ease is a cubic Bézier speed curve like After Effects' graph editor / CSS: [0.33, 0, 0.67, 1] = AE Easy Ease, [0.33, 0, 1, 1] = Easy Ease In, [0, 0, 0.67, 1] = Easy Ease Out, [0.6, -0.4, 0.7, 1] = anticipation (pulls back first), [0.3, 1.4, 0.6, 1] = overshoot, [0.1, 0.9, 0.2, 1] = snappy. Use them for cartoon timing: anticipation before a big move, overshoot and settle after it.
 - light: {"keys": [track of 0..1], "flicker"?: {"from","to"}}: rooms, lamps, motes and the film darkness follow it. shake: {"times": [t...], "strength": 10-20}. focus: {"foxFrom": t} = the iris transitions centre on the frame until t, then on Agent Fox's head.
 
 Elements (drawn in list order: first = furthest back; sets first, Agent Fox usually last):
@@ -259,6 +261,20 @@ Agent Fox (type "fox", at most one): x = his feet (frame fraction), y = ground l
 Camera: [{"at", "kind": "wide"|"medium"|"close"|"extreme"|"insert", "target"?: "fox"|elementId, "enter"?: "cut"|"push"|"whip", "sx"?, "sy"? (where the target lands on screen 0..1), "zoom"?, "drift"?, "locked"?, "foxX"?}]. The first shot is at 0. Wide shots ignore target.
 
 Overlays (screen space): [{"kind": "title", "at", "subAt", "y", "maxWidth", "sunburst"?}] = the episode title slam.
+
+# Layers (After Effects features, on ANY element, Agent Fox included)
+- "parent": elementId — follows that element's animated move (dx, dy), turn (rot), "scaleBy" and wiggle, around its resting place (AE parenting). A "null" element is an invisible parent: give several elements the same null parent and animate only the null to move/turn/zoom them together.
+- "scaleBy": number or keys — animated scale multiplier around the element's position (keyed AE Scale; "scale" stays the drawing's size).
+- "wiggle": {"freq", "x"?, "y"? (frame fractions), "rot"? (rad), "scale"? (fraction), "seed"?} — smooth deterministic jitter (AE wiggle). Small values: x/y 0.002-0.01, rot 0.01-0.05.
+- "repeat": {"every", "from"?, "mode"?: "cycle"|"pingpong"} — the element's own keys loop (AE loopOut), e.g. a bob or a swing.
+- "blend": normal|multiply|screen|overlay|darken|lighten|add|colorDodge|colorBurn|hardLight|softLight|difference|exclusion|hue|saturation|color|luminosity — multiply for ink/stamps on paper, screen/add for light, overlay for texture.
+- "fx": [effects in order] — {"type":"blur","amount"} · {"type":"glow","radius","intensity"?,"color"?} · {"type":"shadow","x"?,"y"?,"blur"?,"opacity"?,"color"?} (drop shadow) · {"type":"color","brightness"?,"contrast"?,"saturation"? (1 = unchanged),"hue"? (degrees),"sepia"?,"grayscale"?,"invert"? (0..1)} · {"type":"tint","color","amount"?} · {"type":"stroke","width","color"?} (outline round the whole shape) · {"type":"opacityFlicker","amount","freq"?} (old-film flicker). Sizes in u; any number may be keys.
+- "mask": {"points": [{x, y}...] (world frame fractions, at least 3), "feather"? (u), "invert"?, "expand"? (u)} — shape mask (AE mask).
+- "matte": {"source": elementId, "mode"?: "alpha"|"alphaInverted"|"luma"|"lumaInverted"} — track matte: shown only through (or outside) another element; give that source "isMatte": true so it is not drawn itself (e.g. a scene seen through a keyhole or a spotlight puff).
+- "motionBlur": {"shutter"? (s, default 0.04), "samples"? (2-16)} — for fast moves (whips, throws, falling objects).
+Elements "text" (per-letter animators: typewriter, fade, pop, rise, drop, wave), "null" and "sprite" (frame-by-frame clips) are listed with the other element types. These features are exact and cost nothing when unused: use them where they make a moment better, not everywhere.
+
+Animation clips (element "sprite"): full drawings played one after another (Cuphead-style frame-by-frame), for special moments the puppet cannot do. Only clips from the clip library given in the request; place them like the fox (x, y = the clip's anchor, usually between the feet), "start" = authored second the first drawing shows, and do not show the puppet fox at the same time if the clip is of Agent Fox (use "from"/"to" on both to hand over).
 
 Sound effects: "sfx": [{"at", "sound", "gain"? (0..2, default 1), "pan"? (-1 left .. 1 right), "count"? (repeats), "every"? (seconds between repeats, default 0.12)}] — synthesised by the studio and mixed over the music and the voice, in the preview and the export. Land them exactly on the picture's beats (a key strike on each letter, a stamp on the slam, a whoosh on a whip pan); a few strong ones beat a constant clatter, and keep them out of the way of spoken words when you can. Sounds:
 ${Object.entries(cat.SFX_SOUNDS).map(([k, d]) => `- ${k}: ${d}`).join('\n')}
@@ -342,6 +358,9 @@ function userMessage(r: EditRequest): string {
           .map(([k, d]) => `${k} (${d})`)
           .join('; ')}.`
       : '# Image model\nNot running: no new pictures (only the library).',
+    r.clips?.length
+      ? `# Animation clip library (for sprite elements)\n${r.clips.map((c) => `- ${c.id}: "${c.label}", ${c.frames} drawings, ${c.duration.toFixed(2)} s at ${c.fps} fps`).join('\n')}`
+      : '# Animation clip library\nEmpty: no sprite elements possible.',
     r.media?.length
       ? `# Image library (for picture elements)\n${r.media.map((m) => `- ${m.id}: "${m.name}" ${m.width}x${m.height}${m.prompt ? ` — ${m.prompt}` : ''}`).join('\n')}`
       : '# Image library\nEmpty: no picture elements possible.',
@@ -365,6 +384,10 @@ function checkPictures(spec: unknown, at: string, r: EditRequest, newKeys: Set<s
     if (el.type !== 'picture') continue;
     const id = String(el.params?.media ?? '');
     if (id.startsWith('new:') ? !newKeys.has(id.slice(4)) : !known.has(id)) problems.push(`${at}: picture "${el.id}" uses "${id}", which is neither in the library nor in your images`);
+  }
+  const clips = new Set((r.clips ?? []).map((c) => c.id));
+  for (const el of (spec as { elements?: { type?: string; id?: string; params?: { clip?: unknown } }[] }).elements ?? []) {
+    if (el.type === 'sprite' && !clips.has(String(el.params?.clip ?? ''))) problems.push(`${at}: sprite "${el.id}" uses a clip that is not in the clip library`);
   }
 }
 

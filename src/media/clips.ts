@@ -58,7 +58,8 @@ let index: ClipInfo[] | null = null;
 let indexPromise: Promise<ClipInfo[]> | null = null;
 
 /** Every clip in the library (public/clips/index.json). */
-export function loadClipIndex(): Promise<ClipInfo[]> {
+export function loadClipIndex(fresh = false): Promise<ClipInfo[]> {
+  if (fresh) indexPromise = null;
   indexPromise ??= fetch(`${base}index.json`, { cache: 'no-store' })
     .then((r) => (r.ok ? r.json() : []))
     .catch(() => [])

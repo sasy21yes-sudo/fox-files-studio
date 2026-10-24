@@ -1,0 +1,130 @@
+{
+ "version": 1,
+ "id": "demo_wave",
+ "label": "DEMO \u2014 Agent Fox waves (pipeline test, rig drawings)",
+ "fps": 24,
+ "width": 571,
+ "height": 800,
+ "anchor": [
+  271.0,
+  793.0
+ ],
+ "pxPerU": 1.31167,
+ "loop": "loop",
+ "atlas": "atlas.webp",
+ "frames": [
+  {
+   "x": 0,
+   "y": 0,
+   "w": 530,
+   "h": 791,
+   "ox": 6,
+   "oy": 4,
+   "hold": 2
+  },
+  {
+   "x": 532,
+   "y": 0,
+   "w": 548,
+   "h": 795,
+   "ox": 2,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 1082,
+   "y": 0,
+   "w": 560,
+   "h": 795,
+   "ox": 2,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 1644,
+   "y": 0,
+   "w": 567,
+   "h": 794,
+   "ox": 2,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 797,
+   "w": 560,
+   "h": 794,
+   "ox": 5,
+   "oy": 4,
+   "hold": 2
+  },
+  {
+   "x": 562,
+   "y": 797,
+   "w": 551,
+   "h": 794,
+   "ox": 4,
+   "oy": 4,
+   "hold": 2
+  },
+  {
+   "x": 1115,
+   "y": 797,
+   "w": 536,
+   "h": 794,
+   "ox": 6,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 1653,
+   "y": 797,
+   "w": 524,
+   "h": 794,
+   "ox": 9,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 1593,
+   "w": 523,
+   "h": 795,
+   "ox": 11,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 525,
+   "y": 1593,
+   "w": 533,
+   "h": 794,
+   "ox": 11,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 1060,
+   "y": 1593,
+   "w": 546,
+   "h": 795,
+   "ox": 11,
+   "oy": 3,
+   "hold": 2
+  },
+  {
+   "x": 1608,
+   "y": 1593,
+   "w": 555,
+   "h": 796,
+   "ox": 12,
+   "oy": 2,
+   "hold": 2
+  }
+ ],
+ "report": {
+  "maxError": 0.0648,
+  "meanError": 0.0295,
+  "source": "../../../AppData/Local/Temp/claude/c--Users-Admin-Desktop-Sasy-fox-files-studio/dff38d2f-ca03-4b29-9d6c-cca49a2be04e/scratchpad/clipsrc/jit"
+ }
+}

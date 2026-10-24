@@ -35,7 +35,7 @@ const MEDIA_NAME = /^[\w-]{1,80}\.(png|jpe?g|webp|gif)$/;
 const TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', gif: 'image/gif' };
 const COMMIT_DELAY = 8000;
 /** What the studio commits: the episodes and the voice packs (re-recorded for their narration). */
-const SYNCED = ['episodes', 'public/voice'];
+const SYNCED = ['episodes', 'public/voice', 'public/clips'];
 const POLL = 45000;
 
 interface State {
