@@ -5,7 +5,7 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "es-em_alex.mp3",
-"duration": 197.41,
+"duration": 197.46,
 "sentences": {
 "La CIA drogó a personas que nunca lo supieron.": [
 0.35,
@@ -243,36 +243,36 @@
 ],
 "El senador Kennedy dijo su nombre: Richard Helms.": [
 174.75,
-2.94,
+2.99,
 []
 ],
 "Lo que sobrevivió fueron sobre todo carpetas financieras.": [
-178.04,
+178.09,
 3.28,
 []
 ],
 "Anticipos, comprobantes, rendiciones de cuentas.": [
-181.67,
+181.72,
 2.88,
 []
 ],
 "Entonces, ¿qué sabemos realmente?": [
-184.9,
+184.95,
 2.1,
 []
 ],
 "Lo suficiente para demostrar que ocurrió.": [
-187.35,
+187.4,
 2.32,
 []
 ],
 "No lo suficiente para saber todo lo que ocurrió.": [
-190.02,
+190.07,
 2.84,
 []
 ],
 "Puede que gran parte de la historia completa nunca llegue a conocerse.": [
-193.21,
+193.26,
 3.85,
 []
 ]
