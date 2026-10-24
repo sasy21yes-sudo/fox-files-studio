@@ -125,6 +125,35 @@ def warp_sprite(s, A, W, H):
     return np.clip(w, 0, 255)
 
 
+def ear_warp(f, ears, k):
+    """Secondary action on the ears: each ear (base -> tip, key A coordinates) stretched (k > 1) or squashed
+    (k < 1) along its own axis around its base, fading to nothing just above the base so the skull stays."""
+    if abs(k - 1) < 1e-3 or not ears:
+        return f
+    H, W = f.shape[:2]
+    yy, xx = np.mgrid[0:H, 0:W].astype(np.float32)
+    mx, my = xx.copy(), yy.copy()
+    for bx, by, tx, ty in ears:
+        ax, ay = tx - bx, ty - by
+        ln = float(np.hypot(ax, ay))
+        ux, uy = ax / ln, ay / ln
+        u = (xx - bx) * ux + (yy - by) * uy          # along the ear, 0 at the base
+        v = -(xx - bx) * uy + (yy - by) * ux         # across
+        w = np.clip(u / (0.3 * ln), 0, 1)
+        w = w * w * (3 - 2 * w)
+        side = np.clip(1.6 - np.abs(v) / (0.45 * ln), 0, 1)
+        kk = 1 + (k - 1) * w * side
+        src_u = np.where(u > 0, u / kk, u)
+        mx += (src_u - u) * ux
+        my += (src_u - u) * uy
+    pre = f.copy()
+    pre[..., :3] *= pre[..., 3:] / 255
+    out = cv2.remap(pre, mx, my, cv2.INTER_LANCZOS4, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    out = np.clip(out, 0, 255)
+    out[..., :3] /= np.maximum(out[..., 3:] / 255, 1e-4)
+    return np.clip(out, 0, 255)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('out')
@@ -135,6 +164,8 @@ def main():
     ap.add_argument('--times', default='0,.12,.4,.75,1')
     ap.add_argument('--back', default='')
     ap.add_argument('--holds', default='')
+    ap.add_argument('--ears', default='', help='ears to animate, key A px: "bx,by,tx,ty;..." (base and tip of each)')
+    ap.add_argument('--ear-stretch', default='', help='per drawing ear length (1 = as drawn; <1 pressed, >1 popped up)')
     ap.add_argument('--fine', type=int, default=16, help='FILM drawings between the bare keys (the spacing grid; ComfyUI allows up to 16)')
     ap.add_argument('--debug', action='store_true', help='also write prop_masks.png')
     ap.add_argument('--lock-below', type=float, default=0.72, help='fraction of the height below which every drawing is key A (legs)')
@@ -168,7 +199,7 @@ def main():
     mB = prop_cut(kB, bB)
     near = cv2.dilate((mA | mB).astype(np.uint8), np.ones((15, 15), np.uint8)).astype(bool)
     if a.debug:
-        cv2.imwrite(os.path.join(a.out, 'prop_masks.png'), np.dstack([mA * 255, mB * 255, near * 120]).astype(np.uint8))
+        cv2.imwrite(os.path.join(a.out, '_prop_masks.png'), np.dstack([mA * 255, mB * 255, near * 120]).astype(np.uint8))
     gA, cA = glove(kA, near)
     gB, cB = glove(kB, near)
     if cA is None or cB is None:
@@ -198,16 +229,20 @@ def main():
     fine = [f * mv + kA * (1 - mv) for f in fine]
     kB = kB * mv + kA * (1 - mv)
     if a.debug:
-        cv2.imwrite(os.path.join(a.out, 'moving.png'), (mv[..., 0] * 255).astype(np.uint8))
+        cv2.imwrite(os.path.join(a.out, '_moving.png'), (mv[..., 0] * 255).astype(np.uint8))
 
-    def drawing(s):
-        if s <= 0:
-            return kA
-        if s >= 1:
-            return kB
+    ears = [tuple(float(v) for v in e.split(',')) for e in a.ears.split(';')] if a.ears else []
+
+    def drawing(s, ear=1.0):
+        if abs(ear - 1) < 1e-3:
+            if s <= 0:
+                return kA
+            if s >= 1:
+                return kB
+        s = min(max(s, 0.0), 1.0)
         i = int(round(s * a.fine))
         s = i / a.fine
-        base = fine[i]
+        base = ear_warp(fine[i], ears, ear)
         gm, c = glove(base, near)
         if c is None:
             sys.exit(f'no glove in the in-between at {s:.2f}')
@@ -230,8 +265,10 @@ def main():
     for f in os.listdir(a.out):
         if f.startswith('f') and f.endswith('.png'):
             os.remove(os.path.join(a.out, f))
+    stretch = [float(v) for v in a.ear_stretch.split(',')] if a.ear_stretch else []
+    stretch = (stretch + [1.0] * len(times))[: len(times)]
     for i, s in enumerate(times):
-        cv2.imwrite(os.path.join(a.out, f'f{i:04d}.png'), np.clip(drawing(s), 0, 255).astype(np.uint8))
+        cv2.imwrite(os.path.join(a.out, f'f{i:04d}.png'), np.clip(drawing(s, stretch[i]), 0, 255).astype(np.uint8))
     holds = a.holds or ','.join(['2'] * len(times))
     with open(os.path.join(a.out, 'holds.txt'), 'w') as f:
         f.write(holds)

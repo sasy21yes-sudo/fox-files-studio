@@ -1,0 +1,121 @@
+{
+ "version": 1,
+ "id": "magnify_peek",
+ "label": "Raises the magnifier to his eye",
+ "fps": 24,
+ "width": 604,
+ "height": 728,
+ "anchor": [
+  273.5,
+  723.0
+ ],
+ "pxPerU": 1.19833,
+ "loop": "once",
+ "atlas": "atlas.webp",
+ "frames": [
+  {
+   "x": 0,
+   "y": 0,
+   "w": 593,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 8
+  },
+  {
+   "x": 595,
+   "y": 0,
+   "w": 600,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1197,
+   "y": 0,
+   "w": 571,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1770,
+   "y": 0,
+   "w": 534,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 726,
+   "w": 507,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 509,
+   "y": 726,
+   "w": 516,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1027,
+   "y": 726,
+   "w": 507,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 14
+  },
+  {
+   "x": 1536,
+   "y": 726,
+   "w": 540,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 1452,
+   "w": 573,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 575,
+   "y": 1452,
+   "w": 597,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1174,
+   "y": 1452,
+   "w": 593,
+   "h": 724,
+   "ox": 2,
+   "oy": 2,
+   "hold": 8
+  }
+ ],
+ "report": {
+  "maxError": 0.0,
+  "meanError": 0.0,
+  "source": "../../../AppData/Local/Temp/claude/c--Users-Admin-Desktop-Sasy-fox-files-studio/dff38d2f-ca03-4b29-9d6c-cca49a2be04e/scratchpad/magnify"
+ }
+}

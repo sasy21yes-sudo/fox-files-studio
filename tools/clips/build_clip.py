@@ -36,7 +36,8 @@ def key(bgr):
 
 def load_frames(src, grid):
     if os.path.isdir(src):
-        names = sorted(n for n in os.listdir(src) if n.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')))
+        # (files starting with _ are debug images written next to the drawings)
+        names = sorted(n for n in os.listdir(src) if n.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')) and not n.startswith('_'))
         imgs = [cv2.imread(os.path.join(src, n), cv2.IMREAD_UNCHANGED) for n in names]
     else:
         sheet = cv2.imread(src, cv2.IMREAD_UNCHANGED)

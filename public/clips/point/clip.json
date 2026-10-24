@@ -1,0 +1,121 @@
+{
+ "version": 1,
+ "id": "point",
+ "label": "Points: snap with overshoot",
+ "fps": 24,
+ "width": 690,
+ "height": 710,
+ "anchor": [
+  309.0,
+  706.0
+ ],
+ "pxPerU": 1.17,
+ "loop": "once",
+ "atlas": "atlas.webp",
+ "frames": [
+  {
+   "x": 0,
+   "y": 0,
+   "w": 597,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 6
+  },
+  {
+   "x": 599,
+   "y": 0,
+   "w": 547,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 3
+  },
+  {
+   "x": 1148,
+   "y": 0,
+   "w": 629,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1779,
+   "y": 0,
+   "w": 686,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 708,
+   "w": 661,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 663,
+   "y": 708,
+   "w": 675,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1340,
+   "y": 708,
+   "w": 678,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 16
+  },
+  {
+   "x": 0,
+   "y": 1416,
+   "w": 679,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 681,
+   "y": 1416,
+   "w": 620,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1303,
+   "y": 1416,
+   "w": 592,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 2
+  },
+  {
+   "x": 1897,
+   "y": 1416,
+   "w": 597,
+   "h": 706,
+   "ox": 2,
+   "oy": 2,
+   "hold": 6
+  }
+ ],
+ "report": {
+  "maxError": 0.0,
+  "meanError": 0.0,
+  "source": "../../../AppData/Local/Temp/claude/c--Users-Admin-Desktop-Sasy-fox-files-studio/dff38d2f-ca03-4b29-9d6c-cca49a2be04e/scratchpad/point"
+ }
+}

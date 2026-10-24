@@ -7,6 +7,20 @@
   "duration": 1.0
  },
  {
+  "id": "magnify_peek",
+  "label": "Raises the magnifier to his eye",
+  "frames": 11,
+  "fps": 24,
+  "duration": 1.9167
+ },
+ {
+  "id": "point",
+  "label": "Points: snap with overshoot",
+  "frames": 11,
+  "fps": 24,
+  "duration": 1.875
+ },
+ {
   "id": "tip_hat",
   "label": "Tips his hat",
   "frames": 14,
