@@ -287,8 +287,9 @@ export function drawCaseHud(g: G, w: number, h: number, u: number, k: number, ke
   const pw = (vertical ? 300 : 280) * u;
   const ph = 92 * u;
   // Vertical video keeps the top band clear for app overlays, so the plaque sits above the desk.
-  const x = w - pw - (vertical ? 0.06 * w : 30 * u);
-  const y = vertical ? h * 0.6 : 26 * u;
+  // (9:16: clear of the Shorts/Reels button column on the right - the plaque sat under Like/Comment)
+  const x = w - pw - (vertical ? 0.15 * w : 30 * u);
+  const y = vertical ? h * 0.56 : 26 * u;
   g.save();
   g.translate(x + pw, y);
   g.scale(appear, appear);
