@@ -590,7 +590,7 @@ export function drawFolder(g: G, x: number, y: number, fw: number, fh: number, r
       g.fillStyle = '#1b110a';
       g.fillText(label, fw * 0.49 * cover, -fh * 0.3 + 30 * u);
       g.restore();
-      drawStamp(g, 'DECLASSIFIED', fw * 0.5, fh * 0.12, 24 * u, -0.18, 1);
+      drawStamp(g, 'FOUND IN 1977', fw * 0.5, fh * 0.12, 24 * u, -0.18, 1);
     }
     g.restore();
   }

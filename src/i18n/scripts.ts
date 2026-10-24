@@ -50,10 +50,10 @@ const italian: LocalizedScript = {
     file: {
       title: 'Il fascicolo',
       narration:
-        "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA. La maggior parte dei suoi documenti era stata distrutta anni prima. Ma non tutti. Il programma si chiamava MKUltra. Quindi, che cos'era? E come facciamo a saperlo?",
+        "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA. I suoi documenti erano stati distrutti anni prima. Ma non tutti. Il programma si chiamava MKUltra. Quindi, che cos'era? E come facciamo a saperlo?",
       keywords: ['1977', 'programma segreto della CIA', 'distrutta', 'MKUltra'],
       beats: [
-        { cue: 'Ma non tutti', kind: 'statement', lines: ['QUASI TUTTO: DISTRUTTO', 'QUALCOSA: SOPRAVVISSUTO'] },
+        { cue: 'Ma non tutti', kind: 'statement', lines: ['DOCUMENTI: DISTRUTTI NEL 1973', 'ALCUNI: RITROVATI NEL 1977'] },
         { cue: 'come facciamo a saperlo?', kind: 'question', text: "Cos'era? Come lo sappiamo?" },
       ],
     },
@@ -70,11 +70,11 @@ const italian: LocalizedScript = {
     experiments: {
       title: 'Gli esperimenti',
       narration:
-        "Ma cosa facevano, in concreto, tutti questi sottoprogetti? Il direttore li divise in categorie. Droghe e alcol. Ipnosi. Ricerca sul sonno. Macchina della verità. Gli atti parlano anche di droghe pensate come aiuto negli interrogatori. Tra le droghe testate c'era l'LSD. E qui arriva la parte più importante. Alcune delle persone testate erano volontari. Ad altre non fu mai detto nulla.",
+        "Ma cosa facevano, in concreto, tutti questi sottoprogetti? Il direttore li divise in categorie. Tra queste: droghe e alcol. Ipnosi. Ricerca sul sonno. Macchina della verità. Gli atti parlano anche di droghe pensate come aiuto negli interrogatori. Tra le droghe testate c'era l'LSD. E qui arriva la parte più importante. Alcune delle persone testate erano volontari. Ad altre non fu mai detto nulla.",
       keywords: ['categorie', 'LSD', 'interrogatori', 'volontari', 'non fu mai detto nulla'],
       beats: [
         { cue: 'in concreto', kind: 'question', text: 'Cosa facevano davvero?' },
-        { cue: 'Ricerca sul sonno', kind: 'list', title: 'LE CATEGORIE', items: ['DROGHE E ALCOL', 'IPNOSI', 'RICERCA SUL SONNO', 'MACCHINA DELLA VERITÀ'] },
+        { cue: 'Ricerca sul sonno', kind: 'list', title: 'ALCUNE CATEGORIE', items: ['DROGHE E ALCOL', 'IPNOSI', 'RICERCA SUL SONNO', 'MACCHINA DELLA VERITÀ'] },
         { cue: 'non fu mai detto nulla', kind: 'versus', left: 'VOLONTARI', right: 'MAI AVVISATI', caption: 'Due tipi molto diversi di soggetti' },
       ],
     },
@@ -98,7 +98,7 @@ const italian: LocalizedScript = {
         { cue: 'venne fuori', kind: 'question', text: 'Come venne fuori?' },
         { cue: 'illegale, scorretto o immorale', kind: 'list', items: ['ILLEGALE?', 'SCORRETTO?', 'IMMORALE?'] },
         {
-          cue: 'senza il loro consenso',
+          cue: 'Il senatore Edward Kennedy disse',
           kind: 'record',
           tag: 'SENATO USA · 3 AGO 1977',
           who: 'Sen. Edward Kennedy',
@@ -140,17 +140,17 @@ const spanish: LocalizedScript = {
     file: {
       title: 'El expediente',
       narration:
-        'En 1977, el Senado de Estados Unidos celebró una audiencia sobre un programa secreto de la CIA. La mayoría de sus archivos se habían destruido años antes. Pero no todos. El programa se llamaba MKUltra. Entonces, ¿qué era? ¿Y cómo lo sabemos?',
+        'En 1977, el Senado de Estados Unidos celebró una audiencia sobre un programa secreto de la CIA. Sus archivos se habían destruido años antes. Pero no todos. El programa se llamaba MKUltra. Entonces, ¿qué era? ¿Y cómo lo sabemos?',
       keywords: ['1977', 'programa secreto de la CIA', 'destruido', 'MKUltra'],
       beats: [
-        { cue: 'Pero no todos', kind: 'statement', lines: ['CASI TODO: DESTRUIDO', 'ALGO: SOBREVIVIÓ'] },
+        { cue: 'Pero no todos', kind: 'statement', lines: ['ARCHIVOS: DESTRUIDOS EN 1973', 'ALGUNOS: HALLADOS EN 1977'] },
         { cue: 'cómo lo sabemos?', kind: 'question', text: '¿Qué era? ¿Cómo lo sabemos?' },
       ],
     },
     question: {
       title: 'El registro',
       narration:
-        'Empecemos por lo que la propia CIA le contó al Senado. Según el testimonio del director de la CIA, MKUltra funcionó de 1953 a 1964. Son once años. Los registros que sobrevivieron enumeran 149 subproyectos. Nombran 80 instituciones, y 44 de ellas eran colegios y universidades. También nombran a 185 investigadores y asistentes ajenos al gobierno.',
+        'Empecemos por lo que la propia CIA le contó al Senado. Según el testimonio del director de la CIA, MKUltra funcionó de 1953 a 1964. Son once años. Los registros que sobrevivieron enumeran 149 subproyectos. Nombran 80 instituciones, y 44 de ellas eran universidades y otros centros de educación superior. También nombran a 185 investigadores y asistentes ajenos al gobierno.',
       keywords: ['1953', '1964', 'once años', '149 subproyectos', '80 instituciones', '44', '185'],
       beats: [
         { cue: 'Son once años', kind: 'span', from: '1953', to: '1964', label: '11 AÑOS' },
@@ -160,11 +160,11 @@ const spanish: LocalizedScript = {
     experiments: {
       title: 'Los experimentos',
       narration:
-        'Entonces, ¿qué hacían en realidad todos estos subproyectos? El director los clasificó en categorías. Drogas y alcohol. Hipnosis. Investigación del sueño. Polígrafos. El registro también incluye drogas pensadas como ayuda en los interrogatorios. El LSD estaba entre las drogas probadas. Y esta es la parte que más importa. Algunas de las personas estudiadas eran voluntarias. A otras nunca se lo dijeron.',
+        'Entonces, ¿qué hacían en realidad todos estos subproyectos? El director los clasificó en categorías. Entre ellas: drogas y alcohol. Hipnosis. Investigación del sueño. Polígrafos. El registro también incluye drogas pensadas como ayuda en los interrogatorios. El LSD estaba entre las drogas probadas. Y esta es la parte que más importa. Algunas de las personas estudiadas eran voluntarias. A otras nunca se lo dijeron.',
       keywords: ['categorías', 'LSD', 'interrogatorios', 'voluntarias', 'nunca se lo dijeron'],
       beats: [
         { cue: 'en realidad', kind: 'question', text: '¿Qué hacían en realidad?' },
-        { cue: 'Investigación del sueño', kind: 'list', title: 'LAS CATEGORÍAS', items: ['DROGAS Y ALCOHOL', 'HIPNOSIS', 'INVESTIGACIÓN DEL SUEÑO', 'POLÍGRAFOS'] },
+        { cue: 'Investigación del sueño', kind: 'list', title: 'ALGUNAS CATEGORÍAS', items: ['DROGAS Y ALCOHOL', 'HIPNOSIS', 'INVESTIGACIÓN DEL SUEÑO', 'POLÍGRAFOS'] },
         { cue: 'nunca se lo dijeron', kind: 'versus', left: 'VOLUNTARIOS', right: 'NUNCA LO SUPIERON', caption: 'Dos tipos muy distintos de sujetos de prueba' },
       ],
     },
@@ -188,7 +188,7 @@ const spanish: LocalizedScript = {
         { cue: 'salió todo esto a la luz', kind: 'question', text: '¿Cómo salió a la luz?' },
         { cue: 'ilegal, indebido o poco ético', kind: 'list', items: ['¿ILEGAL?', '¿INDEBIDO?', '¿POCO ÉTICO?'] },
         {
-          cue: 'sin su conocimiento ni su consentimiento',
+          cue: 'El senador Edward Kennedy dijo',
           kind: 'record',
           tag: 'SENADO DE EE. UU. · 3 AGO 1977',
           who: 'Sen. Edward Kennedy',
@@ -228,10 +228,10 @@ const french: LocalizedScript = {
     file: {
       title: 'Le dossier',
       narration:
-        "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA. La plupart de ses archives avaient été détruites des années plus tôt. Mais pas toutes. Le programme s'appelait MKUltra. Alors, qu'est-ce que c'était ? Et comment le sait-on ?",
+        "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA. Ses archives avaient été détruites des années plus tôt. Mais pas toutes. Le programme s'appelait MKUltra. Alors, qu'est-ce que c'était ? Et comment le sait-on ?",
       keywords: ['1977', 'programme secret de la CIA', 'détruites', 'MKUltra'],
       beats: [
-        { cue: 'Mais pas toutes', kind: 'statement', lines: ['PRESQUE TOUT : DÉTRUIT', 'UNE PARTIE : SAUVÉE'] },
+        { cue: 'Mais pas toutes', kind: 'statement', lines: ['ARCHIVES : DÉTRUITES EN 1973', 'UNE PARTIE : RETROUVÉE EN 1977'] },
         { cue: 'comment le sait-on', kind: 'question', text: "C'était quoi ? Comment le sait-on ?" },
       ],
     },
@@ -248,11 +248,11 @@ const french: LocalizedScript = {
     experiments: {
       title: 'Les expériences',
       narration:
-        "Alors, que faisaient concrètement tous ces sous-projets ? Le directeur les a classés par catégories. Drogues et alcool. Hypnose. Recherche sur le sommeil. Détecteurs de mensonge. Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires. Le LSD faisait partie des drogues testées. Et voici le plus important. Certaines des personnes testées étaient volontaires. D'autres n'ont jamais été prévenues.",
+        "Alors, que faisaient concrètement tous ces sous-projets ? Le directeur les a classés par catégories. Parmi elles : drogues et alcool. Hypnose. Recherche sur le sommeil. Détecteurs de mensonge. Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires. Le LSD faisait partie des drogues testées. Et voici le plus important. Certaines des personnes testées étaient volontaires. D'autres n'ont jamais été prévenues.",
       keywords: ['catégories', 'LSD', 'interrogatoires', 'volontaires', 'jamais été prévenues'],
       beats: [
         { cue: 'concrètement', kind: 'question', text: 'Que faisaient-ils vraiment ?' },
-        { cue: 'Recherche sur le sommeil', kind: 'list', title: 'LES CATÉGORIES', items: ['DROGUES ET ALCOOL', 'HYPNOSE', 'SOMMEIL', 'DÉTECTEUR DE MENSONGE'] },
+        { cue: 'Recherche sur le sommeil', kind: 'list', title: 'QUELQUES CATÉGORIES', items: ['DROGUES ET ALCOOL', 'HYPNOSE', 'SOMMEIL', 'DÉTECTEUR DE MENSONGE'] },
         { cue: 'jamais été prévenues', kind: 'versus', left: 'VOLONTAIRES', right: 'JAMAIS PRÉVENUS', caption: 'Deux types de sujets très différents' },
       ],
     },
@@ -276,7 +276,7 @@ const french: LocalizedScript = {
         { cue: 'été découvert', kind: 'question', text: "Comment l'a-t-on su ?" },
         { cue: "d'illégal, d'inapproprié", kind: 'list', items: ['ILLÉGAL ?', 'INAPPROPRIÉ ?', "CONTRAIRE À L'ÉTHIQUE ?"] },
         {
-          cue: 'à leur insu et sans leur consentement',
+          cue: 'Le sénateur Edward Kennedy a déclaré',
           kind: 'record',
           tag: 'SÉNAT DES ÉTATS-UNIS · 3 AOÛT 1977',
           who: 'Sén. Edward Kennedy',
@@ -317,10 +317,10 @@ const portuguese: LocalizedScript = {
     file: {
       title: 'O arquivo',
       narration:
-        'Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA. A maioria dos seus arquivos tinha sido destruída anos antes. Mas não todos. O programa se chamava MKUltra. Então, o que era? E como a gente sabe?',
+        'Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA. Seus arquivos tinham sido destruídos anos antes. Mas não todos. O programa se chamava MKUltra. Então, o que era? E como a gente sabe?',
       keywords: ['1977', 'programa secreto da CIA', 'destruída', 'MKUltra'],
       beats: [
-        { cue: 'Mas não todos', kind: 'statement', lines: ['QUASE TUDO: DESTRUÍDO', 'UMA PARTE: SOBREVIVEU'] },
+        { cue: 'Mas não todos', kind: 'statement', lines: ['ARQUIVOS: DESTRUÍDOS EM 1973', 'ALGUNS: ENCONTRADOS EM 1977'] },
         { cue: 'como a gente sabe?', kind: 'question', text: 'O que era? Como a gente sabe?' },
       ],
     },
@@ -337,11 +337,11 @@ const portuguese: LocalizedScript = {
     experiments: {
       title: 'Os experimentos',
       narration:
-        'Então, o que todos esses subprojetos faziam de verdade? O diretor os dividiu em categorias. Drogas e álcool. Hipnose. Pesquisa sobre o sono. Polígrafos. O registro também fala de drogas pensadas para ajudar em interrogatórios. O LSD estava entre as drogas testadas. E aqui está a parte que mais importa. Algumas das pessoas testadas eram voluntárias. Outras nunca foram avisadas.',
+        'Então, o que todos esses subprojetos faziam de verdade? O diretor os dividiu em categorias. Entre elas: drogas e álcool. Hipnose. Pesquisa sobre o sono. Polígrafos. O registro também fala de drogas pensadas para ajudar em interrogatórios. O LSD estava entre as drogas testadas. E aqui está a parte que mais importa. Algumas das pessoas testadas eram voluntárias. Outras nunca foram avisadas.',
       keywords: ['categorias', 'LSD', 'interrogatórios', 'voluntárias', 'nunca foram avisadas'],
       beats: [
         { cue: 'faziam de verdade', kind: 'question', text: 'O que faziam de verdade?' },
-        { cue: 'Pesquisa sobre o sono', kind: 'list', title: 'AS CATEGORIAS', items: ['DROGAS E ÁLCOOL', 'HIPNOSE', 'PESQUISA DO SONO', 'POLÍGRAFOS'] },
+        { cue: 'Pesquisa sobre o sono', kind: 'list', title: 'ALGUMAS CATEGORIAS', items: ['DROGAS E ÁLCOOL', 'HIPNOSE', 'PESQUISA DO SONO', 'POLÍGRAFOS'] },
         { cue: 'nunca foram avisadas', kind: 'versus', left: 'VOLUNTÁRIOS', right: 'NUNCA AVISADOS', caption: 'Dois tipos bem diferentes de participante' },
       ],
     },
@@ -365,7 +365,7 @@ const portuguese: LocalizedScript = {
         { cue: 'veio à tona', kind: 'question', text: 'Como veio à tona?' },
         { cue: 'ilegal, impróprio ou antiético', kind: 'list', items: ['ILEGAL?', 'IMPRÓPRIO?', 'ANTIÉTICO?'] },
         {
-          cue: 'sem o conhecimento nem o consentimento',
+          cue: 'O senador Edward Kennedy disse',
           kind: 'record',
           tag: 'SENADO DOS EUA · 3 AGO 1977',
           who: 'Sen. Edward Kennedy',

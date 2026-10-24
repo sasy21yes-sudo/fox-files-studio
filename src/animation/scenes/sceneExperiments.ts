@@ -174,7 +174,7 @@ export const sceneExperiments: SceneRenderer = (s) => {
     [
       { label: 'Probably no human testing', value: 17 },
       { label: 'Human volunteers', value: 14 },
-      { label: 'Probably volunteers', value: 19 },
+      { label: 'Probably volunteers (maybe not all)', value: 19 },
       { label: 'Unwitting subjects', value: 6, hot: true },
     ],
     'Categories as listed by DCI Turner, Senate hearing, Aug. 3, 1977',

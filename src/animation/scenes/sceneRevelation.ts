@@ -34,7 +34,8 @@ export const sceneRevelation: SceneRenderer = (s) => {
   const paperIn = seg(k, 1.3, 1.0);
   const fly = easeInOut(seg(k, 4.6, 0.7));
   const npX = lerp(w / 2, A.x, fly);
-  const npY = lerp(V ? h * 0.3 : h * 0.42, A.y, fly);
+  // (9:16: high and smaller, so the newspaper never sits on Agent Fox's head while he talks)
+  const npY = lerp(V ? h * 0.22 : h * 0.42, A.y, fly);
   const npW = lerp((V ? 0.72 : 0.36) * w, cardW, fly);
 
   const cam = resolveCam(s, [
@@ -159,7 +160,7 @@ export const sceneRevelation: SceneRenderer = (s) => {
   drawSlamNumber(g, bScreen.x, Math.min(bScreen.y, h * 0.7), u, '7', 'BOXES OF RECORDS', k, 9.9, V ? 90 : 100);
 
   if (paperIn > 0 && fly < 1) {
-    drawNewspaper(g, npX + (V ? 0 : w * 0.08) * (1 - fly), npY, npW, u * lerp(V ? 1.25 : 1.1, 0.5, fly), paperIn, {
+    drawNewspaper(g, npX + (V ? 0 : w * 0.08) * (1 - fly), npY, npW, u * lerp(V ? 1.0 : 1.1, 0.5, fly), paperIn, {
       masthead: 'THE FOX FILES GAZETTE',
       date: '1975  ·  ILLUSTRATED EDITION',
       headline: 'SENATE SETS UP INTELLIGENCE PROBE',

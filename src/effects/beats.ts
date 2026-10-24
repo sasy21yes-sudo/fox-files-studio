@@ -90,7 +90,9 @@ export function renderBeats(g: G, w: number, h: number, tl: Timeline, sceneIndex
   g.fillRect(0, 0, w, h);
   g.restore();
   const cx = V ? w * 0.5 : w * 0.62;
-  const cy = V ? h * 0.33 : h * 0.42;
+  // 9:16: in the top band, above the character's head (at a third of the height the cards sat on his face in
+  // half the pop-ups - review, 2026-10-24).
+  const cy = V ? h * 0.21 : h * 0.42;
   const W = V ? w * 0.9 : w * 0.56;
   const s = elastic(inP) * (outP < 1 ? 0.6 + 0.4 * outP : 1);
   g.save();
@@ -547,7 +549,8 @@ function drawRecord(D: Draw, b: Extract<Beat, { kind: 'record' }>) {
   g.font = `400 ${size}px ${FONT_TYPE}`;
   const lines = wrapText(g, b.text, w - pad * 2);
   const lh = size * 1.45;
-  const h = 190 * u + lines.length * lh;
+  // (236: header 134 + the note's own line under the text; with 190 the "paraphrased" note sat on the last line)
+  const h = 236 * u + lines.length * lh;
   card(g, -w / 2, -h / 2, w, h, u, '#f2e8d2', -0.008, 4);
   g.save();
   g.rotate(-0.008);

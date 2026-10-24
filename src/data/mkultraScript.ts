@@ -44,12 +44,12 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
     title: 'The File',
     summary: 'A dark room. Agent Fox enters, a folder lands on the desk, and the title appears.',
     narration:
-      'In 1977, the United States Senate held a hearing about a secret CIA program. Most of its files had been destroyed years earlier. But not all of them. The program was called MKUltra. So what was it? And how do we know?',
+      'In 1977, the United States Senate held a hearing about a secret CIA program. Its files had been destroyed years earlier. But not all of them. The program was called MKUltra. So what was it? And how do we know?',
     keywords: ['1977', 'secret CIA program', 'destroyed', 'MKUltra'],
     sourceIds: ['senate-1977'],
     duration: 26,
     beats: [
-      { cue: 'But not all of them', kind: 'statement', lines: ['MOST FILES: DESTROYED', 'SOME: SURVIVED'] },
+      { cue: 'But not all of them', kind: 'statement', lines: ['FILES: DESTROYED IN 1973', 'SOME: FOUND IN 1977'] },
       { cue: 'And how do we know?', kind: 'question', text: 'What was it? How do we know?' },
     ],
   },
@@ -72,13 +72,13 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
     title: 'The Experiments',
     summary: 'A laboratory sketch: a glass vial, paperwork and a reel-to-reel recorder animate into view.',
     narration:
-      'So what were all these subprojects actually doing? The director sorted them into categories. Drugs and alcohol. Hypnosis. Sleep research. Polygraphs. The record also covers drugs meant as aids to interrogation. LSD was among the drugs tested. And here is the part that matters most. Some of the people tested were volunteers. Some were never told.',
+      'So what were all these subprojects actually doing? The director sorted them into categories. Among them: drugs and alcohol. Hypnosis. Sleep research. Polygraphs. The record also covers drugs meant as aids to interrogation. LSD was among the drugs tested. And here is the part that matters most. Some of the people tested were volunteers. Some were never told.',
     keywords: ['categories', 'LSD', 'interrogation', 'volunteers', 'never told'],
     sourceIds: ['senate-1977'],
     duration: 34,
     beats: [
       { cue: 'actually doing?', kind: 'question', text: 'What were they actually doing?' },
-      { cue: 'Sleep research', kind: 'list', title: 'THE CATEGORIES', items: ['DRUGS & ALCOHOL', 'HYPNOSIS', 'SLEEP RESEARCH', 'POLYGRAPHS'] },
+      { cue: 'Sleep research', kind: 'list', title: 'SOME OF THE CATEGORIES', items: ['DRUGS & ALCOHOL', 'HYPNOSIS', 'SLEEP RESEARCH', 'POLYGRAPHS'] },
       { cue: 'Some were never told', kind: 'versus', left: 'VOLUNTEERS', right: 'NEVER TOLD', caption: 'Two very different kinds of test subject' },
     ],
   },
@@ -110,7 +110,8 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
       { cue: 'come out?', kind: 'question', text: 'How did it come out?' },
       { cue: 'illegal, improper or unethical', kind: 'list', items: ['ILLEGAL?', 'IMPROPER?', 'UNETHICAL?'] },
       {
-        cue: 'without their knowledge or consent',
+        // (on the start of the sentence: on its last words the card stayed 2 s - the episode's key line)
+        cue: 'Senator Edward Kennedy said',
         kind: 'record',
         tag: 'U.S. SENATE · AUG 3, 1977',
         who: 'Sen. Edward Kennedy',

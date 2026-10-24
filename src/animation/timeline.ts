@@ -187,8 +187,9 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
     const start = cursor;
     const sentences = splitSentences(scene.narration);
     const voicedScene = !!voice && sentences.some((x) => voice.sentence(x));
-    // Explainer pacing: a real breath between sentences (recorded clips carry a little air of their own).
-    const gap = voicedScene ? 0.42 : 0.45;
+    // Explainer pacing: a breath between sentences (recorded clips carry a little air of their own); 0.42 s
+    // read as dragging once the packs were brought to explainer pace (review, 2026-10-24).
+    const gap = voicedScene ? 0.3 : 0.45;
     let laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, voice);
     const estimatedSpeech = laid.end - start - NARRATION_LEAD_IN;
     let duration = scene.duration;

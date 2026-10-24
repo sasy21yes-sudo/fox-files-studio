@@ -81,14 +81,17 @@ function drawKineticCaption(g: CanvasRenderingContext2D, w: number, h: number, u
   const words = cue.text.toUpperCase().split(/\s+/);
   const totalChars = cue.text.length;
   const lines = wrapText(g, cue.text.toUpperCase(), w * (vertical ? 0.86 : 0.6));
-  const hot = keywords.map((k) => k.toUpperCase());
-  const isHot = (word: string, idx: number) => {
-    const bare = word.replace(/[^\p{Lu}']/gu, '');
-    return hot.some((k) => {
-      const parts = k.split(' ');
-      return parts.includes(bare) && (parts.length === 1 || words.slice(Math.max(0, idx - 1), idx + 2).join(' ').includes(k));
-    });
-  };
+  // Every word of every occurrence of a keyword lights up (a 3-word window around each word only ever matched
+  // the middle word of a 3-word keyword: "DEL" lit, "ATTI" and "SENATO" did not).
+  const bare = (word: string) => word.replace(/[^\p{Lu}\p{N}']/gu, '');
+  const hotIdx = new Set<number>();
+  const plain = words.map(bare);
+  for (const k of keywords.map((x) => x.toUpperCase().split(/\s+/).map(bare))) {
+    for (let i = 0; i + k.length <= plain.length; i++) {
+      if (k.every((p, j) => plain[i + j] === p)) for (let j = 0; j < k.length; j++) hotIdx.add(i + j);
+    }
+  }
+  const isHot = (_word: string, idx: number) => hotIdx.has(idx);
   // Word start times, proportional to character position within the cue.
   let charPos = 0;
   const starts = words.map((wd) => {

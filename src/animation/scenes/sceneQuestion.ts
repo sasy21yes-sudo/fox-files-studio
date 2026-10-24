@@ -7,7 +7,7 @@ import type { SceneRenderer } from '../stage';
 import { foxHead, layout } from './layout';
 import { armTrack, foxShot, insertShot, lookAt, pointAt, popAt, pulse, track, wideShot } from './helpers';
 
-const ARCHIVE_LABELS = ['MKULTRA · SUBPROJECT', 'FINANCE FOLDERS', 'RETIRED RECORDS', 'BEHAVIORAL RESEARCH', 'VOUCHERS · ADVANCES', 'OTS · 1953–1964'];
+const ARCHIVE_LABELS = ['MKULTRA · SUBPROJECT', 'FINANCE FOLDERS', 'RETIRED RECORDS', 'BEHAVIORAL RESEARCH', 'VOUCHERS · ADVANCES', 'MKULTRA · 1953–1964'];
 
 /**
  * Scene 2 — THE QUESTION
@@ -157,7 +157,7 @@ export const sceneQuestion: SceneRenderer = (s) => {
     u * (V ? 1.05 : 1),
     k,
     10.1,
-    'WHERE THE WORK WAS DONE',
+    'THE INSTITUTIONS NAMED',
     [
       { label: 'Colleges & universities', value: 44, hot: true },
       { label: 'Foundations & drug firms', value: 15 },

@@ -35,7 +35,91 @@ export async function mixExportAudio(input: ExportAudioInput): Promise<AudioBuff
     src.connect(g).connect(ctx.destination);
     src.start(0);
   }
-  return ctx.startRendering();
+  return master(await ctx.startRendering());
+}
+
+/** Delivery loudness: YouTube plays everything at about -14 LUFS and turns louder masters down, but never
+ *  turns a quieter one up (the review measured -17.6). */
+export const TARGET_LUFS = -14;
+/** Sample-peak ceiling: 0.5 dB under the -1 dBTP delivery limit leaves room for inter-sample peaks. */
+const CEILING_DBFS = -1.5;
+
+/**
+ * The master stage: the mix brought to TARGET_LUFS (ITU-R BS.1770 integrated loudness), then a look-ahead
+ * peak limiter so the louder mix stays under the ceiling without clipping. In place; returns the buffer.
+ */
+export function master(buf: AudioBuffer): AudioBuffer {
+  const chans = Array.from({ length: buf.numberOfChannels }, (_, c) => buf.getChannelData(c));
+  const lufs = integratedLoudness(chans, buf.sampleRate);
+  if (!Number.isFinite(lufs)) return buf;
+  const gain = Math.pow(10, (TARGET_LUFS - lufs) / 20);
+  const ceil = Math.pow(10, CEILING_DBFS / 20);
+  const n = chans[0].length;
+  // Gain each sample needs so that the louder channel stays under the ceiling.
+  const need = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let p = 0;
+    for (const ch of chans) p = Math.max(p, Math.abs(ch[i] * gain));
+    need[i] = p > ceil ? ceil / p : 1;
+  }
+  // Look ahead 5 ms: the gain starts going down before a peak arrives (ramp over the window), and comes back
+  // up with an 80 ms release, so the limiter neither clicks nor pumps on single transients.
+  const look = Math.max(1, Math.round(0.005 * buf.sampleRate));
+  const rel = 1 - Math.exp(-1 / (0.08 * buf.sampleRate));
+  const env = new Float32Array(n);
+  let g = 1;
+  for (let i = n - 1; i >= 0; i--) {
+    // running minimum of the need over the next `look` samples (computed backwards)
+    env[i] = Math.min(need[i], i + 1 < n ? env[i + 1] + (1 - env[i + 1]) / look : 1);
+  }
+  for (let i = 0; i < n; i++) {
+    g = env[i] < g ? env[i] : g + (env[i] - g) * rel;
+    const k = gain * g;
+    for (const ch of chans) {
+      const v = ch[i] * k;
+      ch[i] = v > ceil ? ceil : v < -ceil ? -ceil : v;
+    }
+  }
+  return buf;
+}
+
+/** ITU-R BS.1770-4 integrated loudness (LUFS) of channels at 48 kHz (K-weighting, 400 ms blocks, gates). */
+export function integratedLoudness(chans: Float32Array[], sampleRate: number): number {
+  if (sampleRate !== 48000) return NaN;
+  // K-weighting: the BS.1770 pre-filter (high shelf) and RLB high-pass, 48 kHz coefficients.
+  const stages = [
+    { b: [1.53512485958697, -2.69169618940638, 1.19839281085285], a: [-1.69065929318241, 0.73248077421585] },
+    { b: [1.0, -2.0, 1.0], a: [-1.99004745483398, 0.99007225036621] },
+  ];
+  const n = chans[0].length;
+  const block = Math.round(0.4 * sampleRate);
+  const hop = Math.round(0.1 * sampleRate);
+  const nb = n >= block ? Math.floor((n - block) / hop) + 1 : 0;
+  if (!nb) return NaN;
+  const power = new Float64Array(nb);
+  for (const ch of chans) {
+    let x = Float64Array.from(ch);
+    for (const { b, a } of stages) {
+      const y = new Float64Array(n);
+      let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+      for (let i = 0; i < n; i++) {
+        const v = b[0] * x[i] + b[1] * x1 + b[2] * x2 - a[0] * y1 - a[1] * y2;
+        x2 = x1; x1 = x[i]; y2 = y1; y1 = v;
+        y[i] = v;
+      }
+      x = y;
+    }
+    // squared-sum prefix for fast block means
+    const pre = new Float64Array(n + 1);
+    for (let i = 0; i < n; i++) pre[i + 1] = pre[i] + x[i] * x[i];
+    for (let j = 0; j < nb; j++) power[j] += (pre[j * hop + block] - pre[j * hop]) / block;
+  }
+  const L = (p: number) => -0.691 + 10 * Math.log10(p);
+  const abs = Array.from(power).filter((p) => L(p) > -70);
+  if (!abs.length) return -Infinity;
+  const rel = L(abs.reduce((s, p) => s + p, 0) / abs.length) - 10;
+  const gated = abs.filter((p) => L(p) > rel);
+  return L(gated.reduce((s, p) => s + p, 0) / gated.length);
 }
 
 export interface LiveAudioStream {

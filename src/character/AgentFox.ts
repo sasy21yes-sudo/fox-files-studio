@@ -1580,7 +1580,9 @@ const VISEME_MOUTH: Record<MouthShape, MouthId> = {
   o: 8,
   u: 7,
   fv: 5,
-  l: 10,
+  // l/t/d/n: tongue behind the teeth, mouth barely open. (mouth_10, the tongue hanging out, read as a panting
+  // dog on every l/t/d/n - even on the grave lines; it stays available as an expression only.)
+  l: 2,
   smile: 11,
   grin: 2,
   frown: 12,
