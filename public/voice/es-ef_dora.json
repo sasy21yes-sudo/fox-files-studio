@@ -5,7 +5,7 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "es-ef_dora.mp3",
-"duration": 194.19,
+"duration": 194.02,
 "sentences": {
 "La CIA drogó a personas que nunca lo supieron.": [
 0.35,
@@ -217,62 +217,62 @@
 ],
 "El senador Edward Kennedy dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.": [
 143.63,
-7.49,
+7.39,
 [
-2.895
+2.795
 ]
 ],
 "Pero esas cajas nunca fueron toda la historia.": [
-151.47,
+151.37,
 2.64,
 []
 ],
 "Un informe de 1963 del Inspector General de la CIA llevó al fin de las pruebas en personas desprevenidas en 1964.": [
-154.46,
+154.36,
 9.34,
 [
 4.245
 ]
 ],
 "Y en 1973, los archivos de MKUltra fueron destruidos con la autorización del entonces director de la CIA.": [
-164.15,
+164.05,
 7.51,
 [
 3.89
 ]
 ],
 "El senador Kennedy dijo su nombre: Richard Helms.": [
-172.01,
-2.96,
+171.91,
+2.89,
 []
 ],
 "Lo que sobrevivió fueron sobre todo carpetas financieras.": [
-175.32,
+175.15,
 3.23,
 []
 ],
 "Anticipos, comprobantes, rendiciones de cuentas.": [
-178.9,
+178.73,
 2.78,
 []
 ],
 "Entonces, ¿qué sabemos realmente?": [
-182.03,
+181.86,
 2.06,
 []
 ],
 "Lo suficiente para demostrar que ocurrió.": [
-184.44,
+184.27,
 2.31,
 []
 ],
 "No lo suficiente para saber todo lo que ocurrió.": [
-187.1,
+186.93,
 2.66,
 []
 ],
 "Puede que gran parte de la historia completa nunca llegue a conocerse.": [
-190.11,
+189.94,
 3.73,
 []
 ]
