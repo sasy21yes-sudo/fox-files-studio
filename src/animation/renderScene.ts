@@ -197,8 +197,10 @@ export function drawSubtitle(g: CanvasRenderingContext2D, w: number, h: number, 
   const vertical = h > w;
   const u = Math.min(w, h) / 1080;
   const safe = safeArea(w, h);
-  const size = (vertical ? 50 : 44) * u * style.fontScale;
-  const maxWidth = w - safe.left - safe.right;
+  // (9:16: 58 - at 50 the captions were ~1.7% of the height, too small on a phone; 16:9: lines kept to ~62% of the
+  // width, they ran to 80 characters - review, 2026-10-24)
+  const size = (vertical ? 58 : 44) * u * style.fontScale;
+  const maxWidth = vertical ? w - safe.left - safe.right : Math.min(w - safe.left - safe.right, w * 0.62);
   const mask = style.highlightKeywords ? keywordMask(cue.text, keywords) : [];
 
   g.save();

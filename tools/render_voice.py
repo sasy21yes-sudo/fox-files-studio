@@ -89,6 +89,8 @@ def main():
         for voice in entry["voices"]:
             if only and f"{lang}:{voice['id']}" not in only and lang not in only:
                 continue
+            if voice.get("packOnly"):
+                continue  # another engine's pack (e.g. Qwen3: tools/render_voice_qwen.py), not a Kokoro voice
             render_pack(lang, voice, entry["sentences"], a.out, a.bitrate, a.model_dir)
 
 

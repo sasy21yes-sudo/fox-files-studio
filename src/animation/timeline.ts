@@ -226,6 +226,12 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
           return t >= c.start && t < c.start + c.duration ? levelOf(c.text, t - c.start) : 0;
         }
       : undefined;
+  // A caption stays up until the next one when the gap is short (the breath between sentences): no flicker of an
+  // empty bottom for 0.3 s, and more time to read each line.
+  for (let i = 0; i + 1 < cues.length; i++) {
+    const gap = cues[i + 1].start - cues[i].end;
+    if (cues[i + 1].sceneIndex === cues[i].sceneIndex && gap > 0 && gap < 0.8) cues[i].end = cues[i + 1].start;
+  }
   return { total: cursor, spans, cues, hook, lang, voiced: clips.length > 0, clips, level };
 }
 

@@ -484,7 +484,7 @@ function ShotPanel({ shot, index, scene, vertical, ids, onChange, onSelect }: { 
         </>
       )}
       <Field label="Zoom" hint="empty = standard framing">
-        <NumberInput value={shot.zoom ?? 0} step={0.05} min={0} max={5} onChange={(zoom) => set({ zoom: zoom || undefined }, 'zoom')} />
+        <NumberInput value={typeof shot.zoom === 'object' ? shot.zoom.h : (shot.zoom ?? 0)} step={0.05} min={0} max={5} onChange={(zoom) => set({ zoom: zoom || undefined }, 'zoom')} />
       </Field>
       <Field label="Drift / s">
         <NumberInput value={shot.drift ?? 0.015} step={0.005} min={0} max={0.2} onChange={(drift) => set({ drift }, 'drift')} />

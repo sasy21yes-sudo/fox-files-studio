@@ -41,8 +41,8 @@ export async function mixExportAudio(input: ExportAudioInput): Promise<AudioBuff
 /** Delivery loudness: YouTube plays everything at about -14 LUFS and turns louder masters down, but never
  *  turns a quieter one up (the review measured -17.6). */
 export const TARGET_LUFS = -14;
-/** Sample-peak ceiling: 0.5 dB under the -1 dBTP delivery limit leaves room for inter-sample peaks. */
-const CEILING_DBFS = -1.5;
+/** Sample-peak ceiling: 1 dB under the -1 dBTP delivery limit (at -1.5 the inter-sample peaks still reached -0.9 dBTP). */
+const CEILING_DBFS = -2;
 
 /**
  * The master stage: the mix brought to TARGET_LUFS (ITU-R BS.1770 integrated loudness), then a look-ahead

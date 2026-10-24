@@ -78,7 +78,8 @@ function targetPoint(spec: SceneSpec, s: Stage, light: number, target: string | 
 function toShot(spec: SceneSpec, s: Stage, light: number, shot: ShotSpec, fox: FoxElement | undefined): Shot {
   const { w, h, vertical: V } = s;
   const base = { at: shot.at, enter: shot.enter, locked: shot.locked };
-  if (shot.kind === 'wide') return { ...base, zoom: shot.zoom ?? 1, ax: w / 2, ay: h / 2, drift: shot.drift ?? 0.01 };
+  const zoomOr = (fb: number) => (shot.zoom !== undefined ? num(shot.zoom, V) : fb);
+  if (shot.kind === 'wide') return { ...base, zoom: zoomOr(1), ax: w / 2, ay: h / 2, drift: shot.drift ?? 0.01 };
   const target = shot.target ?? 'fox';
   if (target === 'fox' && fox) {
     // Same framing as animation/scenes/helpers.ts foxShot().
@@ -87,7 +88,7 @@ function toShot(spec: SceneSpec, s: Stage, light: number, shot: ShotSpec, fox: F
     const face = shot.kind !== 'medium';
     return {
       ...base,
-      zoom: shot.zoom ?? framing(s, shot.kind),
+      zoom: zoomOr(framing(s, shot.kind)),
       ax: fx + (face ? 70 : 40) * f.S,
       ay: f.y - (face ? 400 : 330) * f.S,
       sx: num(shot.sx, V, V ? 0.5 : 0.36),
@@ -98,7 +99,7 @@ function toShot(spec: SceneSpec, s: Stage, light: number, shot: ShotSpec, fox: F
   const p = targetPoint(spec, s, light, target) ?? { x: w / 2, y: h / 2 };
   return {
     ...base,
-    zoom: shot.zoom ?? framing(s, shot.kind),
+    zoom: zoomOr(framing(s, shot.kind)),
     ax: p.x,
     ay: p.y,
     sx: num(shot.sx, V, 0.5),

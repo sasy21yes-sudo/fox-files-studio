@@ -224,7 +224,8 @@ export interface ShotSpec {
   /** Where the target lands on screen (0..1). */
   sx?: Num;
   sy?: Num;
-  zoom?: number;
+  /** Number or {h, v}: one zoom per format (a 9:16 insert often needs less to keep the character whole). */
+  zoom?: Num;
   drift?: number;
   locked?: boolean;
   /** For fox shots: frame the fox at this x instead of where he is at `at`. */

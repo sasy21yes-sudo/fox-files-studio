@@ -43,10 +43,12 @@ export const sceneRevelation: SceneRenderer = (s) => {
     foxShot(s, L, 1.55, 'close', { foxX: restFoxX, sx: 0.22, sy: 0.55 }),
     foxShot(s, L, 2.9, 'medium', { foxX: restFoxX, sx: 0.24, sy: 0.55 }),
     wideShot(s, 4.5, 'whip'),
-    insertShot(s, 5.4, A.x, A.y, { zoom: V ? 1.4 : 1.7, sy: V ? 0.3 : 0.45 }),
-    insertShot(s, 8.45, B.x, B.y, { zoom: V ? 1.4 : 1.6, sy: V ? 0.3 : 0.42 }),
+    // 9:16: the inserts keep Agent Fox whole in the frame with the card (zoomed in, only his glove poked in from
+    // the edge and the captions sat on his face - review, 2026-10-24).
+    insertShot(s, 5.4, A.x, A.y, { zoom: V ? 1.12 : 1.7, sy: V ? 0.22 : 0.45 }),
+    insertShot(s, 8.45, B.x, B.y, { zoom: V ? 1.12 : 1.6, sx: V ? 0.66 : 0.5, sy: V ? 0.24 : 0.42 }),
     wideShot(s, 11.0, 'whip'),
-    insertShot(s, 12.75, C.x, C.y, { zoom: V ? 1.35 : 1.55, sy: V ? 0.35 : 0.5 }),
+    insertShot(s, 12.75, C.x, C.y, { zoom: V ? 1.1 : 1.55, sy: V ? 0.4 : 0.5 }),
     foxShot(s, L, 13.9, 'close', { foxX: restFoxX, sx: 0.32 }),
     wideShot(s, 15.7, 'whip'),
   ]);
