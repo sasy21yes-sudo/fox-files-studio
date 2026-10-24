@@ -8,6 +8,7 @@ import { IMAGE_STYLES, imageStatus } from './localImage';
 import { loadClipIndex } from '../media/clips';
 import type { Timeline } from '../animation/timeline';
 import { toAuthored } from '../editor/model';
+import type { AiFrame } from './frames';
 
 /**
  * Browser side of "edit with a prompt". The request goes to the dev server
@@ -87,7 +88,19 @@ export async function aiStatus(): Promise<AiStatus> {
  * `timeline` (optional) adds when each subtitle cue of the scenes in scope is heard, in the
  * scene's authored seconds, so Claude can time things to words.
  */
-export async function editWithClaude(project: Project, target: AiTarget, prompt: string, signal?: AbortSignal, timeline?: Timeline): Promise<AiResult> {
+export async function editWithClaude(
+  project: Project,
+  target: AiTarget,
+  prompt: string,
+  signal?: AbortSignal,
+  timeline?: Timeline,
+  extra?: {
+    /** Rendered frames of the scenes in scope (Claude looks at them). */
+    frames?: AiFrame[];
+    /** A check of an edit Claude just made: the original instruction and its summary; frames show the result. */
+    review?: { request: string; summary: string };
+  },
+): Promise<AiResult> {
   const lang = project.settings.language;
   // A one-scene edit still sends its neighbours' narration, so Claude knows the story around it.
   const scenes = project.scenes.map((s, index) => ({
@@ -155,6 +168,8 @@ export async function editWithClaude(project: Project, target: AiTarget, prompt:
     sources,
     media: (project.media ?? []).map((m) => ({ id: m.id, name: m.name, prompt: m.prompt ?? '', width: m.width, height: m.height })),
     clips: (await loadClipIndex()).map((c) => ({ id: c.id, label: c.label, frames: c.frames, fps: c.fps, duration: c.duration })),
+    frames: extra?.frames?.map((f) => ({ scene: f.scene, at: f.at, label: f.label, data: f.data })),
+    review: extra?.review ?? null,
   };
   const r = await fetch('/api/claude/edit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
   const j = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));

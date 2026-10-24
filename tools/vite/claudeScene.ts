@@ -74,6 +74,30 @@ interface EditRequest {
   media?: { id: string; name: string; prompt: string; width: number; height: number }[];
   /** The animation clip library (sprite elements may only use these ids). */
   clips?: { id: string; label: string; frames: number; fps: number; duration: number }[];
+  /** Rendered frames of the scenes in scope (JPEG data URLs), labelled with scene and authored second. */
+  frames?: FrameIn[];
+  /** Set when this is a check of an edit just made: frames then show the result of that edit. */
+  review?: { request: string; summary: string } | null;
+}
+
+interface FrameIn {
+  scene: number;
+  at: number;
+  label: string;
+  data: string;
+}
+
+/** A picture for Claude: base64 JPEG and what it shows. */
+interface Picture {
+  label: string;
+  base64: string;
+}
+
+function pictures(r: EditRequest): Picture[] {
+  return (r.frames ?? [])
+    .map((f) => ({ label: f.label, base64: /^data:image\/jpeg;base64,(.+)$/.exec(f.data)?.[1] ?? '' }))
+    .filter((p) => p.base64)
+    .slice(0, 32);
 }
 
 interface SceneOut {
@@ -287,6 +311,8 @@ question {text} · span {from, to, label} · count {value, label, note?} · vers
 "narration" replaces what the voice says in a scene; leave it "" unless the instruction asks to change the words. The studio records new or changed sentences with its narrator voice automatically and keeps the recording of every sentence you leave word-for-word the same, so change only the sentences that need it. Same rules as everything on screen: only facts from the narration you were given or the listed sources, no invented numbers, names, dates or quotes; keep the tone of the series (clear, catchy explainer, short sentences that read well aloud). Pop-up cues must then be phrases of the NEW narration.
 
 # Research
+When frames are attached, look at them: they are the real picture (placement, overlaps, legibility, what the character is doing), rendered by the studio itself. Judge positions by them, not by numbers alone, and say in the summary what you saw that mattered.
+
 You may use web search and web fetch for ideas: cartoon staging and gags, editing rhythm, how explainers keep viewers watching, period look and props. The web is for craft, not for content: a fact you find there never goes on screen or into the narration unless the listed sources support it. Mention in the summary anything useful you found that you could not use.
 
 # Everything else in the studio
@@ -366,9 +392,19 @@ function userMessage(r: EditRequest): string {
       : '# Image library\nEmpty: no picture elements possible.',
     r.sources.length ? `# Sources (by id)\n${r.sources.map((s) => `- ${s.id}: ${s.title}${[s.publisher, s.date].filter(Boolean).map((x) => ` (${x})`).join('')}: ${s.claims.join(' | ')}`).join('\n')}` : '',
     `# Scenes\n${r.scenes.map(scene).join('\n\n')}`,
-    target
-      ? `# Instruction for scene ${target.index + 1} only (index ${target.index})\n"""${r.prompt}"""`
-      : `# Instruction for the whole episode\n"""${r.prompt}"""`,
+    r.frames?.length
+      ? `# Frames\n${r.frames.length} rendered frame(s) of the scene(s) in scope are attached, in this order (exactly what the viewer sees, subtitles included, ${e.aspect}):\n${r.frames.map((f, i) => `${i + 1}. ${f.label}`).join('\n')}`
+      : '',
+    r.review
+      ? [
+          `# Check your edit${target ? ` of scene ${target.index + 1} (index ${target.index})` : ''}`,
+          `You were asked: """${r.review.request}"""`,
+          `You answered and the studio applied it: """${r.review.summary}"""`,
+          'The scenes above are the result, and the attached frames show it. Look at every frame: is the request done, is every text inside the frame and readable, does anything cover a face, another text or the subtitles, does anything look broken or out of place? If it is right, change nothing (no scenes, no new scenes, no images) and start the summary with "OK:" saying what you checked. If not, return only the fixes, and say in the summary what was wrong.',
+        ].join('\n')
+      : target
+        ? `# Instruction for scene ${target.index + 1} only (index ${target.index})\n"""${r.prompt}"""`
+        : `# Instruction for the whole episode\n"""${r.prompt}"""`,
   ]
     .filter(Boolean)
     .join('\n\n');
@@ -626,7 +662,7 @@ interface Answer {
 interface Backend {
   name: 'claude-code' | 'api';
   model: string;
-  ask(system: string, user: string, signal: AbortSignal): Promise<Answer>;
+  ask(system: string, user: string, signal: AbortSignal, pics?: Picture[]): Promise<Answer>;
 }
 
 /** The newest Claude Code binary on this computer: CLAUDE_CODE_BIN, PATH, the native installer, then editor extensions. */
@@ -671,9 +707,20 @@ function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
   return {
     name: 'claude-code',
     model,
-    ask(system, user, signal) {
+    ask(system, user, signal, pics = []) {
       const sysFile = path.join(work, 'system.md');
       fs.writeFileSync(sysFile, system);
+      // Frames go as files the CLI may only Read (nothing else on disk), listed at the end of the message.
+      const frames = path.join(work, 'frames');
+      fs.rmSync(frames, { recursive: true, force: true });
+      if (pics.length) {
+        fs.mkdirSync(frames, { recursive: true });
+        pics.forEach((p, i) => fs.writeFileSync(path.join(frames, `frame${String(i + 1).padStart(2, '0')}.jpg`), Buffer.from(p.base64, 'base64')));
+        user += `\n\n# Frame files\nOpen every frame with the Read tool before answering (paths relative to the working directory):\n${pics
+          .map((p, i) => `- frames/frame${String(i + 1).padStart(2, '0')}.jpg: ${p.label}`)
+          .join('\n')}`;
+      }
+      const tools = [...(web ? ['WebSearch', 'WebFetch'] : []), ...(pics.length ? ['Read'] : [])];
       const args = [
         '-p',
         '--output-format', 'json',
@@ -681,8 +728,9 @@ function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
         '--system-prompt-file', sysFile,
         '--model', model,
         '--effort', 'high',
-        // Web search/fetch only (ideas and references); no file, shell or other tools.
-        ...(web ? ['--tools', 'WebSearch,WebFetch', '--allowedTools', 'WebSearch', 'WebFetch'] : ['--tools', '']),
+        // Web search/fetch (ideas and references) and reading the frames; no other file, shell or other tools.
+        '--tools', tools.join(','),
+        ...(tools.length ? ['--allowedTools', ...tools.map((t) => (t === 'Read' ? 'Read(./frames/**)' : t))] : []),
         '--setting-sources', '',
         '--strict-mcp-config',
         '--disable-slash-commands',
@@ -737,7 +785,12 @@ function apiBackend(client: Anthropic, model: string): Backend {
   return {
     name: 'api',
     model,
-    async ask(system, user, signal) {
+    async ask(system, user, signal, pics = []) {
+      const content: Anthropic.Beta.BetaContentBlockParam[] = [{ type: 'text', text: user }];
+      for (const p of pics) {
+        content.push({ type: 'text', text: p.label });
+        content.push({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: p.base64 } });
+      }
       const stream = client.beta.messages.stream(
         {
           model,
@@ -746,7 +799,7 @@ function apiBackend(client: Anthropic, model: string): Backend {
           fallbacks: 'default',
           output_config: { effort: 'high', format: { type: 'json_schema', schema: REPLY_SCHEMA } },
           system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
-          messages: [{ role: 'user', content: user }],
+          messages: [{ role: 'user', content }],
         },
         { signal },
       );
@@ -778,7 +831,7 @@ function readBody(req: IncomingMessage): Promise<string> {
     req.setEncoding('utf8');
     req.on('data', (c: string) => {
       data += c;
-      if (data.length > 4_000_000) reject(new Error('request too large'));
+      if (data.length > 24_000_000) reject(new Error('request too large'));
     });
     req.on('end', () => resolve(data));
     req.on('error', reject);
@@ -843,9 +896,10 @@ export function claudeScene(): Plugin {
           const sys = await system();
           const usage: Usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
           let user = userMessage(r);
+          const pics = pictures(r);
 
           for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            const a = await backend.ask(sys, user, abort.signal);
+            const a = await backend.ask(sys, user, abort.signal, pics);
             usage.input += a.usage.input;
             usage.output += a.usage.output;
             usage.cacheRead += a.usage.cacheRead;

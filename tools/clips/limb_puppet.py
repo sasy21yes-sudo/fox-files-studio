@@ -66,6 +66,7 @@ def main():
     ap.add_argument('--blend', type=float, default=10, help='softness of the elbow blend (px)')
     ap.add_argument('--cover', type=float, default=0, help='radius (px) around the shoulder where the body covers the turned limb root (0 = off)')
     ap.add_argument('--ink', type=int, default=3, help='outline width (px) drawn where a bend opens the edge')
+    ap.add_argument('--fill-masks', action='store_true', help='write _mask_f####.png of what each drawing made up (for genfill.py)')
     ap.add_argument('--debug', action='store_true')
     a = ap.parse_args()
 
@@ -116,7 +117,10 @@ def main():
     wsrc = (1 / (1 + np.exp(np.clip((seg_dist(xx, yy, E, Wr + (Wr - E) * 4) - du0) / a.blend, -30, 30)))).astype(np.float32)
     poses = [tuple(float(v) for v in p.split(',')) for p in a.poses.split(';')]
 
+    invented = []  # what the current drawing had to make up (for --fill-masks)
+
     def drawing(au, af):
+        invented.clear()
         if abs(au) < 1e-6 and abs(af) < 1e-6:
             return k
         Ru, Rf = rot(au), rot(au + af)
@@ -179,6 +183,9 @@ def main():
             c2 = coat.copy()
             c2[..., 3] = np.where(coat[..., 3] > 230, 255, 0) * disc
             out = over(c2, out)
+            # where the coat's edge meets the turned sleeve's root: a seam to be redrawn
+            ring = (np.abs(np.hypot(xx - S[0], yy - S[1]) - a.cover) < 10) & (out[..., 3] > 128)
+            invented.append(ring & (w[..., 3] > 64))
         return out
 
     def reink(w):
@@ -193,6 +200,7 @@ def main():
         cut = inner & (lum > 70) & ~cv2.dilate(dark.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))).astype(bool)
         ring = cv2.dilate(la.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * a.ink + 1, 2 * a.ink + 1))).astype(bool) & ~la
         need = ring & cv2.dilate(cut.astype(np.uint8), cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * a.ink + 3, 2 * a.ink + 3))).astype(bool)
+        invented.append(cv2.dilate((need | cut).astype(np.uint8), np.ones((9, 9), np.uint8)).astype(bool))
         if not need.any():
             return w
         ink = np.zeros_like(w)
@@ -202,10 +210,13 @@ def main():
 
     os.makedirs(a.out, exist_ok=True)
     for f in os.listdir(a.out):
-        if f.startswith('f') and f.endswith('.png'):
+        if (f.startswith('f') or f.startswith('_mask_f') or f.startswith('_orig_f')) and f.endswith('.png'):
             os.remove(os.path.join(a.out, f))
     for i, (au, af) in enumerate(poses):
         cv2.imwrite(os.path.join(a.out, f'f{i:04d}.png'), np.clip(drawing(au, af), 0, 255).astype(np.uint8))
+        if a.fill_masks and invented:
+            fm = np.any(invented, axis=0)
+            cv2.imwrite(os.path.join(a.out, f'_mask_f{i:04d}.png'), (fm * 255).astype(np.uint8))
     holds = a.holds or ','.join(['2'] * len(poses))
     with open(os.path.join(a.out, 'holds.txt'), 'w') as f:
         f.write(holds)

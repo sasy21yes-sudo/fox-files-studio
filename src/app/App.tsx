@@ -696,7 +696,7 @@ export function App() {
             />
           </main>
           <div className="right-col">
-          <AiPanel project={project} timeline={timeline} scene={selected} onChange={change} onUndo={hist.undo} />
+          <AiPanel project={project} timeline={timeline} scene={selected} onChange={change} onUndo={hist.undo} retime={(p) => buildTimeline(p, undefined, timing)} />
           <FoxMonitor fox={foxLive} />
           {sel.kind === 'scene' ? (
             <PropertiesPanel

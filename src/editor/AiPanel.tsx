@@ -3,6 +3,8 @@ import type { Project } from '../types';
 import type { Timeline } from '../animation/timeline';
 import { aiStatus, editWithClaude, type AiResult, type AiStatus, type AiTarget } from '../ai/claude';
 import { applyClaudeResult, changesAnything, paintImages } from '../ai/applyClaude';
+import { renderFramesForClaude } from '../ai/frames';
+import { loadProjectMedia } from '../media/store';
 
 type Change = (fn: (p: Project) => Project, key?: string) => void;
 
@@ -12,7 +14,13 @@ interface Props {
   scene: number;
   onChange: Change;
   onUndo(): void;
+  /** The timeline of another version of the project (to render the result of an edit). */
+  retime(p: Project): Timeline;
 }
+
+/** Frames per scene Claude sees: more for one scene, fewer per scene for the whole video. */
+const FRAMES_SCENE = 5;
+const FRAMES_ALL = 3;
 
 const EXAMPLES: Record<'scene' | 'all', string[]> = {
   scene: [
@@ -32,7 +40,7 @@ const EXAMPLES: Record<'scene' | 'all', string[]> = {
 
 
 /** "Ask Claude" box: edit the selected scene or the whole episode with a prompt. */
-export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
+export function AiPanel({ project, timeline, scene, onChange, onUndo, retime }: Props) {
   const [status, setStatus] = useState<AiStatus | null>(null);
   const [open, setOpen] = useState(true);
   const [scope, setScope] = useState<'scene' | 'all'>('scene');
@@ -43,6 +51,10 @@ export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
   const [last, setLast] = useState<AiResult | null>(null);
   /** While Claude's new pictures are being painted by the local image model. */
   const [painting, setPainting] = useState<string | null>(null);
+  const [look, setLook] = useState(true);
+  const [check, setCheck] = useState(true);
+  const [review, setReview] = useState<AiResult | null>(null);
+  const [undoSteps, setUndoSteps] = useState(0);
   const [paintFailed, setPaintFailed] = useState<string[]>([]);
   const abort = useRef<AbortController | null>(null);
   const sc = project.scenes[scene];
@@ -65,9 +77,14 @@ export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
     setElapsed(0);
     setError(null);
     setLast(null);
+    setReview(null);
     abort.current = new AbortController();
+    const scenesOf = (p: Project) => (target === 'all' ? p.scenes.map((_, i) => i) : [target]);
+    const per = target === 'all' ? FRAMES_ALL : FRAMES_SCENE;
     try {
-      const result = await editWithClaude(project, target, prompt.trim(), abort.current.signal, timeline);
+      // Claude sees the scenes as they are now (the real picture), not only their data.
+      const frames = look ? renderFramesForClaude(project, timeline, scenesOf(project), per) : undefined;
+      const result = await editWithClaude(project, target, prompt.trim(), abort.current.signal, timeline, { frames });
       setPaintFailed([]);
       let painted = {};
       if (result.images?.length) {
@@ -76,8 +93,31 @@ export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
         setPaintFailed(out.failed);
         setPainting(null);
       }
-      if (changesAnything(result)) onChange((p) => applyClaudeResult(p, result, painted), `ai:${Date.now()}`);
+      let steps = 0;
+      if (changesAnything(result)) {
+        onChange((p) => applyClaudeResult(p, result, painted), `ai:${Date.now()}`);
+        steps = 1;
+      }
       setLast(result);
+      setUndoSteps(steps);
+      // Check pass: Claude looks at the result of its own edit and fixes what is off (one round).
+      if (check && steps) {
+        const next = applyClaudeResult(project, result, painted);
+        await loadProjectMedia(next);
+        const tl = retime(next);
+        const targets = scenesOf(next).filter((i) => i < next.scenes.length);
+        setPainting('Claude is checking the result on the new frames…');
+        const after = renderFramesForClaude(next, tl, targets, per);
+        const fix = await editWithClaude(next, target === 'all' || target < next.scenes.length ? target : 'all', prompt.trim(), abort.current.signal, tl, {
+          frames: after,
+          review: { request: prompt.trim(), summary: result.summary },
+        });
+        if (changesAnything(fix)) {
+          onChange((p) => applyClaudeResult(p, fix, {}), `ai-check:${Date.now()}`);
+          setUndoSteps(2);
+        }
+        setReview(fix);
+      }
     } catch (e) {
       if (!(e instanceof DOMException && e.name === 'AbortError')) setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -143,6 +183,14 @@ export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
                   </button>
                 ))}
               </div>
+              <div className="row gap small">
+                <label className="chk" title="Claude receives rendered frames of the scenes it edits">
+                  <input type="checkbox" checked={look} onChange={(e) => setLook(e.target.checked)} disabled={!!busy} /> Claude sees the frames
+                </label>
+                <label className="chk" title="After the edit, Claude looks at the new frames and fixes what is off (one more round, about twice the time)">
+                  <input type="checkbox" checked={check} onChange={(e) => setCheck(e.target.checked)} disabled={!!busy} /> Check the result
+                </label>
+              </div>
               <div className="iactions">
                 {busy ? (
                   <>
@@ -174,12 +222,20 @@ export function AiPanel({ project, timeline, scene, onChange, onUndo }: Props) {
                     {last.attempts > 1 ? ' (second try)' : ''} · {last.usage.input + last.usage.cacheRead + last.usage.cacheWrite} in / {last.usage.output} out tokens
                   </p>
                   {paintFailed.length > 0 && <p className="warn-text small">Some pictures could not be painted: {paintFailed.join('; ')}</p>}
-                  {changesAnything(last) && (
+                  {review && (
+                    <p className="small">
+                      <strong>Check:</strong> {review.summary}
+                      {changesAnything(review) ? ` (${describeChanges(review).toLowerCase()})` : ''}
+                    </p>
+                  )}
+                  {undoSteps > 0 && (
                     <button
                       className="btn small ghost"
                       onClick={() => {
-                        onUndo();
+                        for (let i = 0; i < undoSteps; i++) onUndo();
                         setLast(null);
+                        setReview(null);
+                        setUndoSteps(0);
                       }}
                     >
                       Undo this change
