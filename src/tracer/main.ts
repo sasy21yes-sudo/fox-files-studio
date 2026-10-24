@@ -13,7 +13,7 @@
  * Space+drag or middle button: pan; wheel: zoom; Ctrl+Z / Ctrl+Shift+Z: undo / redo.
  */
 import { drawFox, drawHeadStill } from '../character/AgentFox';
-import { faceLayout, loadRig } from '../character/rig/rigPuppet';
+import { faceLayout, loadRig, simplify } from '../character/rig/rigPuppet';
 
 type Pt = [number, number];
 interface Anchor {
@@ -750,7 +750,8 @@ function eyesLayout() {
     nearOffset: [r1(S.offsets.near[0] + dn[0]), r1(S.offsets.near[1] + dn[1])],
     farOffset: [r1(S.offsets.far[0] + df[0]), r1(S.offsets.far[1] + df[1])],
     underline: line ? line.map(([x, y]) => [Math.round(((x - farC[0]) / S.unit) * 1e4) / 1e4, Math.round(((y - farC[1]) / S.unit) * 1e4) / 1e4]) : null,
-    tuft: paths['cheek.tuft']?.a.length >= 3 ? samplePath(paths['cheek.tuft'], 6).map(imgToRig).map(([x, y]) => [r1(x), r1(y)]) : null,
+    // simplified: each save would otherwise multiply the points by 6 (they come back as anchors)
+    tuft: paths['cheek.tuft']?.a.length >= 3 ? simplify(samplePath(paths['cheek.tuft'], 6).map(imgToRig), 0.4).map(([x, y]) => [r1(x), r1(y)]) : null,
   };
 }
 

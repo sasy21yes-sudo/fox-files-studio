@@ -454,19 +454,73 @@ export function drawFace(g: G, f: Face) {
  */
 export function drawCheekTuft(g: G) {
   const P = cheekTuft();
-  const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
   if (P.length < 3) return;
-  // Behind the muzzle: nothing of the tuft is drawn over the snout (from its top outline down).
-  const S = snoutRegion();
-  g.save();
-  if (S.length > 2) {
-    g.beginPath();
-    g.rect(-1e5, -1e5, 2e5, 2e5);
-    g.moveTo(S[0][0], S[0][1]);
-    for (const q of S) g.lineTo(q[0], q[1]);
-    g.closePath();
-    g.clip('evenodd');
+  // The tuft is painted on a layer of its own, then goes BEHIND the muzzle: inside the snout region, the
+  // head's own drawing (its fill and its ink, with their soft edges) cuts it away. A geometric cut would
+  // either eat the tuft above the snout's ink (a green gap) or let it cover the ink.
+  const M = g.getTransform();
+  const sc = Math.hypot(M.a, M.b) || 1;
+  const pad = (TUFT_INK * 2 + TUFT_SHINE) * sc + 4;
+  let x0 = Infinity;
+  let y0 = Infinity;
+  let x1 = -Infinity;
+  let y1 = -Infinity;
+  for (const [x, y] of P) {
+    const q = M.transformPoint({ x, y });
+    x0 = Math.min(x0, q.x);
+    y0 = Math.min(y0, q.y);
+    x1 = Math.max(x1, q.x);
+    y1 = Math.max(y1, q.y);
   }
+  x0 = Math.floor(x0 - pad);
+  y0 = Math.floor(y0 - pad);
+  const w = Math.ceil(x1 + pad) - x0;
+  const h = Math.ceil(y1 + pad) - y0;
+  const o = w > 0 && h > 0 && w * h < 16e6 ? tuftLayer(w, h) : null;
+  if (!o) {
+    paintTuft(g, P);
+    return;
+  }
+  o.setTransform(1, 0, 0, 1, 0, 0);
+  o.globalCompositeOperation = 'source-over';
+  o.clearRect(0, 0, w, h);
+  o.setTransform(M.a, M.b, M.c, M.d, M.e - x0, M.f - y0);
+  paintTuft(o, P);
+  const S = snoutRegion();
+  if (S.length > 2 && images.head) {
+    o.save();
+    o.beginPath();
+    o.moveTo(S[0][0], S[0][1]);
+    for (const q of S) o.lineTo(q[0], q[1]);
+    o.closePath();
+    o.clip();
+    o.globalCompositeOperation = 'destination-out';
+    placed(o, 'head');
+    o.restore();
+  }
+  g.save();
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(o.canvas, 0, 0, w, h, x0, y0, w, h);
+  g.restore();
+}
+
+let TUFT_LAYER: CanvasRenderingContext2D | null = null;
+function tuftLayer(w: number, h: number): CanvasRenderingContext2D | null {
+  if (typeof document === 'undefined') return null;
+  if (!TUFT_LAYER) TUFT_LAYER = document.createElement('canvas').getContext('2d');
+  const c = TUFT_LAYER?.canvas;
+  if (!c) return null;
+  if (c.width < w || c.height < h) {
+    c.width = Math.max(c.width, w);
+    c.height = Math.max(c.height, h);
+  }
+  return TUFT_LAYER;
+}
+
+/** The tuft itself: fur fill, ink only outside the head, shine and shade along its own edges. */
+function paintTuft(g: G, P: V2[]) {
+  const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
+  g.save();
   const path = () => {
     g.beginPath();
     g.moveTo(P[0][0], P[0][1]);
@@ -566,7 +620,8 @@ export function snoutRegion(): V2[] {
       const [x1, y1] = clip[(i + 1) % clip.length];
       if ((x0 - x) * (x1 - x) <= 0 && x0 !== x1) {
         const y = y0 + ((y1 - y0) * (x - x0)) / (x1 - x0);
-        if (y >= C[1] - 0.05 * k && y < best) best = y;
+        // (only the snout's own top outline: never up the forehead behind the corner)
+        if (y >= C[1] - SNOUT_INK && y < best) best = y;
       }
     }
     if (Number.isFinite(best)) top.push([x, best - SNOUT_INK]);
@@ -593,11 +648,42 @@ const TUFT_H = 0.5;
 const TUFT_REACH = 0.24;
 const TUFT_TIP_UP = 0.03;
 
+/** A closed outline with its redundant points dropped (Douglas-Peucker, tolerance in rig px): a shape
+ * drawn freehand in the editor arrives with thousands of points, many of them repeated. */
+export function simplify(P: V2[], tol: number): V2[] {
+  const pts = P.filter((p, i) => i === 0 || Math.hypot(p[0] - P[i - 1][0], p[1] - P[i - 1][1]) > 1e-6);
+  if (pts.length < 4) return pts;
+  const keep = new Uint8Array(pts.length);
+  keep[0] = keep[pts.length - 1] = 1;
+  const stack: [number, number][] = [[0, pts.length - 1]];
+  while (stack.length) {
+    const [a, b] = stack.pop()!;
+    const [ax, ay] = pts[a];
+    const [bx, by] = pts[b];
+    const l = Math.hypot(bx - ax, by - ay);
+    let far = -1;
+    let dmax = tol;
+    for (let i = a + 1; i < b; i++) {
+      const [px, py] = pts[i];
+      const d = l > 1e-9 ? Math.abs((bx - ax) * (ay - py) - (ax - px) * (by - ay)) / l : Math.hypot(px - ax, py - ay);
+      if (d > dmax) {
+        dmax = d;
+        far = i;
+      }
+    }
+    if (far >= 0) {
+      keep[far] = 1;
+      stack.push([a, far], [far, b]);
+    }
+  }
+  return pts.filter((_, i) => keep[i]);
+}
+
 /** The tuft as set in the eye editor, else one shaped like the master's, grown from the head's outline. */
 let TUFT: V2[] | null = null;
 function cheekTuft(): V2[] {
   if (TUFT) return TUFT;
-  if (FACE_LAYOUT.tuft?.length) return (TUFT = FACE_LAYOUT.tuft.map((p): V2 => [p[0], p[1]]));
+  if (FACE_LAYOUT.tuft?.length) return (TUFT = simplify(FACE_LAYOUT.tuft.map((p): V2 => [p[0], p[1]]), 0.6));
   const clip = (RIG as unknown as { headClip?: V2[] }).headClip;
   const k = FACE_UNIT;
   const c = SIDE_FACE.centre('far', k);
