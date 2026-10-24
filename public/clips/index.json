@@ -5,5 +5,12 @@
   "frames": 12,
   "fps": 24,
   "duration": 1.0
+ },
+ {
+  "id": "tip_hat",
+  "label": "Tips his hat",
+  "frames": 10,
+  "fps": 24,
+  "duration": 1.6667
  }
 ]

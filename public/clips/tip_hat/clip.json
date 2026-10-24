@@ -1,0 +1,112 @@
+{
+ "version": 1,
+ "id": "tip_hat",
+ "label": "Tips his hat",
+ "fps": 24,
+ "width": 490,
+ "height": 755,
+ "anchor": [
+  259.0,
+  749.0
+ ],
+ "pxPerU": 1.19833,
+ "loop": "once",
+ "atlas": "atlas.webp",
+ "frames": [
+  {
+   "x": 0,
+   "y": 0,
+   "w": 464,
+   "h": 725,
+   "ox": 2,
+   "oy": 28,
+   "hold": 8
+  },
+  {
+   "x": 466,
+   "y": 0,
+   "w": 462,
+   "h": 729,
+   "ox": 2,
+   "oy": 24,
+   "hold": 2
+  },
+  {
+   "x": 930,
+   "y": 0,
+   "w": 462,
+   "h": 748,
+   "ox": 2,
+   "oy": 5,
+   "hold": 2
+  },
+  {
+   "x": 1394,
+   "y": 0,
+   "w": 474,
+   "h": 742,
+   "ox": 2,
+   "oy": 11,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 750,
+   "w": 480,
+   "h": 753,
+   "ox": 2,
+   "oy": 0,
+   "hold": 2
+  },
+  {
+   "x": 482,
+   "y": 750,
+   "w": 486,
+   "h": 750,
+   "ox": 2,
+   "oy": 3,
+   "hold": 10
+  },
+  {
+   "x": 970,
+   "y": 750,
+   "w": 476,
+   "h": 745,
+   "ox": 2,
+   "oy": 8,
+   "hold": 2
+  },
+  {
+   "x": 1448,
+   "y": 750,
+   "w": 462,
+   "h": 753,
+   "ox": 2,
+   "oy": 0,
+   "hold": 2
+  },
+  {
+   "x": 0,
+   "y": 1505,
+   "w": 462,
+   "h": 733,
+   "ox": 2,
+   "oy": 20,
+   "hold": 2
+  },
+  {
+   "x": 464,
+   "y": 1505,
+   "w": 464,
+   "h": 725,
+   "ox": 2,
+   "oy": 28,
+   "hold": 8
+  }
+ ],
+ "report": {
+  "maxError": 0.0003,
+  "meanError": 0.0002,
+  "source": "../../../AppData/Local/Temp/claude/c--Users-Admin-Desktop-Sasy-fox-files-studio/dff38d2f-ca03-4b29-9d6c-cca49a2be04e/scratchpad/tip_hat"
+ }
+}
