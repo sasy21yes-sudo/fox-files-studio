@@ -46,10 +46,10 @@
      ]
     },
     {
-     "text": "Most of its files had been destroyed years earlier.",
-     "say": "Most of its files had been destroyed years earlier.",
+     "text": "Its files had been destroyed years earlier.",
+     "say": "Its files had been destroyed years earlier.",
      "parts": [
-      "Most of its files had been destroyed years earlier."
+      "Its files had been destroyed years earlier."
      ]
     },
     {
@@ -137,10 +137,10 @@
      ]
     },
     {
-     "text": "Drugs and alcohol.",
-     "say": "Drugs and alcohol.",
+     "text": "Among them: drugs and alcohol.",
+     "say": "Among them: drugs and alcohol.",
      "parts": [
-      "Drugs and alcohol."
+      "Among them: drugs and alcohol."
      ]
     },
     {
@@ -380,6 +380,13 @@
   "it": {
    "voices": [
     {
+     "id": "it_qwen_narratore",
+     "label": "Narratore — voce nuova (Qwen3)",
+     "kokoroLang": "it",
+     "speed": 1,
+     "packOnly": true
+    },
+    {
      "id": "im_nicola",
      "label": "Nicola — narratore",
      "kokoroLang": "it",
@@ -416,10 +423,10 @@
      ]
     },
     {
-     "text": "La maggior parte dei suoi documenti era stata distrutta anni prima.",
-     "say": "La maggior parte dei suoi documenti era stata distrutta anni prima.",
+     "text": "I suoi documenti erano stati distrutti anni prima.",
+     "say": "I suoi documenti erano stati distrutti anni prima.",
      "parts": [
-      "La maggior parte dei suoi documenti era stata distrutta anni prima."
+      "I suoi documenti erano stati distrutti anni prima."
      ]
     },
     {
@@ -481,9 +488,9 @@
     },
     {
      "text": "Citano 80 istituzioni, e 44 di queste erano college e università.",
-     "say": "Citano 80 istituzioni, e 44 di queste erano còlleg e università.",
+     "say": "Citano 80 istituzioni, e 44 di queste erano còllegi e università.",
      "parts": [
-      "Citano 80 istituzioni, e 44 di queste erano còlleg e università."
+      "Citano 80 istituzioni, e 44 di queste erano còllegi e università."
      ]
     },
     {
@@ -508,10 +515,10 @@
      ]
     },
     {
-     "text": "Droghe e alcol.",
-     "say": "Droghe e alcol.",
+     "text": "Tra queste: droghe e alcol.",
+     "say": "Tra queste: droghe e alcol.",
      "parts": [
-      "Droghe e alcol."
+      "Tra queste: droghe e alcol."
      ]
     },
     {
@@ -637,17 +644,17 @@
     },
     {
      "text": "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Church.",
-     "say": "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Ciòrc.",
+     "say": "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Ciòrci.",
      "parts": [
       "Nel gennaio 1975, il Senato creò una commissione speciale,",
-      "presieduta dal senatore Frank Ciòrc."
+      "presieduta dal senatore Frank Ciòrci."
      ]
     },
     {
      "text": "Il suo compito era scoprire se le agenzie di intelligence americane avessero fatto qualcosa di illegale, scorretto o immorale.",
-     "say": "Il suo compito era scoprire se le agenzie di intelligence americane avessero fatto qualcosa di illegale, scorretto o immorale.",
+     "say": "Il suo compito era scoprire se le agenzie di intèlligens americane avessero fatto qualcosa di illegale, scorretto o immorale.",
      "parts": [
-      "Il suo compito era scoprire se le agenzie di intelligence",
+      "Il suo compito era scoprire se le agenzie di intèlligens",
       "americane avessero fatto qualcosa di illegale, scorretto o immorale."
      ]
     },
@@ -787,10 +794,10 @@
      ]
     },
     {
-     "text": "La mayoría de sus archivos se habían destruido años antes.",
-     "say": "La mayoría de sus archivos se habían destruido años antes.",
+     "text": "Sus archivos se habían destruido años antes.",
+     "say": "Sus archivos se habían destruido años antes.",
      "parts": [
-      "La mayoría de sus archivos se habían destruido años antes."
+      "Sus archivos se habían destruido años antes."
      ]
     },
     {
@@ -851,10 +858,11 @@
      ]
     },
     {
-     "text": "Nombran 80 instituciones, y 44 de ellas eran colegios y universidades.",
-     "say": "Nombran 80 instituciones, y 44 de ellas eran colegios y universidades.",
+     "text": "Nombran 80 instituciones, y 44 de ellas eran universidades y otros centros de educación superior.",
+     "say": "Nombran 80 instituciones, y 44 de ellas eran universidades y otros centros de educación superior.",
      "parts": [
-      "Nombran 80 instituciones, y 44 de ellas eran colegios y universidades."
+      "Nombran 80 instituciones, y 44 de ellas eran",
+      "universidades y otros centros de educación superior."
      ]
     },
     {
@@ -879,10 +887,10 @@
      ]
     },
     {
-     "text": "Drogas y alcohol.",
-     "say": "Drogas y alcohol.",
+     "text": "Entre ellas: drogas y alcohol.",
+     "say": "Entre ellas: drogas y alcohol.",
      "parts": [
-      "Drogas y alcohol."
+      "Entre ellas: drogas y alcohol."
      ]
     },
     {
@@ -1040,9 +1048,9 @@
     },
     {
      "text": "El senador Edward Kennedy dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.",
-     "say": "El senador Edward Kennedy dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.",
+     "say": "El senador Edward Kénedi dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.",
      "parts": [
-      "El senador Edward Kennedy dijo que la CIA había drogado",
+      "El senador Edward Kénedi dijo que la CIA había drogado",
       "a ciudadanos estadounidenses sin su conocimiento ni su consentimiento."
      ]
     },
@@ -1071,9 +1079,9 @@
     },
     {
      "text": "El senador Kennedy dijo su nombre: Richard Helms.",
-     "say": "El senador Kennedy dijo su nombre: Richard Helms.",
+     "say": "El senador Kénedi dijo su nombre: Richard Jelms.",
      "parts": [
-      "El senador Kennedy dijo su nombre: Richard Helms."
+      "El senador Kénedi dijo su nombre: Richard Jelms."
      ]
     },
     {
@@ -1132,9 +1140,9 @@
    "sentences": [
     {
      "text": "La CIA a drogué des gens qui n'en savaient rien.",
-     "say": "La CIA a drogué des gens qui n'en savaient rien.",
+     "say": "La cé i a a drogué des gens qui n'en savaient rien.",
      "parts": [
-      "La CIA a drogué des gens qui n'en savaient rien."
+      "La cé i a a drogué des gens qui n'en savaient rien."
      ]
     },
     {
@@ -1146,17 +1154,17 @@
     },
     {
      "text": "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA.",
-     "say": "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA.",
+     "say": "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la cé i a.",
      "parts": [
       "En 1977, le Sénat des États-Unis a tenu une",
-      "audition sur un programme secret de la CIA."
+      "audition sur un programme secret de la cé i a."
      ]
     },
     {
-     "text": "La plupart de ses archives avaient été détruites des années plus tôt.",
-     "say": "La plupart de ses archives avaient été détruites des années plus tôt.",
+     "text": "Ses archives avaient été détruites des années plus tôt.",
+     "say": "Ses archives avaient été détruites des années plus tôt.",
      "parts": [
-      "La plupart de ses archives avaient été détruites des années plus tôt."
+      "Ses archives avaient été détruites des années plus tôt."
      ]
     },
     {
@@ -1189,16 +1197,16 @@
     },
     {
      "text": "Commençons par ce que la CIA elle-même a dit au Sénat.",
-     "say": "Commençons par ce que la CIA elle-même a dit au Sénat.",
+     "say": "Commençons par ce que la cé i a elle-même a dit au Sénat.",
      "parts": [
-      "Commençons par ce que la CIA elle-même a dit au Sénat."
+      "Commençons par ce que la cé i a elle-même a dit au Sénat."
      ]
     },
     {
      "text": "Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964.",
-     "say": "Selon le témoignage du directeur de la CIA, ème ka ultra a duré de 1953 à 1964.",
+     "say": "Selon le témoignage du directeur de la cé i a, ème ka ultra a duré de 1953 à 1964.",
      "parts": [
-      "Selon le témoignage du directeur de la CIA,",
+      "Selon le témoignage du directeur de la cé i a,",
       "ème ka ultra a duré de 1953 à 1964."
      ]
     },
@@ -1245,10 +1253,10 @@
      ]
     },
     {
-     "text": "Drogues et alcool.",
-     "say": "Drogues et alcool.",
+     "text": "Parmi elles : drogues et alcool.",
+     "say": "Parmi elles : drogues et alcool.",
      "parts": [
-      "Drogues et alcool."
+      "Parmi elles : drogues et alcool."
      ]
     },
     {
@@ -1353,9 +1361,9 @@
     },
     {
      "text": "En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.",
-     "say": "En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.",
+     "say": "En 1953, lors d'une réunion organisée par la cé i a, on lui a fait prendre du LSD à son insu.",
      "parts": [
-      "En 1953, lors d'une réunion organisée par la CIA,",
+      "En 1953, lors d'une réunion organisée par la cé i a,",
       "on lui a fait prendre du LSD à son insu."
      ]
     },
@@ -1391,25 +1399,25 @@
     },
     {
      "text": "Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un centre d'archives pour dossiers inactifs.",
-     "say": "Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de ème ka ultra dans un centre d'archives pour dossiers inactifs.",
+     "say": "Puis, en 1977, un employé de la cé i a a retrouvé sept cartons d'archives de ème ka ultra dans un centre d'archives pour dossiers inactifs.",
      "parts": [
-      "Puis, en 1977, un employé de la CIA a retrouvé sept",
+      "Puis, en 1977, un employé de la cé i a a retrouvé sept",
       "cartons d'archives de ème ka ultra dans un centre d'archives pour dossiers inactifs."
      ]
     },
     {
      "text": "En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.",
-     "say": "En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.",
+     "say": "En août de la même année, les sénateurs ont interrogé le directeur de la cé i a lors d'une audition conjointe.",
      "parts": [
       "En août de la même année,",
-      "les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe."
+      "les sénateurs ont interrogé le directeur de la cé i a lors d'une audition conjointe."
      ]
     },
     {
      "text": "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.",
-     "say": "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.",
+     "say": "Le sénateur Edward Kennedy a déclaré que la cé i a avait drogué des citoyens américains à leur insu et sans leur consentement.",
      "parts": [
-      "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué",
+      "Le sénateur Edward Kennedy a déclaré que la cé i a avait drogué",
       "des citoyens américains à leur insu et sans leur consentement."
      ]
     },
@@ -1422,18 +1430,18 @@
     },
     {
      "text": "Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.",
-     "say": "Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.",
+     "say": "Un rapport de 1963 de l'inspecteur général de la cé i a a mené à la fin des tests à l'insu des sujets en 1964.",
      "parts": [
-      "Un rapport de 1963 de l'inspecteur général de la CIA a mené",
+      "Un rapport de 1963 de l'inspecteur général de la cé i a a mené",
       "à la fin des tests à l'insu des sujets en 1964."
      ]
     },
     {
      "text": "Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.",
-     "say": "Et en 1973, les dossiers de ème ka ultra ont été détruits sur l'autorité du directeur de la CIA de l'époque.",
+     "say": "Et en 1973, les dossiers de ème ka ultra ont été détruits sur l'autorité du directeur de la cé i a de l'époque.",
      "parts": [
       "Et en 1973, les dossiers de ème ka ultra ont été détruits",
-      "sur l'autorité du directeur de la CIA de l'époque."
+      "sur l'autorité du directeur de la cé i a de l'époque."
      ]
     },
     {
@@ -1505,9 +1513,9 @@
    "sentences": [
     {
      "text": "A CIA drogou pessoas que nunca souberam.",
-     "say": "A CIA drogou pessoas que nunca souberam.",
+     "say": "A cía drogou pessoas que nunca souberam.",
      "parts": [
-      "A CIA drogou pessoas que nunca souberam."
+      "A cía drogou pessoas que nunca souberam."
      ]
     },
     {
@@ -1519,17 +1527,17 @@
     },
     {
      "text": "Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA.",
-     "say": "Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA.",
+     "say": "Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da cía.",
      "parts": [
       "Em 1977, o Senado dos Estados Unidos fez",
-      "uma audiência sobre um programa secreto da CIA."
+      "uma audiência sobre um programa secreto da cía."
      ]
     },
     {
-     "text": "A maioria dos seus arquivos tinha sido destruída anos antes.",
-     "say": "A maioria dos seus arquivos tinha sido destruída anos antes.",
+     "text": "Seus arquivos tinham sido destruídos anos antes.",
+     "say": "Seus arquivos tinham sido destruídos anos antes.",
      "parts": [
-      "A maioria dos seus arquivos tinha sido destruída anos antes."
+      "Seus arquivos tinham sido destruídos anos antes."
      ]
     },
     {
@@ -1562,16 +1570,16 @@
     },
     {
      "text": "Vamos começar pelo que a própria CIA contou ao Senado.",
-     "say": "Vamos começar pelo que a própria CIA contou ao Senado.",
+     "say": "Vamos começar pelo que a própria cía contou ao Senado.",
      "parts": [
-      "Vamos começar pelo que a própria CIA contou ao Senado."
+      "Vamos começar pelo que a própria cía contou ao Senado."
      ]
     },
     {
      "text": "Segundo o depoimento do diretor da CIA, o MKUltra funcionou de 1953 a 1964.",
-     "say": "Segundo o depoimento do diretor da CIA, o eme cá ultra funcionou de 1953 a 1964.",
+     "say": "Segundo o depoimento do diretor da cía, o eme cá ultra funcionou de 1953 a 1964.",
      "parts": [
-      "Segundo o depoimento do diretor da CIA,",
+      "Segundo o depoimento do diretor da cía,",
       "o eme cá ultra funcionou de 1953 a 1964."
      ]
     },
@@ -1618,10 +1626,10 @@
      ]
     },
     {
-     "text": "Drogas e álcool.",
-     "say": "Drogas e álcool.",
+     "text": "Entre elas: drogas e álcool.",
+     "say": "Entre elas: drogas e álcool.",
      "parts": [
-      "Drogas e álcool."
+      "Entre elas: drogas e álcool."
      ]
     },
     {
@@ -1724,9 +1732,9 @@
     },
     {
      "text": "Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber.",
-     "say": "Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber.",
+     "say": "Em 1953, numa reunião convocada pela cía, ele recebeu LSD sem saber.",
      "parts": [
-      "Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber."
+      "Em 1953, numa reunião convocada pela cía, ele recebeu LSD sem saber."
      ]
     },
     {
@@ -1761,24 +1769,24 @@
     },
     {
      "text": "Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do MKUltra num centro de arquivos inativos.",
-     "say": "Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do eme cá ultra num centro de arquivos inativos.",
+     "say": "Depois, em 1977, um funcionário da cía encontrou sete caixas de registros do eme cá ultra num centro de arquivos inativos.",
      "parts": [
-      "Depois, em 1977, um funcionário da CIA encontrou sete caixas",
+      "Depois, em 1977, um funcionário da cía encontrou sete caixas",
       "de registros do eme cá ultra num centro de arquivos inativos."
      ]
     },
     {
      "text": "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.",
-     "say": "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.",
+     "say": "Naquele agosto, os senadores interrogaram o diretor da cía numa audiência conjunta.",
      "parts": [
-      "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta."
+      "Naquele agosto, os senadores interrogaram o diretor da cía numa audiência conjunta."
      ]
     },
     {
      "text": "O senador Edward Kennedy disse que a CIA tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.",
-     "say": "O senador Edward Kennedy disse que a CIA tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.",
+     "say": "O senador Edward Kénedi disse que a cía tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.",
      "parts": [
-      "O senador Edward Kennedy disse que a CIA tinha drogado",
+      "O senador Edward Kénedi disse que a cía tinha drogado",
       "cidadãos americanos sem o conhecimento nem o consentimento deles."
      ]
     },
@@ -1791,25 +1799,25 @@
     },
     {
      "text": "Um relatório de 1963 do Inspetor-Geral da CIA levou ao fim dos testes em pessoas desavisadas em 1964.",
-     "say": "Um relatório de 1963 do Inspetor-Geral da CIA levou ao fim dos testes em pessoas desavisadas em 1964.",
+     "say": "Um relatório de 1963 do Inspetor-Geral da cía levou ao fim dos testes em pessoas desavisadas em 1964.",
      "parts": [
-      "Um relatório de 1963 do Inspetor-Geral da CIA levou",
+      "Um relatório de 1963 do Inspetor-Geral da cía levou",
       "ao fim dos testes em pessoas desavisadas em 1964."
      ]
     },
     {
      "text": "E em 1973, arquivos do MKUltra foram destruídos com a autorização do então diretor da CIA.",
-     "say": "E em 1973, arquivos do eme cá ultra foram destruídos com a autorização do então diretor da CIA.",
+     "say": "E em 1973, arquivos do eme cá ultra foram destruídos com a autorização do então diretor da cía.",
      "parts": [
       "E em 1973, arquivos do eme cá ultra foram destruídos",
-      "com a autorização do então diretor da CIA."
+      "com a autorização do então diretor da cía."
      ]
     },
     {
      "text": "O senador Kennedy disse o nome dele: Richard Helms.",
-     "say": "O senador Kennedy disse o nome dele: Richard Helms.",
+     "say": "O senador Kénedi disse o nome dele: Richard Rélms.",
      "parts": [
-      "O senador Kennedy disse o nome dele: Richard Helms."
+      "O senador Kénedi disse o nome dele: Richard Rélms."
      ]
     },
     {

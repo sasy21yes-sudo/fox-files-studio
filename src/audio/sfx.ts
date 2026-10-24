@@ -1,5 +1,6 @@
 import type { Timeline } from '../animation/timeline';
 import { rng } from '../animation/math';
+import { placeBeats } from '../effects/beats';
 
 /**
  * Cartoon sound effects for data scenes (SceneSpec.sfx): typewriter keys, a stamp, a slide whistle...
@@ -203,9 +204,30 @@ interface Hit {
   seed: number;
 }
 
-/** Every hit of every scene's cues, in timeline seconds. */
+/** The sound each kind of pop-up arrives with (none of the 16 pop-ups had one - review, 2026-10-24). */
+const POPUP_SOUND: Record<string, SfxSound> = {
+  question: 'pop',
+  count: 'pop',
+  span: 'pop',
+  waffle: 'pop',
+  list: 'pop',
+  versus: 'whoosh',
+  statement: 'whoosh',
+  define: 'paper',
+  record: 'paper',
+};
+/** Pop-up sounds sit under the voice: a cue for the eye, not a gag. */
+const POPUP_GAIN = 0.35;
+
+/** Every hit of every scene's cues and pop-ups, in timeline seconds. */
 export function sfxHits(tl: Timeline): Hit[] {
   const hits: Hit[] = [];
+  tl.spans.forEach((span) =>
+    placeBeats(tl, span.index).forEach((b, j) => {
+      const sound = POPUP_SOUND[b.beat.kind];
+      if (sound) hits.push({ t: b.start, sound, gain: POPUP_GAIN, pan: 0.15, seed: 900000 + span.index * 100 + j });
+    }),
+  );
   for (const span of tl.spans) {
     const cues = (span.scene.spec as { sfx?: SfxCue[] } | null | undefined)?.sfx;
     if (!cues?.length) continue;
@@ -238,7 +260,8 @@ export function renderSfx(tl: Timeline): AudioBuffer | null {
   for (const h of hits) {
     const r = rng(h.seed + 17);
     const v = 1 + (r() - 0.5) * 0.12; // a little pitch variation per hit
-    const g = h.gain * (0.85 + r() * 0.3) * 0.7;
+    // (bus at 0.4: at 0.7 the scene-1 bell and drum were the loudest moment of the whole mix, over the voice)
+    const g = h.gain * (0.85 + r() * 0.3) * 0.4;
     const s = GEN[h.sound](r, v);
     const gl = g * Math.cos(((h.pan + 1) * Math.PI) / 4) * Math.SQRT2;
     const gr = g * Math.sin(((h.pan + 1) * Math.PI) / 4) * Math.SQRT2;

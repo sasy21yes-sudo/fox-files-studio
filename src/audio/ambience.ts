@@ -349,14 +349,9 @@ async function synthesize(tl: Timeline): Promise<AudioBuffer> {
   }
 
   // ---- Duck under narration, fade in/out, soft-limit, add crackle.
-  const duck = new Float32Array(N).fill(1);
-  for (const c of tl.cues) {
-    const a = Math.max(0, Math.floor((c.start - 0.12) * SR));
-    const z = Math.min(N, Math.floor((c.end + 0.05) * SR));
-    for (let n = a; n < z; n++) duck[n] = 0.42;
-  }
+  const duck = duckTarget(tl, N, SR);
   const aDown = 1 - Math.exp(-1 / (0.06 * SR));
-  const aUp = 1 - Math.exp(-1 / (0.25 * SR));
+  const aUp = 1 - Math.exp(-1 / (DUCK_RELEASE * SR));
   let d = 1;
   const r = rng(2024);
   const fadeIn = tl.hook ? 0.03 : 0.6;
@@ -378,6 +373,30 @@ async function synthesize(tl: Timeline): Promise<AudioBuffer> {
   return buf;
 }
 
+/** Music level under the voice: 0.25 = -12 dB (at 0.42, -7.5 dB, the voice was only ~11.6 dB over the music). */
+const DUCK_LEVEL = 0.25;
+/** Lines closer than this share one duck: the music stays down through a breath instead of pumping up in it. */
+const DUCK_BRIDGE = 0.8;
+/** How long the music takes to come back up after the voice (s). */
+const DUCK_RELEASE = 0.5;
+
+/** Per-sample target gain of the music: DUCK_LEVEL while a line is spoken (and across short breaths), else 1. */
+function duckTarget(tl: Timeline, N: number, sr: number): Float32Array {
+  const duck = new Float32Array(N).fill(1);
+  const spans: [number, number][] = [];
+  for (const c of [...tl.cues].sort((x, y) => x.start - y.start)) {
+    const last = spans[spans.length - 1];
+    if (last && c.start - last[1] < DUCK_BRIDGE) last[1] = Math.max(last[1], c.end);
+    else spans.push([c.start, c.end]);
+  }
+  for (const [s0, s1] of spans) {
+    const a = Math.max(0, Math.floor((s0 - 0.12) * sr));
+    const z = Math.min(N, Math.floor((s1 + 0.05) * sr));
+    duck.fill(DUCK_LEVEL, a, z);
+  }
+  return duck;
+}
+
 /**
  * Fit a music track the user loaded (e.g. from the YouTube Audio Library) to the
  * episode: loop it to the timeline length with a short crossfade, duck it under
@@ -389,14 +408,9 @@ export function fitMusicTrack(src: AudioBuffer, tl: Timeline): AudioBuffer {
   const out = new AudioBuffer({ length: N, numberOfChannels: 2, sampleRate: sr });
   const xf = Math.min(Math.floor(sr * 1.5), Math.floor(src.length / 4));
   const loopLen = Math.max(1, src.length - xf);
-  const duck = new Float32Array(N).fill(1);
-  for (const c of tl.cues) {
-    const a = Math.max(0, Math.floor((c.start - 0.12) * sr));
-    const z = Math.min(N, Math.floor((c.end + 0.05) * sr));
-    for (let n = a; n < z; n++) duck[n] = 0.42;
-  }
+  const duck = duckTarget(tl, N, sr);
   const aDown = 1 - Math.exp(-1 / (0.06 * sr));
-  const aUp = 1 - Math.exp(-1 / (0.25 * sr));
+  const aUp = 1 - Math.exp(-1 / (DUCK_RELEASE * sr));
   for (let ch = 0; ch < 2; ch++) {
     const inp = src.getChannelData(Math.min(ch, src.numberOfChannels - 1));
     const o = out.getChannelData(ch);

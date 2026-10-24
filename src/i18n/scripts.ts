@@ -123,9 +123,11 @@ const italian: LocalizedScript = {
   },
   say: [
     ['MKUltra', 'emme kappa ultra'],
-    ['Church', 'Ciòrc'],
+    // (Whisper heard "colleghe", "Chork" and "intelligenza": soft endings spelled out)
+    ['Church', 'Ciòrci'],
     ['New York', 'Niu Iòrk'],
-    ['college', 'còlleg'],
+    ['college', 'còllegi'],
+    ['intelligence', 'intèlligens'],
   ],
 };
 
@@ -214,6 +216,8 @@ const spanish: LocalizedScript = {
   say: [
     ['MKUltra', 'eme ka ultra'],
     ['Church', 'Chorch'],
+    ['Helms', 'Jelms'],
+    ['Kennedy', 'Kénedi'],
   ],
 };
 
@@ -303,6 +307,7 @@ const french: LocalizedScript = {
     ['MKUltra', 'ème ka ultra'],
     ['Church', 'Tcheurtch'],
     ['New York', 'Niou York'],
+    ['CIA', 'cé i a'],
   ],
 };
 
@@ -391,6 +396,9 @@ const portuguese: LocalizedScript = {
   say: [
     ['MKUltra', 'eme cá ultra'],
     ['Church', 'Tchârtch'],
+    ['Helms', 'Rélms'],
+    ['Kennedy', 'Kénedi'],
+    ['CIA', 'cía'],
   ],
 };
 
