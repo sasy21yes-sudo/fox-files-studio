@@ -1867,3 +1867,31 @@ body.resizing-v * {
   grid-template-columns: none;
   grid-auto-flow: column;
 }
+.ch-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+.ch-thumb {
+  margin: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 4px;
+}
+.ch-thumb.on {
+  border-color: var(--brass);
+}
+.ch-thumb canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+}
+.ch-cover {
+  width: 200px;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}

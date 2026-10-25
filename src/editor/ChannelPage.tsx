@@ -11,8 +11,9 @@ import { loadProjectMedia } from '../media/store';
 import { BANNER, ICON, drawBanner, drawIcon } from '../channel/brand';
 import { cutStats, forecast, type CutStats } from '../channel/forecast';
 import { FONT_TITLE } from '../animation/stage';
+import { COVER, LAYOUTS, THUMB, drawShortCover, drawThumbnail, loadMaster, type ThumbLayout } from '../channel/thumbnails';
 
-export type ChannelTab = 'dashboard' | 'brand' | 'preview';
+export type ChannelTab = 'dashboard' | 'brand' | 'thumbs' | 'preview';
 
 /** The channel's identity (channel/channel.json), per language where it is text the viewer reads. */
 interface ChannelInfo {
@@ -23,6 +24,9 @@ interface ChannelInfo {
   /** Thumbnail words (2-3, never the title's words). */
   thumb: Partial<Record<Lang, string>>;
   keywords: string;
+  /** The thumbnail chosen in the Thumbnails tab: layout and the episode second of its frame. */
+  thumbLayout?: ThumbLayout;
+  thumbAt?: number;
 }
 const DEFAULT: ChannelInfo = {
   name: 'The Fox Files',
@@ -95,13 +99,13 @@ export function ChannelPage({ project, timing, initialTab = 'dashboard' }: Props
       <header className="channel-head">
         <strong>Channel</strong>
         <div className="segmented compact">
-          {(['dashboard', 'brand', 'preview'] as const).map((k) => (
+          {(['dashboard', 'brand', 'thumbs', 'preview'] as const).map((k) => (
             <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>
-              {k === 'dashboard' ? 'Dashboard' : k === 'brand' ? 'Brand kit' : 'YouTube preview'}
+              {k === 'dashboard' ? 'Dashboard' : k === 'brand' ? 'Brand kit' : k === 'thumbs' ? 'Thumbnails' : 'YouTube preview'}
             </button>
           ))}
         </div>
-        {tab === 'brand' && (
+        {(tab === 'brand' || tab === 'thumbs') && (
           <button className="btn primary small" disabled={JSON.stringify(info) === saved} onClick={() => void save()}>
             Save channel
           </button>
@@ -109,6 +113,7 @@ export function ChannelPage({ project, timing, initialTab = 'dashboard' }: Props
       </header>
       {tab === 'dashboard' && <Dashboard project={project} info={info} cuts={cuts} />}
       {tab === 'brand' && <Brand info={info} lang={lang} onChange={setInfo} />}
+      {tab === 'thumbs' && <Thumbs project={project} info={info} cuts={cuts} onChange={setInfo} />}
       {tab === 'preview' && <Preview project={project} info={info} cuts={cuts} />}
     </main>
   );
@@ -308,10 +313,12 @@ function Brand({ info, lang, onChange }: { info: ChannelInfo; lang: Lang; onChan
   const icon = useRef<HTMLCanvasElement>(null);
   const [safe, setSafe] = useState(true);
   useEffect(() => {
-    const b = banner.current?.getContext('2d');
-    if (b) drawBanner(b, info.name, info.tagline[lang] ?? '');
-    const i = icon.current?.getContext('2d');
-    if (i) drawIcon(i);
+    void loadMaster().then(() => {
+      const b = banner.current?.getContext('2d');
+      if (b) drawBanner(b, info.name, info.tagline[lang] ?? '');
+      const i = icon.current?.getContext('2d');
+      if (i) drawIcon(i);
+    });
   }, [info.name, info.tagline, lang]);
   const download = (c: HTMLCanvasElement | null, name: string) =>
     c?.toBlob((b) => {
@@ -347,7 +354,7 @@ function Brand({ info, lang, onChange }: { info: ChannelInfo; lang: Lang; onChan
         <button className="btn small" onClick={() => download(icon.current, 'fox-files-icon.png')}>
           Download icon PNG
         </button>
-        <p className="help small">Drawn by the studio from Agent Fox's rig and the series' sunburst, so the channel matches the videos.</p>
+        <p className="help small">The master Agent Fox (hat, face and lens) on the series' brass sunburst.</p>
       </section>
       <section className="ch-card">
         <h3>Identity ({lang})</h3>
@@ -407,6 +414,7 @@ function Preview({ project, info, cuts }: { project: Project; info: ChannelInfo;
         c.height = h;
         return c;
       };
+      await loadMaster();
       const b = mk(BANNER.w, BANNER.h);
       drawBanner(b.getContext('2d')!, info.name, info.tagline[lang] ?? '');
       const i = mk(ICON, ICON);
@@ -437,8 +445,14 @@ function Preview({ project, info, cuts }: { project: Project; info: ChannelInfo;
         }
         return c.toDataURL('image/jpeg', 0.85);
       };
-      const thumb = frameAt(cuts.long, '16:9', 640, 360, info.thumb[lang] ?? null);
-      const short = cuts.short ? frameAt(cuts.short, '9:16', 270, 480, null) : '';
+      // The thumbnail chosen in the Thumbnails tab (default: Dossier on the strongest card) and the Short's cover.
+      void frameAt;
+      const tc = mk(THUMB.w, THUMB.h);
+      drawThumbnail(tc.getContext('2d')!, info.thumbLayout ?? 'dossier', episodeFrame(project, cuts.long, info.thumbAt ?? strongMoment(cuts.long)), info.thumb[lang] ?? '', 'THE FOX FILES · MKULTRA');
+      const thumb = tc.toDataURL('image/jpeg', 0.85);
+      const sc = mk(COVER.w, COVER.h);
+      drawShortCover(sc.getContext('2d')!, null, info.thumb[lang] ?? '', projectHook(project, lang)?.text ?? '');
+      const short = cuts.short ? sc.toDataURL('image/jpeg', 0.8) : '';
       if (alive) setImg({ banner: b.toDataURL('image/jpeg', 0.85), icon: i.toDataURL('image/png'), thumb, short });
     })();
     return () => {
@@ -499,6 +513,120 @@ function Preview({ project, info, cuts }: { project: Project; info: ChannelInfo;
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ thumbnails
+
+/** A frame of the episode (16:9, no subtitles), for thumbnails. */
+function episodeFrame(project: Project, tl: Timeline, t: number): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = THUMB.w;
+  c.height = THUMB.h;
+  renderFrame(c.getContext('2d')!, c.width, c.height, { ...project, settings: { ...project.settings, aspect: '16:9' } }, tl, t, { filmGrain: false, subtitles: project.settings.subtitles, burnSubtitles: false });
+  return c;
+}
+
+/** Candidate moments for a thumbnail: the episode's cards (records, identikits, statements, counts). */
+function moments(tl: Timeline): { at: number; label: string }[] {
+  return tl.spans
+    .flatMap((s, k) => placeBeats(tl, k).map((p) => ({ p, scene: s.scene.title })))
+    .filter(({ p }) => ['record', 'person', 'statement', 'count', 'waffle'].includes(p.beat.kind))
+    .map(({ p, scene }) => ({ at: +(p.start + 1.2).toFixed(1), label: `${formatTime(p.start)} · ${scene} · ${p.beat.kind}${'name' in p.beat ? ` ${p.beat.name}` : ''}` }));
+}
+function strongMoment(tl: Timeline) {
+  const all = tl.spans.flatMap((_s, k) => placeBeats(tl, k));
+  const p = all.find((x) => x.beat.kind === 'record') ?? all.find((x) => x.beat.kind === 'person');
+  return p ? p.start + 1.2 : tl.total * 0.4;
+}
+
+function Thumbs({ project, info, cuts, onChange }: { project: Project; info: ChannelInfo; cuts: Cuts; onChange(i: ChannelInfo): void }) {
+  const lang = project.settings.language;
+  const list = useMemo(() => moments(cuts.long), [cuts.long]);
+  const at = info.thumbAt ?? strongMoment(cuts.long);
+  const refs = useRef<Record<string, HTMLCanvasElement | null>>({});
+  const cover = useRef<HTMLCanvasElement>(null);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    void (async () => {
+      await Promise.all([loadMaster(), loadProjectMedia(project)]);
+      if (!alive) return;
+      const frame = episodeFrame(project, cuts.long, at);
+      for (const l of LAYOUTS) {
+        const g = refs.current[l.id]?.getContext('2d');
+        if (g) drawThumbnail(g, l.id, frame, info.thumb[lang] ?? '', 'THE FOX FILES · MKULTRA');
+      }
+      const cg = cover.current?.getContext('2d');
+      if (cg) drawShortCover(cg, null, info.thumb[lang] ?? '', projectHook(project, lang)?.text ?? '');
+      setReady(true);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [project, cuts.long, at, info.thumb, lang]);
+  const download = (c: HTMLCanvasElement | null | undefined, name: string) =>
+    c?.toBlob((b) => {
+      if (!b) return;
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  const using = info.thumbLayout ?? 'dossier';
+  return (
+    <div className="channel-grid">
+      <section className="ch-card wide">
+        <h3>Thumbnails · 1280×720 {ready ? '' : '(drawing…)'}</h3>
+        <div className="row gap wrap small">
+          <label className="tune-row ch-row">
+            <span>Frame</span>
+            <select className="isel" value={String(at)} onChange={(e) => onChange({ ...info, thumbAt: Number(e.target.value) })}>
+              {!list.some((m) => m.at === at) && <option value={String(at)}>{formatTime(at)}</option>}
+              {list.map((m) => (
+                <option key={m.at} value={String(m.at)}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <span className="muted">Words: “{info.thumb[lang]}” (Brand kit)</span>
+        </div>
+        <div className="ch-thumbs">
+          {LAYOUTS.map((l) => (
+            <figure key={l.id} className={`ch-thumb ${using === l.id ? 'on' : ''}`}>
+              <canvas ref={(c) => void (refs.current[l.id] = c)} width={THUMB.w} height={THUMB.h} />
+              <figcaption className="row gap small">
+                <b>{l.label}</b>
+                <button className="btn small ghost" onClick={() => onChange({ ...info, thumbLayout: l.id, thumbAt: at })}>
+                  {using === l.id ? '✓ In use' : 'Use this one'}
+                </button>
+                <button className="btn small ghost" onClick={() => download(refs.current[l.id], `fox-files-thumb-${l.id}.png`)}>
+                  PNG
+                </button>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+      <section className="ch-card">
+        <h3>Short cover · 1080×1920</h3>
+        <canvas ref={cover} width={COVER.w} height={COVER.h} className="ch-cover" />
+        <button className="btn small" onClick={() => download(cover.current, 'fox-files-short-cover.png')}>
+          Download PNG
+        </button>
+      </section>
+      <section className="ch-card">
+        <h3>Rules these follow</h3>
+        <ul className="ch-checks small">
+          <li>The master Agent Fox on every thumbnail, the same series tag in the same corner.</li>
+          <li>2–3 words in the series font, never the title's words (title.py checks the pairing).</li>
+          <li>One strong frame of the episode: a record, an identikit, a big statement.</li>
+          <li>Readable at phone size: big words, high contrast, one focal point.</li>
+        </ul>
+      </section>
     </div>
   );
 }

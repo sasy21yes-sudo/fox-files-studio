@@ -1,6 +1,7 @@
 import { captureFox, drawFox, type FoxDebug, type FoxPose } from '../character/AgentFox';
 import { drawSunburst } from '../effects/cartoon';
 import { FONT_TITLE, FONT_TYPE } from '../animation/stage';
+import { drawMaster, masterImage } from './thumbnails';
 
 /**
  * The channel's art, drawn by the studio itself from the episode's own parts (sunburst, Agent Fox's rig, the
@@ -52,10 +53,12 @@ export function drawBanner(g: CanvasRenderingContext2D, name: string, tagline: s
   const sx = (w - safe.w) / 2;
   const sy = (h - safe.h) / 2;
   // Agent Fox on the left of the safe area, feet on its bottom edge.
-  foxAt(g, 'ankle_near', sx + 250, sy + safe.h + 40, 0.62, { armFront: 'tiphat' } as Partial<FoxPose>);
+  // The master Agent Fox (await loadMaster() first); the rig until it is loaded.
+  if (masterImage()) drawMaster(g, sx + 230, sy + safe.h - 4, safe.h * 0.97);
+  else foxAt(g, 'ankle_near', sx + 250, sy + safe.h + 40, 0.62, { armFront: 'tiphat' } as Partial<FoxPose>);
   g.textAlign = 'left';
   g.textBaseline = 'alphabetic';
-  const tx = sx + 560;
+  const tx = sx + 470;
   outlinedText(g, name.toUpperCase(), tx, sy + 235, 150, FONT_TITLE, BRASS);
   g.font = `700 54px ${FONT_TYPE}`;
   g.fillStyle = CREAM;
@@ -63,7 +66,10 @@ export function drawBanner(g: CanvasRenderingContext2D, name: string, tagline: s
   g.restore();
 }
 
-/** The round channel icon: Agent Fox's face on a brass sunburst (YouTube crops it to a circle). */
+/**
+ * The round channel icon: the master Agent Fox (hat, face and lens - public/brand/master.png, await loadMaster()
+ * first) on a brass sunburst; the rig's face until the master is loaded. YouTube crops it to a circle.
+ */
 export function drawIcon(g: CanvasRenderingContext2D) {
   const s = ICON;
   g.save();
@@ -73,7 +79,12 @@ export function drawIcon(g: CanvasRenderingContext2D) {
   g.beginPath();
   g.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2);
   g.clip();
-  foxAt(g, 'eye_near', s * 0.56, s * 0.48, 2.6, {});
+  const m = masterImage();
+  if (m) {
+    // Crop chosen on the master (Salvatore, 2026-10-25): from 30% of its width, a square 72% wide, a hair above.
+    const side = m.width * 0.72;
+    g.drawImage(m, m.width * 0.3, -m.height * 0.03, side, side, 0, 0, s, s);
+  } else foxAt(g, 'eye_near', s * 0.56, s * 0.48, 2.6, {});
   g.restore();
   g.save();
   g.strokeStyle = INK;
