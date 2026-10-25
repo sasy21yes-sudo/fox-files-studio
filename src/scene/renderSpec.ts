@@ -305,7 +305,9 @@ function drawTitleOverlay(s: Stage, o: TitleOverlay) {
     drawSunburst(g, w / 2, y + 20 * u, r, s.time * 0.4, '#5a3315', '#8a5422', 20);
     g.restore();
   }
-  drawTitle(g, w, y, u * (V ? 0.95 : 1), o.title ?? s.project.episodeTitle, o.subtitle ?? s.project.episodeSubtitle, tp, seg(k, o.subAt, 1.2), num(o.maxWidth, V) * w);
+  // (the tagline finishes typing before the scene cuts away: it was cut at "Cosa ri" - 2026-10-25)
+  const subDur = Math.max(0.3, Math.min(1.2, s.authored - o.subAt - 0.25));
+  drawTitle(g, w, y, u * (V ? 0.95 : 1), o.title ?? s.project.episodeTitle, o.subtitle ?? s.project.episodeSubtitle, tp, seg(k, o.subAt, subDur), num(o.maxWidth, V) * w);
 }
 
 /** Draw one frame of a data scene. Same contract as the hand-coded scene renderers. */
