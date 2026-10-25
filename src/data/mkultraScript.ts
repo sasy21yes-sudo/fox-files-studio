@@ -21,7 +21,9 @@ export type Beat =
   | { cue: string; kind: 'waffle'; total: number; hit: number; label: string; note?: string }
   | { cue: string; kind: 'list'; items: string[]; title?: string }
   | { cue: string; kind: 'record'; tag: string; who: string; text: string; highlight: string; note: string }
-  | { cue: string; kind: 'statement'; lines: string[] };
+  | { cue: string; kind: 'statement'; lines: string[] }
+  /** A person named in the narration: identikit card (role and year must come from the narration or sources). */
+  | { cue: string; kind: 'person'; name: string; role: string; year?: string };
 
 export interface ScriptEntry {
   id: MkSceneId;
@@ -87,14 +89,12 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
     title: 'The Human Cost',
     summary: 'Evidence of testing without informed consent. The room turns quiet and serious.',
     narration:
-      "The testimony counted six subprojects that tested drugs on unwitting people. Unwitting means they didn't know. Some of those tests happened in safe houses in San Francisco and New York City. There was no informed consent. One case shows what that meant. Dr. Frank Olson was an Army civilian employee. In 1953, at a meeting called by the CIA, he was given LSD without knowing it. About a week later, he was dead.",
+      "The testimony counted six subprojects that tested drugs on unwitting people. Some of those tests happened in safe houses in San Francisco and New York City. There was no informed consent. One case shows what that meant. Dr. Frank Olson was an Army civilian employee. In 1953, at a meeting called by the CIA, he was given LSD without knowing it. About a week later, he was dead.",
     keywords: ['six subprojects', 'unwitting', 'safe houses', 'no informed consent', 'Frank Olson'],
     sourceIds: ['senate-1977'],
     duration: 40,
     beats: [
       { cue: 'six subprojects', kind: 'waffle', total: 149, hit: 6, label: '6 OF 149 SUBPROJECTS', note: 'tested drugs on people who did not know' },
-      { cue: "Unwitting means", kind: 'define', word: 'un·wit·ting', pos: 'adjective', meaning: 'not knowing; unaware of what is happening' },
-      { cue: 'no informed consent', kind: 'define', word: 'in·formed con·sent', pos: 'noun', meaning: 'agreeing to an experiment after being told what it involves' },
     ],
   },
   {

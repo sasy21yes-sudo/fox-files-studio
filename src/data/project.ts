@@ -110,7 +110,10 @@ function restoreScene(raw: unknown, base: Scene | undefined, index: number): Sce
     title: base && isMkScene(raw.id) ? base.title : str(raw.title, fallback.title),
     summary: str(raw.summary, fallback.summary),
     duration,
-    authoredDuration: base && isMkScene(raw.id) ? base.authoredDuration : clampNum(raw.authoredDuration, 0.5, MAX_SCENE_DURATION, duration),
+    // A coded MKUltra scene keeps its built-in choreography length; a data scene (spec) keeps its own, which its
+    // times are authored against (the longer typewriter intro was reset to 9 s on load).
+    authoredDuration: base && isMkScene(raw.id) && !isObj(raw.spec) ? base.authoredDuration : clampNum(raw.authoredDuration, 0.5, MAX_SCENE_DURATION, duration),
+    choreoEnd: typeof raw.choreoEnd === 'number' && raw.choreoEnd > 0 ? raw.choreoEnd : undefined,
     transition: TRANSITIONS.includes(raw.transition as TransitionType) ? (raw.transition as TransitionType) : fallback.transition,
     chapterCard: raw.chapterCard === false ? false : undefined,
     narration: str(raw.narration, fallback.narration),

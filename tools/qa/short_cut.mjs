@@ -10,9 +10,9 @@ const r = await p.evaluate(async (LANG) => {
   const { buildShortTimeline } = await import('/src/animation/timeline.ts');
   const { loadStudioPack, studioTiming } = await import('/src/audio/studioVoice.ts');
   const { STUDIO_VOICES } = await import('/src/audio/studioVoices.ts');
-  const { switchLanguage } = await import('/src/data/project.ts');
+  const { restoreProject, switchLanguage } = await import('/src/data/project.ts');
   const saved = await (await fetch(`/episodes/mkultra-secret-experiments.foxproj.json?${Date.now()}`)).json();
-  const pr = switchLanguage(saved, LANG);
+  const pr = switchLanguage(restoreProject(saved) ?? saved, LANG);
   const voice = pr.settings.studioVoice?.[LANG] ?? STUDIO_VOICES[LANG][0].id;
   const tl = buildShortTimeline(pr, studioTiming(await loadStudioPack(LANG, voice, undefined, Date.now()), new Map()));
   if (!tl) return null;

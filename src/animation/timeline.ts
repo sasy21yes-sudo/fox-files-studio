@@ -226,9 +226,9 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
     const start = cursor;
     const sentences = splitSentences(scene.narration);
     const voicedScene = !!voice && sentences.some((x) => voice.sentence(x));
-    // Explainer pacing: a breath between sentences (recorded clips carry a little air of their own); 0.42 s
-    // read as dragging once the packs were brought to explainer pace (review, 2026-10-24).
-    const gap = voicedScene ? 0.3 : 0.45;
+    // A breath between sentences (recorded clips carry a little air of their own): 0.3 s at explainer pace was
+    // "too fast, too much information, easy to get lost" (Salvatore, 2026-10-25); 0.42 s had read as dragging.
+    const gap = voicedScene ? 0.5 : 0.55;
     const marks = (scene.breaths ?? []).map((b) => b.trim().toLowerCase()).filter(Boolean);
     const breath = marks.length ? (s: string) => marks.some((b) => s.trim().toLowerCase().startsWith(b)) : undefined;
     let laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, voice, 1, breath);
@@ -297,7 +297,7 @@ export const cueAt = (tl: Timeline, t: number): Subtitle | undefined =>
 
 /** Time-stretch factor from real scene seconds to authored choreography seconds. */
 export const choreoTime = (span: SceneSpan, local: number) =>
-  (local + (span.offset ?? 0)) * (span.scene.authoredDuration / (span.fullDuration ?? span.duration));
+  (local + (span.offset ?? 0)) * ((span.scene.choreoEnd ?? span.scene.authoredDuration) / (span.fullDuration ?? span.duration));
 
 export function formatTime(t: number): string {
   const s = Math.max(0, t);

@@ -25,6 +25,9 @@ export interface Scene {
   duration: number;
   /** The duration the choreography was authored for. Events are time-stretched to `duration`. */
   authoredDuration: number;
+  /** Play the choreography only up to this authored second, stretched over the whole scene (a coded scene cut in
+   *  two: the rest of its story moved to another scene). */
+  choreoEnd?: number;
   /** Transition used when entering this scene. */
   transition: TransitionType;
   /** false = no chapter intertitle on this scene even when the episode uses them (cutaways). */

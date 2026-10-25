@@ -81,12 +81,10 @@ const italian: LocalizedScript = {
     cost: {
       title: 'Il costo umano',
       narration:
-        "Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare. Ignare significa che non lo sapevano. Alcuni di quei test avvennero in case sicure a San Francisco e a New York. Non c'era alcun consenso informato. Un caso mostra cosa significasse. Il dottor Frank Olson era un dipendente civile dell'Esercito. Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa. Circa una settimana dopo, era morto.",
+        "Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare. Alcuni di quei test avvennero in case sicure a San Francisco e a New York. Non c'era alcun consenso informato. Un caso mostra cosa significasse. Il dottor Frank Olson era un dipendente civile dell'Esercito. Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa. Circa una settimana dopo, era morto.",
       keywords: ['sei sottoprogetti', 'ignare', 'case sicure', 'consenso informato', 'Frank Olson'],
       beats: [
         { cue: 'sei sottoprogetti', kind: 'waffle', total: 149, hit: 6, label: '6 SU 149 SOTTOPROGETTI', note: 'testarono droghe su persone che non sapevano' },
-        { cue: 'Ignare significa', kind: 'define', word: 'i·gnà·ro', pos: 'aggettivo', meaning: 'che non sa; inconsapevole di ciò che sta succedendo' },
-        { cue: 'alcun consenso informato', kind: 'define', word: 'con·sen·so in·for·mà·to', pos: 'sostantivo', meaning: 'accettare un esperimento dopo che ti è stato spiegato cosa comporta' },
       ],
     },
     revelation: {
@@ -172,12 +170,10 @@ const spanish: LocalizedScript = {
     cost: {
       title: 'El coste humano',
       narration:
-        'Según el testimonio, seis subproyectos probaron drogas en personas desprevenidas. Desprevenidas significa que no lo sabían. Algunas de esas pruebas se hicieron en pisos francos de San Francisco y Nueva York. No hubo consentimiento informado. Un caso muestra lo que eso significaba. El doctor Frank Olson era un empleado civil del Ejército. En 1953, en una reunión convocada por la CIA, le dieron LSD sin que lo supiera. Más o menos una semana después, estaba muerto.',
+        'Según el testimonio, seis subproyectos probaron drogas en personas desprevenidas. Algunas de esas pruebas se hicieron en pisos francos de San Francisco y Nueva York. No hubo consentimiento informado. Un caso muestra lo que eso significaba. El doctor Frank Olson era un empleado civil del Ejército. En 1953, en una reunión convocada por la CIA, le dieron LSD sin que lo supiera. Más o menos una semana después, estaba muerto.',
       keywords: ['seis subproyectos', 'desprevenidas', 'pisos francos', 'consentimiento informado', 'Frank Olson'],
       beats: [
         { cue: 'seis subproyectos', kind: 'waffle', total: 149, hit: 6, label: '6 DE 149 SUBPROYECTOS', note: 'probaron drogas en personas que no lo sabían' },
-        { cue: 'Desprevenidas significa', kind: 'define', word: 'des·pre·ve·ni·do', pos: 'adjetivo', meaning: 'que no sabe ni se espera lo que está pasando' },
-        { cue: 'No hubo consentimiento', kind: 'define', word: 'con·sen·ti·mien·to in·for·ma·do', pos: 'sustantivo', meaning: 'aceptar un experimento después de que te expliquen en qué consiste' },
       ],
     },
     revelation: {
@@ -261,12 +257,10 @@ const french: LocalizedScript = {
     cost: {
       title: 'Le coût humain',
       narration:
-        "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu. À leur insu, ça veut dire sans le savoir. Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York. Il n'y avait aucun consentement éclairé. Un cas montre ce que cela voulait dire. Le docteur Frank Olson était un employé civil de l'armée. En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu. Environ une semaine plus tard, il était mort.",
+        "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu. Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York. Il n'y avait aucun consentement éclairé. Un cas montre ce que cela voulait dire. Le docteur Frank Olson était un employé civil de l'armée. En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu. Environ une semaine plus tard, il était mort.",
       keywords: ['six sous-projets', 'à leur insu', 'planques', 'consentement éclairé', 'Frank Olson'],
       beats: [
         { cue: 'six sous-projets', kind: 'waffle', total: 149, hit: 6, label: '6 SUR 149 SOUS-PROJETS', note: 'ont testé des drogues sur des gens qui ne savaient pas' },
-        { cue: 'ça veut dire', kind: 'define', word: "à l'in·su de", pos: 'locution', meaning: 'sans que la personne le sache' },
-        { cue: 'aucun consentement éclairé', kind: 'define', word: 'con·sen·te·ment é·clai·ré', pos: 'nom', meaning: "accepter une expérience après avoir été informé de ce qu'elle implique" },
       ],
     },
     revelation: {
@@ -355,12 +349,10 @@ const portuguese: LocalizedScript = {
     cost: {
       title: 'O custo humano',
       narration:
-        'Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas. Desavisadas quer dizer que elas não sabiam. Alguns desses testes aconteceram em casas seguras em São Francisco e Nova York. Não houve consentimento informado. Um caso mostra o que isso significava. O doutor Frank Olson era um funcionário civil do Exército. Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber. Cerca de uma semana depois, estava morto.',
+        'Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas. Alguns desses testes aconteceram em casas seguras em São Francisco e Nova York. Não houve consentimento informado. Um caso mostra o que isso significava. O doutor Frank Olson era um funcionário civil do Exército. Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber. Cerca de uma semana depois, estava morto.',
       keywords: ['seis subprojetos', 'desavisadas', 'casas seguras', 'consentimento informado', 'Frank Olson'],
       beats: [
         { cue: 'seis subprojetos', kind: 'waffle', total: 149, hit: 6, label: '6 DE 149 SUBPROJETOS', note: 'testaram drogas em quem não sabia' },
-        { cue: 'Desavisadas quer dizer', kind: 'define', word: 'de·sa·vi·sa·do', pos: 'adjetivo', meaning: 'que não sabe; sem consciência do que está acontecendo' },
-        { cue: 'Não houve consentimento', kind: 'define', word: 'con·sen·ti·men·to in·for·ma·do', pos: 'substantivo', meaning: 'aceitar um experimento depois de saber o que ele envolve' },
       ],
     },
     revelation: {

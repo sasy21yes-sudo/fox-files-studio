@@ -215,6 +215,7 @@ const POPUP_SOUND: Record<string, SfxSound> = {
   statement: 'whoosh',
   define: 'paper',
   record: 'paper',
+  person: 'stamp',
 };
 /** Pop-up sounds sit under the voice: a cue for the eye, not a gag. */
 const POPUP_GAIN = 0.35;
@@ -239,7 +240,7 @@ export function sfxHits(tl: Timeline): Hit[] {
   for (const span of tl.spans) {
     const cues = (span.scene.spec as { sfx?: SfxCue[] } | null | undefined)?.sfx;
     if (!cues?.length) continue;
-    const k = (span.fullDuration ?? span.duration) / Math.max(1e-6, span.scene.authoredDuration);
+    const k = (span.fullDuration ?? span.duration) / Math.max(1e-6, span.scene.choreoEnd ?? span.scene.authoredDuration);
     const off = span.offset ?? 0;
     cues.forEach((c, ci) => {
       if (!isSfxSound(c.sound)) return;

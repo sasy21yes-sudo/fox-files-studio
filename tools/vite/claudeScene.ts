@@ -323,7 +323,8 @@ ${Object.entries(cat.SFX_SOUNDS).map(([k, d]) => `- ${k}: ${d}`).join('\n')}
 
 # Pop-ups ("beats")
 Explainer cards that appear when a phrase of the narration is spoken. Each has "cue": an EXACT phrase copied from that scene's narration, and "kind" with its fields:
-question {text} · span {from, to, label} · count {value, label, note?} · versus {left, right, caption?} · define {word, pos, meaning} · waffle {total, hit, label, note?} · list {items[], title?} · record {tag, who, text, highlight, note} · statement {lines[]}.
+question {text} · span {from, to, label} · count {value, label, note?} · versus {left, right, caption?} · define {word, pos, meaning} · waffle {total, hit, label, note?} · list {items[], title?} · record {tag, who, text, highlight, note} · statement {lines[]} · person {name, role, year?} (a 1930s identikit card when a person is named: role and year only from the narration or the sources).
+Do not add define pop-ups unless the director asks for one: he does not want terms explained.
 
 # Narration
 "narration" replaces what the voice says in a scene; leave it "" unless the instruction asks to change the words. The studio records new or changed sentences with its narrator voice automatically and keeps the recording of every sentence you leave word-for-word the same, so change only the sentences that need it. Same rules as everything on screen: only facts from the narration you were given or the listed sources, no invented numbers, names, dates or quotes; keep the tone of the series (clear, catchy explainer, short sentences that read well aloud). Pop-up cues must then be phrases of the NEW narration.

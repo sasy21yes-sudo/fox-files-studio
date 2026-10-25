@@ -142,6 +142,9 @@ export function renderBeats(g: G, w: number, h: number, tl: Timeline, sceneIndex
     case 'statement':
       drawStatement(D, active.beat);
       break;
+    case 'person':
+      drawPerson(D, active.beat);
+      break;
   }
   g.restore();
 }
@@ -654,4 +657,164 @@ function drawStatement(D: Draw, b: Extract<Beat, { kind: 'statement' }>) {
     outlined(g, line, 0, 0, size, FONT_TITLE, i === n - 1 && n > 1 ? GOLD : CREAM, u);
     g.restore();
   });
+}
+
+/**
+ * A person named in the narration: a 1930s "identikit" card - an ink sketch on a mugshot height chart, the name,
+ * the role and the year. The sketch is a generic cartoon bust (hair and jaw vary with the name), never a likeness:
+ * nothing about the real face is claimed.
+ */
+function drawPerson(D: Draw, b: Extract<Beat, { kind: 'person' }>) {
+  const { g, u, W, t } = D;
+  const w = D.V ? W * 0.92 : W * 0.9;
+  const h = (D.V ? 420 : 360) * u;
+  const x = -w / 2;
+  const y = -h / 2;
+  card(g, x, y, w, h, u, PAPER, -0.015);
+  const ph = h - 56 * u;
+  const pw = ph * 0.8;
+  const px = x + 28 * u;
+  const py = y + 28 * u;
+  // Mugshot frame with height lines.
+  g.save();
+  g.fillStyle = '#dccba3';
+  g.fillRect(px, py, pw, ph);
+  g.strokeStyle = 'rgba(23,13,7,0.35)';
+  g.lineWidth = 2 * u;
+  for (let i = 1; i < 6; i++) {
+    const ly = py + (ph * i) / 6;
+    g.beginPath();
+    g.moveTo(px, ly);
+    g.lineTo(px + pw * 0.18, ly);
+    g.stroke();
+  }
+  g.beginPath();
+  g.rect(px, py, pw, ph);
+  g.clip();
+  // (the hair shape picks from the letters of the name, so each person gets a different sketch)
+  const code = [...b.name].reduce((a, c) => a + c.charCodeAt(0), 0);
+  drawSketch(g, px + pw / 2, py + ph * 0.5, ph * 0.34, u, (code % 3) / 3 + 0.01, hash(code));
+  g.restore();
+  g.strokeStyle = INK;
+  g.lineWidth = 5 * u;
+  g.strokeRect(px, py, pw, ph);
+  // Text block.
+  const tx = px + pw + 30 * u;
+  const tw = x + w - 28 * u - tx;
+  const reveal = popAt(t, 0.15);
+  g.save();
+  g.textAlign = 'left';
+  g.textBaseline = 'alphabetic';
+  g.fillStyle = RED;
+  g.font = `700 ${(D.V ? 30 : 26) * u}px ${FONT_TYPE}`;
+  g.fillText('IDENTIKIT', tx, y + 70 * u);
+  g.globalAlpha *= clamp(reveal);
+  const nameSize = fitSize(g, b.name.toUpperCase(), FONT_TITLE, '900', (D.V ? 62 : 54) * u, tw);
+  outlined(g, b.name.toUpperCase(), tx, y + 70 * u + nameSize * 1.15, nameSize, FONT_TITLE, CREAM, u);
+  g.fillStyle = INK;
+  const roleSize = (D.V ? 30 : 26) * u;
+  g.font = `600 ${roleSize}px ${FONT_TYPE}`;
+  const lines = wrapText(g, b.role, tw);
+  lines.slice(0, 3).forEach((l, i) => g.fillText(l, tx, y + 70 * u + nameSize * 1.15 + roleSize * (1.6 + i * 1.25)));
+  if (b.year) {
+    g.font = `700 ${(D.V ? 40 : 34) * u}px ${FONT_TYPE}`;
+    g.fillStyle = RED;
+    g.textAlign = 'right';
+    g.fillText(b.year, x + w - 30 * u, y + h - 30 * u);
+  }
+  g.restore();
+}
+
+/** A generic rubber-hose bust in ink: head, ears, brows, eyes, nose, mouth, collar and tie. */
+function drawSketch(g: G, cx: number, cy: number, r: number, u: number, seed: number, shape: number) {
+  const jaw = 0.88 + shape * 0.2;
+  const hair = Math.floor(seed * 3);
+  g.save();
+  g.lineCap = 'round';
+  g.lineJoin = 'round';
+  g.strokeStyle = INK;
+  g.fillStyle = '#efe2c2';
+  g.lineWidth = 5 * u;
+  // Shoulders, collar and tie.
+  g.beginPath();
+  g.moveTo(cx - r * 1.5, cy + r * 1.9);
+  g.quadraticCurveTo(cx - r * 1.3, cy + r * 1.0, cx, cy + r * 0.95);
+  g.quadraticCurveTo(cx + r * 1.3, cy + r * 1.0, cx + r * 1.5, cy + r * 1.9);
+  g.closePath();
+  g.fillStyle = '#5b4632';
+  g.fill();
+  g.stroke();
+  g.fillStyle = '#efe2c2';
+  g.beginPath();
+  g.moveTo(cx - r * 0.42, cy + r * 0.95);
+  g.lineTo(cx, cy + r * 1.35);
+  g.lineTo(cx + r * 0.42, cy + r * 0.95);
+  g.closePath();
+  g.fill();
+  g.stroke();
+  g.fillStyle = '#7a1f14';
+  g.beginPath();
+  g.moveTo(cx - r * 0.1, cy + r * 1.05);
+  g.lineTo(cx + r * 0.1, cy + r * 1.05);
+  g.lineTo(cx + r * 0.16, cy + r * 1.8);
+  g.lineTo(cx - r * 0.16, cy + r * 1.8);
+  g.closePath();
+  g.fill();
+  g.stroke();
+  // Ears and head.
+  g.fillStyle = '#efe2c2';
+  for (const s of [-1, 1]) {
+    g.beginPath();
+    g.ellipse(cx + s * r * 0.82 * jaw, cy + r * 0.05, r * 0.16, r * 0.24, 0, 0, Math.PI * 2);
+    g.fill();
+    g.stroke();
+  }
+  g.beginPath();
+  g.ellipse(cx, cy, r * 0.8 * jaw, r, 0, 0, Math.PI * 2);
+  g.fill();
+  g.stroke();
+  // Hair: three generic shapes.
+  g.fillStyle = '#2b1d12';
+  g.beginPath();
+  if (hair === 0) {
+    g.ellipse(cx, cy - r * 0.62, r * 0.78 * jaw, r * 0.42, 0, Math.PI, 0);
+  } else if (hair === 1) {
+    g.moveTo(cx - r * 0.78 * jaw, cy - r * 0.3);
+    g.quadraticCurveTo(cx - r * 0.6, cy - r * 1.15, cx + r * 0.2, cy - r * 1.02);
+    g.quadraticCurveTo(cx + r * 0.85 * jaw, cy - r * 0.9, cx + r * 0.78 * jaw, cy - r * 0.35);
+    g.quadraticCurveTo(cx + r * 0.1, cy - r * 0.72, cx - r * 0.78 * jaw, cy - r * 0.3);
+  } else {
+    g.ellipse(cx, cy - r * 0.74, r * 0.6 * jaw, r * 0.3, 0, Math.PI, 0);
+  }
+  g.fill();
+  // Face: brows, eyes, nose, mouth (sketch lines only).
+  g.lineWidth = 4 * u;
+  for (const s of [-1, 1]) {
+    g.beginPath();
+    g.moveTo(cx + s * r * 0.18, cy - r * 0.2);
+    g.lineTo(cx + s * r * 0.48, cy - r * 0.24);
+    g.stroke();
+    g.beginPath();
+    g.arc(cx + s * r * 0.33, cy - r * 0.04, r * 0.06, 0, Math.PI * 2);
+    g.fillStyle = INK;
+    g.fill();
+  }
+  g.beginPath();
+  g.moveTo(cx, cy + r * 0.02);
+  g.quadraticCurveTo(cx - r * 0.12, cy + r * 0.3, cx + r * 0.04, cy + r * 0.32);
+  g.stroke();
+  g.beginPath();
+  g.moveTo(cx - r * 0.24, cy + r * 0.56);
+  g.quadraticCurveTo(cx, cy + r * 0.62, cx + r * 0.24, cy + r * 0.54);
+  g.stroke();
+  // Pencil hatching on one cheek, for the sketch look.
+  g.lineWidth = 2 * u;
+  g.strokeStyle = 'rgba(23,13,7,0.45)';
+  for (let i = 0; i < 5; i++) {
+    g.beginPath();
+    g.moveTo(cx + r * (0.4 + i * 0.06), cy + r * 0.15);
+    g.lineTo(cx + r * (0.28 + i * 0.06), cy + r * 0.5);
+    g.stroke();
+  }
+  g.restore();
 }

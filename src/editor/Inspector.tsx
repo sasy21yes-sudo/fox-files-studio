@@ -53,6 +53,7 @@ export const BEAT_TEMPLATES: Record<Beat['kind'], Beat> = {
   list: { cue: '', kind: 'list', items: ['First', 'Second', 'Third'], title: 'List' },
   record: { cue: '', kind: 'record', tag: 'RECORD', who: 'Source', text: 'Quoted line from the record.', highlight: 'record', note: 'Paraphrase' },
   statement: { cue: '', kind: 'statement', lines: ['One strong line.'] },
+  person: { cue: '', kind: 'person', name: 'Name', role: 'Role from the sources', year: '1977' },
 };
 
 // ------------------------------------------------------------------ elements

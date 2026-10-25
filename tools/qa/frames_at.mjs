@@ -18,14 +18,14 @@ const data = await p.evaluate(
     const { buildTimeline, buildShortTimeline } = await import('/src/animation/timeline.ts');
     const { loadStudioPack, studioTiming } = await import('/src/audio/studioVoice.ts');
     const { STUDIO_VOICES } = await import('/src/audio/studioVoices.ts');
-    const { switchLanguage } = await import('/src/data/project.ts');
+    const { restoreProject, switchLanguage } = await import('/src/data/project.ts');
     const { loadCanvasFonts } = await import('/src/app/fonts.ts');
     const { loadProjectMedia } = await import('/src/media/store.ts');
     const R = await import('/src/character/rig/rigPuppet.ts');
     await R.loadRig();
     await loadCanvasFonts();
     const saved = await (await fetch(`/episodes/${EPISODE}.foxproj.json?${Date.now()}`)).json();
-    const pr = switchLanguage(saved, LANG || saved.settings.language);
+    const pr = switchLanguage(restoreProject(saved) ?? saved, LANG || saved.settings.language);
     if (ASPECT) pr.settings.aspect = ASPECT;
     await loadProjectMedia(pr);
     const lang = pr.settings.language;
