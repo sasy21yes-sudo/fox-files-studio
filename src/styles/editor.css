@@ -1,8 +1,13 @@
 /* ------------------------------------------------------------------ editor layout (Resolve-style) */
 
 .studio.editor {
-  grid-template-columns: 268px minmax(0, 1fr) 372px;
-  grid-template-rows: auto minmax(0, 1fr) minmax(230px, 40vh);
+  /* Panel sizes: the splitters (editor/Splitters.tsx) set these on the element. */
+  --left-w: 268px;
+  --right-w: 372px;
+  --tl-h: max(230px, 40vh);
+  position: relative;
+  grid-template-columns: var(--left-w) minmax(0, 1fr) var(--right-w);
+  grid-template-rows: auto minmax(0, 1fr) var(--tl-h);
   grid-template-areas:
     'top top top'
     'left center props'
@@ -736,11 +741,18 @@ textarea.itext {
   border-left: 1px solid var(--line);
   background: var(--panel);
 }
+/* The column scrolls as a whole: Ask Claude and the monitor no longer squeeze the properties to a sliver. */
+.right-col {
+  overflow-y: auto;
+}
+.right-col > * {
+  flex-shrink: 0;
+}
 .right-col > .properties,
 .right-col > .inspector {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
+  flex: 1 0 auto;
+  min-height: 320px;
+  overflow: visible;
   border-left: 0;
 }
 .studio.editor.theater .right-col {
@@ -1357,4 +1369,68 @@ textarea.itext {
   background: #2a1d12;
   border-radius: 6px;
   flex: none;
+}
+
+/* ---------- Panel splitters (drag the edges between left / centre / right and the timeline) ---------- */
+.split {
+  z-index: 20;
+  position: relative;
+  touch-action: none;
+}
+.split::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  transition: background 0.12s;
+}
+.split:hover::after,
+.split.on::after {
+  background: var(--brass);
+  opacity: 0.6;
+}
+.split-left,
+.split-right {
+  grid-row: 2;
+  width: 7px;
+  cursor: col-resize;
+}
+.split-left {
+  grid-area: left;
+  justify-self: end;
+  margin-right: -4px;
+}
+.split-right {
+  grid-area: props;
+  justify-self: start;
+  margin-left: -4px;
+}
+.split-tl {
+  grid-area: tl;
+  align-self: start;
+  height: 7px;
+  margin-top: -4px;
+  cursor: row-resize;
+}
+body.resizing-h,
+body.resizing-h * {
+  cursor: col-resize !important;
+  user-select: none;
+}
+body.resizing-v,
+body.resizing-v * {
+  cursor: row-resize !important;
+  user-select: none;
+}
+@media (max-width: 1180px) {
+  .split-left,
+  .split-right {
+    display: none;
+  }
+}
+/* Three-way choices (model, thinking) on one line, whatever the column width. */
+.ai-body .row > .segmented {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 }

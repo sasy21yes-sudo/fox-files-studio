@@ -27,6 +27,7 @@ import { TimelineEditor } from '../editor/TimelineEditor';
 import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
 import { TeamPage } from '../editor/TeamPage';
+import { Splitters, usePanelSizes } from '../editor/Splitters';
 import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
@@ -49,6 +50,7 @@ export function App() {
   const [savedTick, setSavedTick] = useState(0);
   const [selection, setSelectionRaw] = useState<Selection>({ kind: 'scene', scene: 0 });
   const [theater, setTheater] = useState(false);
+  const panels = usePanelSizes();
   const [showSources, setShowSources] = useState(false);
   const [showSheet, setShowSheet] = useState(false);
   const [musicBuffer, setMusicBuffer] = useState<AudioBuffer | null>(null);
@@ -634,7 +636,7 @@ export function App() {
   };
 
   return (
-    <div className={`studio editor page-${page} ${theater ? 'theater' : ''}`}>
+    <div className={`studio editor page-${page} ${theater ? 'theater' : ''}`} style={page === 'edit' && !theater ? panels.style : undefined}>
       <TopBar
         project={project}
         page={page}
@@ -686,6 +688,7 @@ export function App() {
 
       {page === 'edit' && (
         <>
+          {!theater && <Splitters setSizes={panels.setSizes} />}
           <LeftPanel
             project={project}
             timeline={timeline}
