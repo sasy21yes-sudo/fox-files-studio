@@ -5,7 +5,7 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "fr-ff_siwis.mp3",
-"duration": 192.05,
+"duration": 189.194,
 "sentences": {
 "La CIA a drogué des gens qui n'en savaient rien.": [
 0.35,
@@ -58,150 +58,150 @@
 ],
 "Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964.": [
 25.32,
-7.55,
+5.8863,
 [
-4.075
+3.2102
 ]
 ],
 "Soit onze ans.": [
-33.22,
+31.5563,
 0.86,
 []
 ],
 "Les archives qui ont survécu recensent 149 sous-projets.": [
-34.43,
+32.7663,
 3.7,
 []
 ],
 "Elles citent 80 institutions, dont 44 universités et établissements d'enseignement supérieur.": [
-38.48,
+36.8163,
 5.99,
 [
 1.995
 ]
 ],
 "Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.": [
-44.82,
+43.1563,
 4.79,
 []
 ],
 "Alors, que faisaient concrètement tous ces sous-projets ?": [
-49.96,
+48.2963,
 2.46,
 []
 ],
 "Le directeur les a classés par catégories.": [
-52.77,
+51.1063,
 2.23,
 []
 ],
 "Parmi elles : drogues et alcool.": [
-55.35,
+53.6863,
 1.57,
 []
 ],
 "Hypnose.": [
-57.27,
+55.6063,
 0.79,
 []
 ],
 "Recherche sur le sommeil.": [
-58.41,
+56.7463,
 1.4,
 []
 ],
 "Détecteurs de mensonge.": [
-60.16,
+58.4963,
 1.44,
 []
 ],
 "Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires.": [
-61.95,
+60.2863,
 4.55,
 [
 2.27
 ]
 ],
 "Le LSD faisait partie des drogues testées.": [
-66.85,
+65.1863,
 2.21,
 []
 ],
 "Et voici le plus important.": [
-69.41,
+67.7463,
 1.43,
 []
 ],
 "Certaines des personnes testées étaient volontaires.": [
-71.19,
+69.5263,
 2.36,
 []
 ],
 "D'autres n'ont jamais été prévenues.": [
-73.9,
+72.2363,
 1.62,
 []
 ],
 "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu.": [
-75.87,
+74.2063,
 4.79,
 [
 2.75
 ]
 ],
 "À leur insu, ça veut dire sans le savoir.": [
-81.01,
+79.3463,
 2.14,
 []
 ],
 "Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York.": [
-83.5,
+81.8363,
 5.04,
 [
 2.56
 ]
 ],
 "Il n'y avait aucun consentement éclairé.": [
-88.89,
+87.2263,
 1.98,
 []
 ],
 "Un cas montre ce que cela voulait dire.": [
-91.22,
+89.5563,
 1.95,
 []
 ],
 "Le docteur Frank Olson était un employé civil de l'armée.": [
-93.52,
+91.8563,
 4.02,
 []
 ],
 "En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.": [
-97.89,
+96.2263,
 6.64,
 [
 3.76
 ]
 ],
 "Environ une semaine plus tard, il était mort.": [
-104.88,
+103.2163,
 2.25,
 []
 ],
 "Alors, comment tout cela a-t-il été découvert ?": [
-107.48,
+105.8163,
 2.28,
 []
 ],
 "En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church.": [
-110.11,
-7.62,
+108.4463,
+7.3048,
 [
-4.69
+4.5324
 ]
 ],
 "Sa mission était de découvrir si les agences de renseignement américaines avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.": [
-118.08,
+116.1011,
 8.54,
 [
 1.85,
@@ -209,7 +209,7 @@
 ]
 ],
 "Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un centre d'archives pour dossiers inactifs.": [
-126.97,
+124.9911,
 9.34,
 [
 2.195,
@@ -218,7 +218,7 @@
 ]
 ],
 "En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.": [
-136.66,
+134.6811,
 6.25,
 [
 1.365,
@@ -226,7 +226,7 @@
 ]
 ],
 "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.": [
-143.26,
+141.2811,
 7.89,
 [
 2.285,
@@ -234,62 +234,63 @@
 ]
 ],
 "Mais ces cartons n'ont jamais été toute l'histoire.": [
-151.5,
+149.5211,
 2.49,
 []
 ],
 "Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.": [
-154.34,
-8.67,
+152.3611,
+8.1425,
 [
-2.745,
-4.39,
-7.135
+2.6005,
+4.1589,
+6.7594
 ]
 ],
 "Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.": [
-163.36,
+160.8536,
 7.69,
 [
 3.915
 ]
 ],
 "Le sénateur Kennedy l'a nommé : Richard Helms.": [
-171.4,
+168.8936,
 3.45,
 []
 ],
 "Ce qui a survécu, ce sont surtout des dossiers financiers.": [
-175.2,
+172.6936,
 2.96,
 []
 ],
 "Des avances, des pièces justificatives, des comptes.": [
-178.51,
+176.0036,
 2.77,
 []
 ],
 "Alors, que sait-on vraiment ?": [
-181.63,
+179.1236,
 1.32,
 []
 ],
 "Assez pour montrer que c'est arrivé.": [
-183.3,
+180.7936,
 1.7,
 []
 ],
 "Pas assez pour savoir tout ce qui est arrivé.": [
-185.35,
+182.8436,
 2.2,
 []
 ],
 "Une grande partie de l'histoire complète ne sera peut-être jamais connue.": [
-187.9,
+185.3936,
 3.8,
 [
 2.15
 ]
 ]
-}
+},
+"pace": 1.0073
 }
