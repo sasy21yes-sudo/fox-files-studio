@@ -21,8 +21,17 @@ export interface AiStatus {
   available: boolean;
   backend?: 'claude-code' | 'api' | null;
   model?: string;
+  /** Models the panel may pick. */
+  models?: string[];
   /** False when the page is not served by `npm run dev`. */
   devServer: boolean;
+}
+
+/** Cost controls of one request. */
+export interface AiOptions {
+  model?: string;
+  effort?: 'low' | 'medium' | 'high';
+  web?: boolean;
 }
 
 /** What to edit: one scene (its index) or the whole episode. */
@@ -68,7 +77,8 @@ export interface AiResult {
   /** Episode changes: episodeTitle, episodeSubtitle, hook, settings, sources_add. */
   episode?: Record<string, unknown> | null;
   images?: AiImage[];
-  usage: { input: number; output: number; cacheRead: number; cacheWrite: number };
+  /** Tokens of the request (new input, cache reads, cache writes, output) and its cost in USD when known. */
+  usage: { input: number; output: number; cacheRead: number; cacheWrite: number; cost?: number };
   model: string;
   attempts: number;
 }
@@ -99,6 +109,8 @@ export async function editWithClaude(
     frames?: AiFrame[];
     /** A check of an edit Claude just made: the original instruction and its summary; frames show the result. */
     review?: { request: string; summary: string };
+    /** Cost controls: model, thinking effort, web search. */
+    options?: AiOptions;
   },
 ): Promise<AiResult> {
   const lang = project.settings.language;
@@ -170,9 +182,11 @@ export async function editWithClaude(
     clips: (await loadClipIndex()).map((c) => ({ id: c.id, label: c.label, frames: c.frames, fps: c.fps, duration: c.duration })),
     frames: extra?.frames?.map((f) => ({ scene: f.scene, at: f.at, label: f.label, data: f.data })),
     review: extra?.review ?? null,
+    options: extra?.options,
   };
   const r = await fetch('/api/claude/edit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal });
   const j = await r.json().catch(() => ({ error: `HTTP ${r.status}` }));
-  if (!r.ok) throw new Error((j as { error?: string }).error ?? `HTTP ${r.status}`);
+  // (a failed answer was still paid for: the error carries its usage)
+  if (!r.ok) throw Object.assign(new Error((j as { error?: string }).error ?? `HTTP ${r.status}`), { usage: (j as { usage?: AiResult['usage'] }).usage });
   return j as AiResult;
 }

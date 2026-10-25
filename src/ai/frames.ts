@@ -14,8 +14,8 @@ export interface AiFrame {
   data: string;
 }
 
-/** Longest side of a frame sent to Claude (px): enough to read pop-ups and subtitles. */
-const FRAME_SIZE = 768;
+/** Longest side of a frame sent to Claude (px): enough to read pop-ups and subtitles (~300 tokens a frame). */
+const FRAME_SIZE = 640;
 
 /**
  * Frames of the given scenes, rendered by the same renderFrame as the preview and the export, so Claude

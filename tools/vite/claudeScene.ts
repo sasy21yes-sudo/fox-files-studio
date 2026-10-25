@@ -7,7 +7,7 @@
  *
  * - Claude Code (default): runs the local `claude` CLI headless (`claude -p`),
  *   so requests use the Claude Code login of this computer — no API key. Its
- *   only tools are web search and web fetch (ideas and references; CLAUDE_WEB=off
+ *   only tools are web search and web fetch, when the panel asks (CLAUDE_WEB=off
  *   in .env turns them off): it never touches files.
  * - Anthropic API: only when no Claude Code binary is found and
  *   ANTHROPIC_API_KEY is set in .env (read on the Node side, never sent to the page).
@@ -78,7 +78,18 @@ interface EditRequest {
   frames?: FrameIn[];
   /** Set when this is a check of an edit just made: frames then show the result of that edit. */
   review?: { request: string; summary: string } | null;
+  /** Cost controls chosen in the panel. */
+  options?: AskOptions;
 }
+
+/** Model, thinking effort and web tools of one request (the panel's cost controls). */
+interface AskOptions {
+  model?: string;
+  effort?: 'low' | 'medium' | 'high';
+  web?: boolean;
+}
+const MODELS = ['claude-opus-5-5', 'claude-sonnet-5-5', 'claude-haiku-5-5'];
+const DEFAULT_EFFORT = 'medium';
 
 interface FrameIn {
   scene: number;
@@ -149,6 +160,8 @@ interface Usage {
   output: number;
   cacheRead: number;
   cacheWrite: number;
+  /** USD, when the backend reports it (Claude Code does). */
+  cost?: number;
 }
 
 /** The reply shape (strict-schema friendly: every object closed, documents as JSON strings). */
@@ -163,7 +176,12 @@ const REPLY_SCHEMA = {
         type: 'object',
         properties: {
           index: { type: 'integer', description: 'Scene index as given (0-based).' },
-          spec_json: { type: 'string', description: 'The complete new SceneSpec as a JSON string, or "" to keep the current one.' },
+          spec_patch_json: {
+            type: 'string',
+            description:
+              'Small spec changes as a JSON Patch string: [{"op": "replace"|"add"|"remove", "path": "/elements/@<id>/params/size", "value": ...}] ("@<id>" = the array item with that id; "-" = append). Prefer this to spec_json whenever the change touches a few values. "" if not used.',
+          },
+          spec_json: { type: 'string', description: 'The complete new SceneSpec as a JSON string, only for big rewrites (spec_patch_json is cheaper), or "" to keep the current one.' },
           beats_json: { type: 'string', description: 'The complete new list of pop-ups as a JSON string, or "" to keep them.' },
           duration: { type: 'number', description: 'New scene length in seconds, or 0 to keep it.' },
           narration: {
@@ -175,7 +193,7 @@ const REPLY_SCHEMA = {
             description: 'Other scene fields to change as a JSON object (title, summary, transition, chapterCard, keywords, sourceIds), or "" to keep them.',
           },
         },
-        required: ['index', 'spec_json', 'beats_json', 'duration', 'narration', 'fields_json'],
+        required: ['index', 'spec_patch_json', 'spec_json', 'beats_json', 'duration', 'narration', 'fields_json'],
         additionalProperties: false,
       },
     },
@@ -229,7 +247,7 @@ const REPLY_SCHEMA = {
 
 interface Reply {
   summary: string;
-  scenes: { index: number; spec_json: string; beats_json: string; duration: number; narration: string; fields_json: string }[];
+  scenes: { index: number; spec_patch_json?: string; spec_json: string; beats_json: string; duration: number; narration: string; fields_json: string }[];
   new_scenes?: { ref: string; title: string; summary: string; narration: string; duration: number; transition: string; spec_json: string; beats_json: string }[];
   order_json?: string;
   episode_json?: string;
@@ -328,7 +346,7 @@ The MKUltra episode takes its episode title, subtitle and scene titles from its 
 Some scenes have no spec ("spec": null): they are drawn by code. You can still change their pop-ups and length without touching the picture (spec_json ""). Write a new spec for one only when the instruction needs a change to its picture; it then replaces the coded version, so build it complete from the narration and the scene intent.
 
 # Rules
-1. Change only what the instruction asks; keep everything else exactly as it was (same ids, same values). A spec you return is the COMPLETE spec, never a fragment.
+1. Change only what the instruction asks; keep everything else exactly as it was (same ids, same values). For a change to a few values, return spec_patch_json (JSON Patch operations, items addressed by "@<id>") and leave spec_json ""; return spec_json, the COMPLETE spec, only when most of the scene changes. Every token you write costs: never repeat what stays the same.
 2. Return only the scenes you changed. For a one-scene instruction, change only that scene. For a whole-episode instruction, keep the episode consistent (same set style, Agent Fox's look, pacing) and avoid rewriting scenes the instruction does not need.
 3. Facts: this is a documentary. Text in pop-ups and on props must be supported by the narration or the listed sources. Never invent numbers, names, dates or quotes. If the instruction asks for a fact that is not supported, do the rest and say so in the summary.
 4. Good cartoon staging: anticipation before big moves, overlapping action, a camera change every 2-4 seconds, key moments on close-ups or inserts, Agent Fox fully in frame in both formats, nothing important hidden behind the subtitles (bottom 20%).
@@ -514,6 +532,62 @@ function checkEpisode(e: unknown, r: EditRequest, problems: string[]): Record<st
 }
 
 /** Checks Claude's reply against the request; returns what to apply or the problems. */
+/**
+ * A JSON Patch (RFC 6902 add / replace / remove) on a copy of a scene spec. A path segment "@<id>" picks the
+ * array item with that id ("/elements/@stamp/params/size"), so Claude need not count indices. Small edits come
+ * back as a few operations instead of the whole spec rewritten (the output tokens were most of the cost).
+ */
+function applyPatch(spec: unknown, ops: unknown, at: string, problems: string[]): unknown {
+  if (!Array.isArray(ops)) {
+    problems.push(`${at}: spec_patch_json must be a list of operations`);
+    return null;
+  }
+  const doc = structuredClone(spec) as Record<string, unknown>;
+  for (const [n, op] of ops.entries()) {
+    const o = op as { op?: string; path?: string; value?: unknown };
+    const where = `${at}: patch op ${n + 1} (${o.op} ${o.path})`;
+    if (!['add', 'replace', 'remove'].includes(o.op ?? '') || typeof o.path !== 'string' || !o.path.startsWith('/')) {
+      problems.push(`${where}: needs op add|replace|remove and a path starting with /`);
+      continue;
+    }
+    const keys = o.path.slice(1).split('/').map((k) => k.replace(/~1/g, '/').replace(/~0/g, '~'));
+    let parent: unknown = doc;
+    for (const key of keys.slice(0, -1)) {
+      parent = step(parent, key);
+      if (parent === undefined) break;
+    }
+    const last = keys[keys.length - 1];
+    if (!parent || typeof parent !== 'object') {
+      problems.push(`${where}: path not found`);
+      continue;
+    }
+    if (Array.isArray(parent)) {
+      const i = last === '-' ? parent.length : last.startsWith('@') ? parent.findIndex((x) => (x as { id?: unknown })?.id === last.slice(1)) : Number(last);
+      if (!Number.isInteger(i) || i < 0 || i > parent.length || (o.op !== 'add' && i >= parent.length)) {
+        problems.push(`${where}: no such item`);
+        continue;
+      }
+      if (o.op === 'remove') parent.splice(i, 1);
+      else if (o.op === 'add') parent.splice(i, 0, o.value);
+      else parent[i] = o.value;
+    } else {
+      const obj = parent as Record<string, unknown>;
+      if (o.op !== 'add' && !(last in obj)) {
+        problems.push(`${where}: no such field`);
+        continue;
+      }
+      if (o.op === 'remove') delete obj[last];
+      else obj[last] = o.value;
+    }
+  }
+  return doc;
+}
+
+function step(node: unknown, key: string): unknown {
+  if (Array.isArray(node)) return key.startsWith('@') ? node.find((x) => (x as { id?: unknown })?.id === key.slice(1)) : node[Number(key)];
+  return node && typeof node === 'object' ? (node as Record<string, unknown>)[key] : undefined;
+}
+
 function checkReply(reply: Reply, r: EditRequest, validateSpec: (x: unknown) => string[]): Changes & { problems: string[] } {
   const problems: string[] = [];
   const scenes: SceneOut[] = [];
@@ -554,8 +628,12 @@ function checkReply(reply: Reply, r: EditRequest, validateSpec: (x: unknown) => 
     let spec: unknown = null;
     let beats: unknown = null;
     try {
-      if (s.spec_json) {
-        spec = JSON.parse(s.spec_json);
+      if (s.spec_patch_json && !s.spec_json) {
+        if (!src.spec) problems.push(`${at}: spec_patch_json needs a current spec (this scene is hand-coded: send spec_json)`);
+        else spec = applyPatch(src.spec, JSON.parse(s.spec_patch_json), at, problems);
+      }
+      if (s.spec_json) spec = JSON.parse(s.spec_json);
+      if (spec) {
         problems.push(...validateSpec(spec).map((p) => `${at}: ${p}`));
         checkPictures(spec, at, r, keys, problems);
       }
@@ -662,7 +740,7 @@ interface Answer {
 interface Backend {
   name: 'claude-code' | 'api';
   model: string;
-  ask(system: string, user: string, signal: AbortSignal, pics?: Picture[]): Promise<Answer>;
+  ask(system: string, user: string, signal: AbortSignal, pics: Picture[], opts: AskOptions): Promise<Answer>;
 }
 
 /** The newest Claude Code binary on this computer: CLAUDE_CODE_BIN, PATH, the native installer, then editor extensions. */
@@ -698,7 +776,7 @@ function findClaudeCode(env: Record<string, string>): string | null {
 /** Variables that tie a process to a running Claude Code session; the studio's call must be its own session. */
 const SESSION_VARS = /^(CLAUDECODE|CLAUDE_PID|CLAUDE_EFFORT|CLAUDE_AGENT_SDK_VERSION|CLAUDE_CODE_(ENTRYPOINT|SESSION_ID|CHILD_SESSION|MESSAGING_SOCKET|MESSAGING_TOKEN|SESSION_ATTENDED|EXECPATH|EMIT_STARTUP_TIMING|ENABLE_SDK_FILE_CHECKPOINTING))$/;
 
-function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
+function claudeCodeBackend(bin: string, model: string, webAllowed: boolean): Backend {
   // Runs outside the project so no CLAUDE.md, settings or MCP servers are picked up.
   const work = path.join(os.tmpdir(), 'fox-studio-claude');
   fs.mkdirSync(work, { recursive: true });
@@ -707,30 +785,26 @@ function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
   return {
     name: 'claude-code',
     model,
-    ask(system, user, signal, pics = []) {
+    ask(system, user, signal, pics, opts) {
       const sysFile = path.join(work, 'system.md');
       fs.writeFileSync(sysFile, system);
-      // Frames go as files the CLI may only Read (nothing else on disk), listed at the end of the message.
-      const frames = path.join(work, 'frames');
-      fs.rmSync(frames, { recursive: true, force: true });
-      if (pics.length) {
-        fs.mkdirSync(frames, { recursive: true });
-        pics.forEach((p, i) => fs.writeFileSync(path.join(frames, `frame${String(i + 1).padStart(2, '0')}.jpg`), Buffer.from(p.base64, 'base64')));
-        user += `\n\n# Frame files\nOpen every frame with the Read tool before answering (paths relative to the working directory):\n${pics
-          .map((p, i) => `- frames/frame${String(i + 1).padStart(2, '0')}.jpg: ${p.label}`)
-          .join('\n')}`;
-      }
-      const tools = [...(web ? ['WebSearch', 'WebFetch'] : []), ...(pics.length ? ['Read'] : [])];
+      // The frames go inside the message (stream-json input), so the answer takes one turn. They used to be files
+      // opened with Read, one tool turn each, and every turn re-sent all the frames read before it.
+      const content: unknown[] = [{ type: 'text', text: user }];
+      for (const p of pics) content.push({ type: 'text', text: p.label }, { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: p.base64 } });
+      const tools = webAllowed && opts.web ? ['WebSearch', 'WebFetch'] : [];
       const args = [
         '-p',
-        '--output-format', 'json',
+        '--input-format', 'stream-json',
+        '--output-format', 'stream-json',
+        '--verbose',
         '--json-schema', JSON.stringify(REPLY_SCHEMA),
         '--system-prompt-file', sysFile,
-        '--model', model,
-        '--effort', 'high',
-        // Web search/fetch (ideas and references) and reading the frames; no other file, shell or other tools.
+        '--model', opts.model ?? model,
+        '--effort', opts.effort ?? DEFAULT_EFFORT,
+        // Only web search/fetch, and only when the request asks for them: no file, shell or other tools.
         '--tools', tools.join(','),
-        ...(tools.length ? ['--allowedTools', ...tools.map((t) => (t === 'Read' ? 'Read(./frames/**)' : t))] : []),
+        ...(tools.length ? ['--allowedTools', ...tools] : []),
         '--setting-sources', '',
         '--strict-mcp-config',
         '--disable-slash-commands',
@@ -750,16 +824,24 @@ function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
           clearTimeout(timer);
           signal.removeEventListener('abort', stop);
           if (signal.aborted) return reject(new Error('stopped'));
-          let j: {
+          type Result = {
+            type?: string;
             is_error?: boolean;
             result?: string;
             structured_output?: Reply;
             usage?: { input_tokens?: number; output_tokens?: number; cache_read_input_tokens?: number; cache_creation_input_tokens?: number };
             modelUsage?: Record<string, unknown>;
+            total_cost_usd?: number;
           };
-          try {
-            j = JSON.parse(out);
-          } catch {
+          const lines = out.split('\n').flatMap((l) => {
+            try {
+              return [JSON.parse(l) as Result];
+            } catch {
+              return [];
+            }
+          });
+          const j = lines.filter((x) => x.type === 'result').at(-1);
+          if (!j) {
             const why = (err || out).trim().split('\n').slice(-3).join(' ') || `exit code ${code}`;
             return reject(new Error(`Claude Code did not answer: ${why}`));
           }
@@ -769,13 +851,14 @@ function claudeCodeBackend(bin: string, model: string, web: boolean): Backend {
             output: u.output_tokens ?? 0,
             cacheRead: u.cache_read_input_tokens ?? 0,
             cacheWrite: u.cache_creation_input_tokens ?? 0,
+            cost: j.total_cost_usd,
           };
-          const used = Object.keys(j.modelUsage ?? {}).find((m) => m.startsWith('claude-opus') || m.startsWith('claude-sonnet') || m.startsWith('claude-fable')) ?? model;
+          const used = Object.keys(j.modelUsage ?? {}).find((m) => /^claude-(opus|sonnet|haiku|fable)/.test(m)) ?? opts.model ?? model;
           if (j.is_error || !j.structured_output) {
             resolve({ reply: null, error: j.result?.trim() || 'Claude Code returned no structured answer.', usage, model: used });
           } else resolve({ reply: j.structured_output, usage, model: used });
         });
-        child.stdin.end(user);
+        child.stdin.end(`${JSON.stringify({ type: 'user', message: { role: 'user', content } })}\n`);
       });
     },
   };
@@ -785,7 +868,7 @@ function apiBackend(client: Anthropic, model: string): Backend {
   return {
     name: 'api',
     model,
-    async ask(system, user, signal, pics = []) {
+    async ask(system, user, signal, pics, opts) {
       const content: Anthropic.Beta.BetaContentBlockParam[] = [{ type: 'text', text: user }];
       for (const p of pics) {
         content.push({ type: 'text', text: p.label });
@@ -793,11 +876,11 @@ function apiBackend(client: Anthropic, model: string): Backend {
       }
       const stream = client.beta.messages.stream(
         {
-          model,
+          model: opts.model ?? model,
           max_tokens: 64000,
           betas: ['server-side-fallback-2026-07-01'],
           fallbacks: 'default',
-          output_config: { effort: 'high', format: { type: 'json_schema', schema: REPLY_SCHEMA } },
+          output_config: { effort: opts.effort ?? DEFAULT_EFFORT, format: { type: 'json_schema', schema: REPLY_SCHEMA } },
           system: [{ type: 'text', text: system, cache_control: { type: 'ephemeral' } }],
           messages: [{ role: 'user', content }],
         },
@@ -886,7 +969,7 @@ export function claudeScene(): Plugin {
         });
         try {
           if (req.method === 'GET' && req.url?.startsWith('/status'))
-            return send(res, 200, { available: !!backend, backend: backend?.name ?? null, model: backend?.model ?? model });
+            return send(res, 200, { available: !!backend, backend: backend?.name ?? null, model: backend?.model ?? model, models: MODELS });
           if (req.method !== 'POST' || !req.url?.startsWith('/edit')) return send(res, 404, { error: 'not found' });
           if (!backend) return send(res, 503, { error: 'Claude Code was not found on this computer (and there is no ANTHROPIC_API_KEY in .env).' });
           const r = JSON.parse(await readBody(req)) as EditRequest;
@@ -897,13 +980,21 @@ export function claudeScene(): Plugin {
           const usage: Usage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 };
           let user = userMessage(r);
           const pics = pictures(r);
+          const o = r.options ?? {};
+          const opts: AskOptions = {
+            model: o.model && MODELS.includes(o.model) ? o.model : undefined,
+            effort: o.effort && ['low', 'medium', 'high'].includes(o.effort) ? o.effort : DEFAULT_EFFORT,
+            web: !!o.web,
+          };
 
           for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-            const a = await backend.ask(sys, user, abort.signal, pics);
+            // A second try fixes the format of the first answer: it needs the text, not the frames again.
+            const a = await backend.ask(sys, user, abort.signal, attempt === 1 ? pics : [], opts);
             usage.input += a.usage.input;
             usage.output += a.usage.output;
             usage.cacheRead += a.usage.cacheRead;
             usage.cacheWrite += a.usage.cacheWrite;
+            if (a.usage.cost !== undefined) usage.cost = (usage.cost ?? 0) + a.usage.cost;
             if (!a.reply) return send(res, 502, { error: a.error, usage });
             const { problems, ...changes } = checkReply(a.reply, r, validateSpec);
             if (!problems.length) return send(res, 200, { summary: a.reply.summary, ...changes, usage, model: a.model, attempts: attempt });
