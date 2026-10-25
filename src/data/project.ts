@@ -1,4 +1,4 @@
-import type { Hook, MediaItem, Project, ProjectSettings, Scene, Source, TransitionType } from '../types';
+import type { Hook, MediaItem, Project, ProjectSettings, Scene, ShortCut, Source, TransitionType } from '../types';
 import type { Beat } from './mkultraScript';
 import { createMkultraProject } from './mkultraProject';
 import { starterSpec } from './specs';
@@ -141,6 +141,14 @@ export function restoreProject(raw: unknown): Project | null {
     .filter((s): s is Scene => !!s);
   if (!scenes.length) return null;
   const sources = Array.isArray(stored.sources) ? (stored.sources.filter((s) => isObj(s) && typeof s.id === 'string') as Source[]) : base.sources;
+  /** The Short's own cut: kept only with well-formed clips. */
+  function restoreShort(v: unknown): ShortCut | undefined {
+    if (!isObj(v) || !Array.isArray(v.clips)) return undefined;
+    const clips = v.clips.filter(
+      (c): c is ShortCut['clips'][number] => isObj(c) && typeof c.scene === 'string' && Number.isInteger(c.from) && Number.isInteger(c.to),
+    );
+    return { enabled: v.enabled !== false, clips };
+  }
   return {
     ...base,
     id: typeof stored.id === 'string' && stored.id ? stored.id : base.id,
@@ -156,6 +164,7 @@ export function restoreProject(raw: unknown): Project | null {
       : undefined,
     sources,
     scenes,
+    short: restoreShort(stored.short),
     settings: {
       ...base.settings,
       ...(isObj(stored.settings) ? stored.settings : {}),

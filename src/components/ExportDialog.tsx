@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ExportMethod, ExportResult, ExportSettings, Project } from '../types';
-import { buildTimeline, formatTime, toSRT, toVTT, type Timeline, type VoiceTiming } from '../animation/timeline';
+import { buildShortTimeline, buildTimeline, formatTime, toSRT, toVTT, type Timeline, type VoiceTiming } from '../animation/timeline';
 import { fitMusicTrack, renderAmbience } from '../audio/ambience';
 import { buildPublishingKit } from '../export/publishingKit';
 import { EXPORT_FPS, EXPORT_SIZES, detectCapabilities, type Capabilities } from '../export/capabilities';
@@ -218,7 +218,8 @@ export function ExportDialog({ project, timeline, musicBuffer, customMusic, narr
     try {
       for (const [i, a] of (['16:9', '9:16'] as const).entries()) {
         const proj: Project = { ...project, settings: { ...project.settings, aspect: a } };
-        const tl = buildTimeline(proj, undefined, mode === 'studio' ? voice : null);
+        // The Short is its own cut when the project has one (project.short), else the whole episode with the hook.
+        const tl = (a === '9:16' && buildShortTimeline(proj, mode === 'studio' ? voice : null)) || buildTimeline(proj, undefined, mode === 'studio' ? voice : null);
         const music = includeMusic ? (customMusic ? fitMusicTrack(customMusic, tl) : await renderAmbience(tl)) : null;
         const vc = caps.webCodecs.available ? caps.webCodecs.video[a] : null;
         const rec = caps.recorder.formats.find((f) => f.extension === 'mp4') ?? caps.recorder.formats[0];

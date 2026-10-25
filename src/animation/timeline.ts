@@ -33,6 +33,10 @@ export interface SceneSpan {
   overflow: boolean;
   /** True when the scene was lengthened to fit the recorded (neural) narration. */
   extended: boolean;
+  /** Short cut only: where the clip starts inside the scene (real s) and the scene's full length, so the
+   *  choreography plays exactly as in the episode. */
+  offset?: number;
+  fullDuration?: number;
 }
 
 /** One rendered narration sentence. */
@@ -65,6 +69,8 @@ export interface Timeline {
   clips: { text: string; start: number; duration: number }[];
   /** Voice level (0..1) at a timeline time when the narration is recorded; drives the mouth. */
   level?: (t: number) => number;
+  /** True for the Short's own cut (buildShortTimeline): no chapter cards, spans are clips of scenes. */
+  short?: boolean;
   /** Cold-open hook at the start of the 9:16 Short (scene spans start after it). */
   hook?: { start: 0; end: number; text: string; keywords: string[] };
 }
@@ -289,7 +295,7 @@ export const cueAt = (tl: Timeline, t: number): Subtitle | undefined =>
 
 /** Time-stretch factor from real scene seconds to authored choreography seconds. */
 export const choreoTime = (span: SceneSpan, local: number) =>
-  local * (span.scene.authoredDuration / span.duration);
+  (local + (span.offset ?? 0)) * (span.scene.authoredDuration / (span.fullDuration ?? span.duration));
 
 export function formatTime(t: number): string {
   const s = Math.max(0, t);
@@ -322,4 +328,86 @@ export function toVTT(tl: Timeline): string {
       : 'WEBVTT\nNOTE Timing is estimated from word counts (scene-level sync), not measured from audio.\n\n') +
     tl.cues.map((c) => `${stamp(c.start, '.')} --> ${stamp(c.end, '.')}\n${c.text}\n`).join('\n')
   );
+}
+
+// ---------- The Short's own cut ----------
+
+/** Lead-in before a Short clip's first word and breath after its last (real s); the last clip holds longer. */
+const SHORT_PRE = 0.25;
+const SHORT_POST = 0.45;
+const SHORT_END = 1.4;
+
+/** When sentences from..to of a scene are heard in a timeline: from the voice clips, else from the cues. */
+function sentenceRange(tl: Timeline, span: SceneSpan, from: number, to: number): [number, number] | null {
+  const sentences = splitSentences(span.scene.narration);
+  const lo = Math.max(0, Math.min(from, to));
+  const hi = Math.min(sentences.length - 1, Math.max(from, to));
+  if (lo > hi) return null;
+  const inSpan = (t: number) => t >= span.start - 1e-3 && t < span.end;
+  const voiced = sentences.slice(lo, hi + 1).map((s) => tl.clips.find((c) => c.text === s && inSpan(c.start)));
+  if (voiced.every(Boolean)) return [voiced[0]!.start, voiced[voiced.length - 1]!.start + voiced[voiced.length - 1]!.duration];
+  // No recording: walk the scene's cues, which are the sentences' parts in order.
+  const norm = (s: string) => s.replace(/\s+/g, '').length;
+  const cues = tl.cues.filter((c) => c.sceneIndex === span.index);
+  let si = 0;
+  let acc = 0;
+  let start: number | null = null;
+  let end: number | null = null;
+  for (const c of cues) {
+    if (si >= lo && si <= hi) {
+      start ??= c.start;
+      end = c.end;
+    }
+    acc += norm(c.text);
+    if (si < sentences.length && acc >= norm(sentences[si]) - 1) {
+      si++;
+      acc = 0;
+    }
+  }
+  return start !== null && end !== null ? [start, end] : null;
+}
+
+/**
+ * The Short as its own cut (project.short): the hook, then each clip - a run of sentences of one scene, cut from
+ * the 9:16 episode with its picture, voice, pop-ups and sounds - back to back, without chapter cards. Null when
+ * the project has no enabled cut. The editor keeps working on the whole episode's timeline.
+ */
+export function buildShortTimeline(project: Project, voice?: VoiceTiming | null): Timeline | null {
+  const cut = project.short;
+  if (!cut?.enabled || !cut.clips.length) return null;
+  const long = buildTimeline({ ...project, settings: { ...project.settings, aspect: '9:16' } }, undefined, voice);
+  let cursor = long.hook?.end ?? 0;
+  const spans: SceneSpan[] = [];
+  const cues: Subtitle[] = long.cues.filter((c) => c.sceneIndex < 0);
+  const clips = long.clips.filter((c) => c.start < cursor);
+  const map: { start: number; end: number; from: number; said: number }[] = [];
+  cut.clips.forEach((clip, n) => {
+    const L = long.spans.find((s) => s.scene.id === clip.scene);
+    const range = L && sentenceRange(long, L, clip.from, clip.to);
+    if (!L || !range) return;
+    const last = n === cut.clips.length - 1;
+    const a = Math.max(L.start, range[0] - SHORT_PRE);
+    const b = Math.min(L.end, range[1] + (last ? SHORT_END : SHORT_POST));
+    const k = spans.length;
+    const shift = cursor - a;
+    spans.push({ ...L, index: k, start: cursor, end: cursor + (b - a), duration: b - a, offset: a - L.start, fullDuration: L.duration, overflow: false, extended: false });
+    // Only the chosen sentences speak: the breath after the last one shows the picture, not the next line.
+    const said = (t: number) => t >= range[0] - 0.05 && t < range[1] - 0.05;
+    for (const c of long.cues)
+      if (c.sceneIndex === L.index && said(c.start)) cues.push({ ...c, id: `short-${k}-${c.id}`, sceneIndex: k, start: c.start + shift, end: Math.min(c.end, b) + shift });
+    for (const c of long.clips) if (said(c.start)) clips.push({ ...c, start: c.start + shift });
+    map.push({ start: cursor, end: cursor + (b - a), from: a, said: range[1] });
+    cursor += b - a;
+  });
+  if (!spans.length) return null;
+  const longLevel = long.level;
+  const level = longLevel
+    ? (t: number) => {
+        const m = map.find((x) => t >= x.start && t < x.end);
+        if (!m) return t < (long.hook?.end ?? 0) ? longLevel(t) : 0;
+        const lt = t - m.start + m.from;
+        return lt < m.said ? longLevel(lt) : 0;
+      }
+    : undefined;
+  return { total: cursor, spans, cues, hook: long.hook, lang: long.lang, voiced: long.voiced, clips, level, short: true };
 }

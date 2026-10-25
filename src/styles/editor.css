@@ -1434,3 +1434,39 @@ body.resizing-v * {
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
 }
+/* ---------- Short cut panel ---------- */
+.short-list {
+  max-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 6px 8px;
+  margin-top: 6px;
+}
+.short-scene {
+  margin: 6px 0 8px;
+}
+.short-scene > strong {
+  display: block;
+  font-size: 12px;
+  color: var(--brass-hi);
+  margin-bottom: 2px;
+}
+.short-line {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  gap: 6px;
+  align-items: start;
+  font-size: 12px;
+  line-height: 1.35;
+  padding: 2px 0;
+  color: var(--muted);
+  cursor: pointer;
+}
+.short-line.on {
+  color: var(--text);
+}
+.short-line code {
+  font-size: 11px;
+  color: var(--muted);
+}

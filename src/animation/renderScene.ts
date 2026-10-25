@@ -98,9 +98,9 @@ export function renderFrame(
     h,
     u,
     vertical,
-    t: local,
+    t: local + (span.offset ?? 0),
     k: choreoTime(span, local),
-    dur: span.duration,
+    dur: span.fullDuration ?? span.duration,
     authored: span.scene.authoredDuration,
     time,
     speaking: !!cue && cue.sceneIndex === span.index,
@@ -135,7 +135,8 @@ export function renderFrame(
   renderBeats(g, w, h, tl, span.index, time);
 
   // Chapter intertitle (or a plain transition) at the start of each scene.
-  const chapters = project.settings.chapterCards !== false && span.scene.chapterCard !== false;
+  // (the Short's own cut has no chapter cards: clips cut straight into each other)
+  const chapters = !tl.short && project.settings.chapterCards !== false && span.scene.chapterCard !== false;
   if (chapters && local < CHAPTER_LEN) {
     drawChapterCard(g, w, h, u, local, time, span.index + 1, span.scene.title, span.index === 0);
   } else if (!chapters && local < TRANSITION_IN) {
@@ -154,7 +155,7 @@ export function renderFrame(
   drawGate(g, w, h, u);
 
   if (opts.burnSubtitles && opts.subtitles.enabled && cue) {
-    drawSubtitle(g, w, h, cue, project.scenes[cue.sceneIndex]?.keywords ?? [], opts.subtitles);
+    drawSubtitle(g, w, h, cue, tl.spans[cue.sceneIndex]?.scene.keywords ?? [], opts.subtitles);
   }
   if (opts.showSafeArea) drawSafeArea(g, w, h);
 }

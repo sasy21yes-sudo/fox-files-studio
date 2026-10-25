@@ -5,7 +5,7 @@ import { loadInitialProject, loadProject, saveProject, stashProject, storage } f
 import { recorderStatus, startRecorder, type RecorderStatus } from '../audio/voiceRecorder';
 import { episodeHash, markSynced, onEpisodesChanged, pullEpisode, pushEpisode, syncAvailable, syncedHash, syncStatus, type SyncStatus } from '../data/episodeSync';
 import { projectHook } from '../data/projectText';
-import { buildTimeline, hasHook, locate, splitSentences } from '../animation/timeline';
+import { buildShortTimeline, buildTimeline, hasHook, locate, splitSentences } from '../animation/timeline';
 import { fitMusicTrack, renderAmbience } from '../audio/ambience';
 import { renderSfx } from '../audio/sfx';
 import { AudioEngine, type NarrationFile } from '../audio/narration';
@@ -28,6 +28,7 @@ import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
 import { TeamPage } from '../editor/TeamPage';
 import { Splitters, usePanelSizes } from '../editor/Splitters';
+import { ShortPanel } from '../editor/ShortPanel';
 import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
@@ -116,7 +117,12 @@ export function App() {
   }, [studioMode, pack, voiceKey, liveVersion]);
 
   const timeline = useMemo(() => buildTimeline(project, undefined, timing), [project, timing]);
-  const durationsKey = timeline.spans.map((s) => s.duration.toFixed(2)).join(',') + '|' + timeline.cues.map((c) => c.start.toFixed(2)).join(',');
+  // The Short's own cut (9:16 with project.short): the preview plays it while "Preview the Short" is on, and the
+  // export renders what the preview plays. The editor (scene list, timeline, inspector) keeps the whole episode.
+  const shortTl = useMemo(() => (project.settings.aspect === '9:16' ? buildShortTimeline(project, timing) : null), [project, timing]);
+  const [shortView, setShortView] = useState(false);
+  const playTl = shortView && shortTl ? shortTl : timeline;
+  const durationsKey = playTl.spans.map((s) => s.duration.toFixed(2)).join(',') + '|' + timeline.cues.map((c) => c.start.toFixed(2)).join(',');
 
   // Sentences the pack does not have (the user rewrote them).
   const sentences = useMemo(() => {
@@ -126,9 +132,9 @@ export function App() {
   const missing = useMemo(() => (timing ? sentences.filter((x) => !timing.clip(x)) : []), [sentences, timing]);
   const studioTrack = useMemo<NarrationFile | null>(() => {
     if (!timing) return null;
-    const buffer = renderStudioTrack(timeline, timing);
+    const buffer = renderStudioTrack(playTl, timing);
     return buffer ? { name: `Studio voice · ${studio.label}`, duration: buffer.duration, buffer } : null;
-  }, [timeline, timing, studio.label]);
+  }, [playTl, timing, studio.label]);
 
   // The local voice server is probed automatically only when the studio itself runs on this machine
   // (a public page asking for 127.0.0.1 would trigger a browser permission prompt).
@@ -171,10 +177,10 @@ export function App() {
   const narrationTrack = studioMode ? studioTrack : project.settings.narrationMode === 'file' ? narrationFile : null;
 
   // A music track loaded by the user replaces the built-in score (looped, ducked under the voice).
-  const fittedMusic = useMemo(() => (customMusic ? fitMusicTrack(customMusic.buffer, timeline) : null), [customMusic, timeline]);
+  const fittedMusic = useMemo(() => (customMusic ? fitMusicTrack(customMusic.buffer, playTl) : null), [customMusic, playTl]);
   const activeMusic = fittedMusic ?? musicBuffer;
-  const sfxBuffer = useMemo(() => renderSfx(timeline), [timeline]);
-  const playback = usePlayback({ project, timeline, engine, narrator, musicBuffer: activeMusic, narrationFile: narrationTrack, sfxBuffer });
+  const sfxBuffer = useMemo(() => renderSfx(playTl), [playTl]);
+  const playback = usePlayback({ project, timeline: playTl, engine, narrator, musicBuffer: activeMusic, narrationFile: narrationTrack, sfxBuffer });
   const current = locate(timeline, playback.time).span.index;
 
   // ---- Persistence (debounced autosave into the project library).
@@ -385,7 +391,7 @@ export function App() {
   useEffect(() => {
     let alive = true;
     const id = window.setTimeout(() => {
-      renderAmbience(timeline).then(
+      renderAmbience(playTl).then(
         (b) => alive && setMusicBuffer(b),
         () => alive && setMusicBuffer(null),
       );
@@ -624,7 +630,7 @@ export function App() {
 
   const exportProps = {
     project,
-    timeline,
+    timeline: playTl,
     musicBuffer: activeMusic,
     customMusic: customMusic?.buffer ?? null,
     narrationFile: narrationTrack,
@@ -701,13 +707,16 @@ export function App() {
           <main className="center">
             <PreviewPlayer
               project={project}
-              timeline={timeline}
+              timeline={playTl}
               playback={playback}
-              audioLabel={audioLabel}
-              editing={{ selection: sel, onSelect: setSelection, onChange: change, onFox: setFoxLive }}
+              audioLabel={shortView && shortTl ? `Short cut · ${audioLabel}` : audioLabel}
+              editing={shortView && shortTl ? undefined : { selection: sel, onSelect: setSelection, onChange: change, onFox: setFoxLive }}
             />
           </main>
           <div className="right-col">
+          {project.settings.aspect === '9:16' && (
+            <ShortPanel project={project} timeline={timeline} short={shortTl} previewing={shortView && !!shortTl} onPreview={(on) => { setShortView(on); playback.seek(0); }} onChange={change} />
+          )}
           <AiPanel project={project} timeline={timeline} scene={selected} onChange={change} onUndo={hist.undo} retime={(p) => buildTimeline(p, undefined, timing)} />
           <FoxMonitor fox={foxLive} />
           {sel.kind === 'scene' ? (

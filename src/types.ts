@@ -103,6 +103,16 @@ export interface MediaItem {
   seed?: number;
 }
 
+/**
+ * The Short as its own cut (a summary of the strongest moments): clips of the episode, each a run of sentences
+ * of one scene, played back to back after the hook. Sentences are counted in the scene's narration (0-based,
+ * splitSentences), the same in every language.
+ */
+export interface ShortCut {
+  enabled: boolean;
+  clips: { scene: string; from: number; to: number }[];
+}
+
 export interface Project {
   id: string;
   schemaVersion: number;
@@ -110,6 +120,8 @@ export interface Project {
   template: 'mkultra' | 'custom';
   /** Last edit (ms since epoch), for the project library. */
   updated?: number;
+  /** The Short's own cut (9:16): without it, the Short is the whole episode with the hook. */
+  short?: ShortCut;
   /** Images that picture elements can show. */
   media?: MediaItem[];
   /** Short hook for custom episodes, per language. */

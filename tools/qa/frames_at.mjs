@@ -13,9 +13,9 @@ p.setDefaultTimeout(300000);
 await p.goto(URL);
 await p.waitForTimeout(2500);
 const data = await p.evaluate(
-  async ([LANG, ASPECT, TIMES, WIDTH, EPISODE]) => {
+  async ([LANG, ASPECT, TIMES, WIDTH, EPISODE, SHORT]) => {
     const { renderFrame } = await import('/src/animation/renderScene.ts');
-    const { buildTimeline } = await import('/src/animation/timeline.ts');
+    const { buildTimeline, buildShortTimeline } = await import('/src/animation/timeline.ts');
     const { loadStudioPack, studioTiming } = await import('/src/audio/studioVoice.ts');
     const { STUDIO_VOICES } = await import('/src/audio/studioVoices.ts');
     const { switchLanguage } = await import('/src/data/project.ts');
@@ -31,7 +31,9 @@ const data = await p.evaluate(
     const lang = pr.settings.language;
     const voice = pr.settings.studioVoice?.[lang] ?? STUDIO_VOICES[lang][0].id;
     const pack = await loadStudioPack(lang, voice, undefined, Date.now()).catch(() => null);
-    const tl = buildTimeline(pr, undefined, studioTiming(pack, new Map()));
+    const timing = studioTiming(pack, new Map());
+    // SHORT=1: the Short's own cut.
+    const tl = (SHORT && buildShortTimeline(pr, timing)) || buildTimeline(pr, undefined, timing);
     const V = pr.settings.aspect === '9:16';
     const [w, h] = V ? [540, 960] : [960, 540];
     const c = document.createElement('canvas');
@@ -55,7 +57,7 @@ const data = await p.evaluate(
     });
     return sheet.toDataURL('image/jpeg', 0.85);
   },
-  [LANG, ASPECT, TIMES, WIDTH, EPISODE],
+  [LANG, ASPECT, TIMES, WIDTH, EPISODE, process.env.SHORT === '1'],
 );
 fs.writeFileSync(out, Buffer.from(data.split(',')[1], 'base64'));
 await b.close();

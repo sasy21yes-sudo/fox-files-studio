@@ -29,9 +29,9 @@ await p.goto(URL);
 await p.waitForTimeout(3000);
 
 const kit = await p.evaluate(
-  async ([LANG, ASPECT, EVERY, EPISODE]) => {
+  async ([LANG, ASPECT, EVERY, EPISODE, SHORT]) => {
     const { renderFrame } = await import('/src/animation/renderScene.ts');
-    const { buildTimeline } = await import('/src/animation/timeline.ts');
+    const { buildTimeline, buildShortTimeline } = await import('/src/animation/timeline.ts');
     const { loadStudioPack, studioTiming, renderStudioTrack } = await import('/src/audio/studioVoice.ts');
     const { STUDIO_VOICES } = await import('/src/audio/studioVoices.ts');
     const { renderAmbience } = await import('/src/audio/ambience.ts');
@@ -53,7 +53,8 @@ const kit = await p.evaluate(
     const voice = pr.settings.studioVoice?.[lang] ?? STUDIO_VOICES[lang][0].id;
     const pack = await loadStudioPack(lang, voice).catch(() => null);
     const timing = studioTiming(pack, new Map());
-    const tl = buildTimeline(pr, undefined, timing);
+    // SHORT=1: the Short's own cut (project.short) instead of the whole episode.
+    const tl = (SHORT && buildShortTimeline(pr, timing)) || buildTimeline(pr, undefined, timing);
     const vertical = pr.settings.aspect === '9:16';
     const [w, h] = vertical ? [540, 960] : [960, 540];
     const c = document.createElement('canvas');
@@ -139,10 +140,10 @@ const kit = await p.evaluate(
     };
     return { frames, sheets, timeline, mix: await wav(mix), narration: await wav(narration), music: await wav(music) };
   },
-  [pos[0] ?? null, pos[1] ?? null, every, EPISODE],
+  [pos[0] ?? null, pos[1] ?? null, every, EPISODE, process.env.SHORT === '1'],
 );
 
-const out = pos[2] ?? `qa-out/review/${kit.timeline.language}_${kit.timeline.aspect.replace(':', 'x')}`;
+const out = pos[2] ?? `qa-out/review/${kit.timeline.language}_${kit.timeline.aspect.replace(':', 'x')}${process.env.SHORT === '1' ? '_short' : ''}`;
 // Replace the material, never the team's reports (a whole-folder wipe once deleted round 1's reports).
 for (const f of ['frames', 'sheets', 'mix.wav', 'narration.wav', 'music.wav', 'timeline.json']) fs.rmSync(path.join(out, f), { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'frames'), { recursive: true });

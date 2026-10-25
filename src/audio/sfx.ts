@@ -231,14 +231,17 @@ export function sfxHits(tl: Timeline): Hit[] {
   for (const span of tl.spans) {
     const cues = (span.scene.spec as { sfx?: SfxCue[] } | null | undefined)?.sfx;
     if (!cues?.length) continue;
-    const k = span.duration / Math.max(1e-6, span.scene.authoredDuration);
+    const k = (span.fullDuration ?? span.duration) / Math.max(1e-6, span.scene.authoredDuration);
+    const off = span.offset ?? 0;
     cues.forEach((c, ci) => {
       if (!isSfxSound(c.sound)) return;
       const n = Math.max(1, Math.min(64, Math.round(c.count ?? 1)));
       for (let j = 0; j < n; j++) {
         const at = c.at + j * (c.every ?? 0.12);
         if (at < 0 || at > span.scene.authoredDuration) continue;
-        hits.push({ t: span.start + at * k, sound: c.sound, gain: Math.max(0, Math.min(2, c.gain ?? 1)), pan: Math.max(-1, Math.min(1, c.pan ?? 0)), seed: span.index * 1000 + ci * 64 + j });
+        // (a Short clip plays only its part of the scene)
+        if (at * k < off || at * k - off > span.duration) continue;
+        hits.push({ t: span.start + at * k - off, sound: c.sound, gain: Math.max(0, Math.min(2, c.gain ?? 1)), pan: Math.max(-1, Math.min(1, c.pan ?? 0)), seed: span.index * 1000 + ci * 64 + j });
       }
     });
   }
