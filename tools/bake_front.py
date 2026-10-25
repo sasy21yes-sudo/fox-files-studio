@@ -237,8 +237,32 @@ def mouths(head_bgr, nose, nose_bot, picks):
             print(f'mouth {k + 1}: no mouth found under the nose, skipped')
             continue
         ch = ndi.binary_fill_holes(ndi.binary_closing(np.isin(lab, keep), iterations=3))
-        frac = ch.sum() / box.sum()
+        # An open mouth drops the jaw below the blank head's chin: keep the render's lowered jaw (where it
+        # differs from the head under the chin, next to the mouth), column by column down to its own chin
+        # outline, so the bottom of the mouth is never cut flat; the neck under it stays the head's.
+        cols = np.nonzero(ch.any(0))[0]
+        low = np.zeros_like(box)
+        for x in range(max(x0, cols.min() - 30), min(x1, cols.max() + 31)):
+            yb = int(np.nonzero(box[:, x])[0].max()) if box[:, x].any() else 885
+            low[yb - 6: yb + 120, x] = True
+        dl, dn = ndi.label((np.abs(f - head_bgr.astype(float)).max(2) > 45) & low)
+        touch = set(np.unique(dl[ndi.binary_dilation(ch, iterations=8) & (dl > 0)]))
+        jaw = np.isin(dl, list(touch)) if touch else np.zeros_like(box)
+        dark = f.max(2) < 90
+        for x in np.nonzero(jaw.any(0))[0]:
+            ys_ = np.nonzero(jaw[:, x] & dark[:, x])[0]
+            if len(ys_):
+                jaw[ys_.max() + 4:, x] = False
+            else:
+                jaw[:, x] = False
+        jaw = ndi.binary_fill_holes(ndi.binary_closing(jaw | ch, iterations=3)) & (jaw | ch | low) & ~ch
+        frac = (ch | jaw).sum() / (box | jaw).sum()
         soft = cv2.GaussianBlur(cv2.dilate(ch.astype(np.uint8), np.ones((9, 9), np.uint8)).astype(np.float32), (0, 0), 2.5)
+        # The lowered jaw fades out sideways into the head's own chin (no vertical edge where they meet).
+        xs = np.arange(jaw.shape[1])
+        taper = np.clip((xs - (cols.min() - 25)) / 40.0, 0, 1) * np.clip(((cols.max() + 25) - xs) / 40.0, 0, 1)
+        jsoft = cv2.GaussianBlur(jaw.astype(np.float32), (0, 0), 2.5) * taper[None, :]
+        soft = np.maximum(soft, jsoft)
         _, ka = key(r)
         save(f'mouth_{k + 1}', bgra(r, soft * ka), (0, 0))
         done.append((k + 1, pick[-1]['version'], round(float(frac), 3)))
