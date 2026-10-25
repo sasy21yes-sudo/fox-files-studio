@@ -20,6 +20,7 @@ import { drawMotes, drawMug, drawWallClock } from '../effects/cartoon';
 import { mediaImage } from '../media/store';
 import { clipFrameAt, getClip } from '../media/clips';
 import { FONT_SANS, FONT_TITLE, FONT_TYPE } from '../animation/stage';
+import { tr } from '../i18n/labels';
 import type { ElementType, Num } from './spec';
 import { num } from './tracks';
 
@@ -409,7 +410,8 @@ const FONTS: Record<string, string> = { display: FONT_TITLE, type: FONT_TYPE, sa
  */
 function drawText(c: ElCtx) {
   const { g } = c;
-  const text = ps(c, 'text', '');
+  // Translated as a whole before it is drawn letter by letter (the canvas-level label patch only sees letters).
+  const text = tr(ps(c, 'text', ''));
   if (!text) return;
   const size = pn(c, 'size', 72) * c.u * c.scale;
   const font = `${ps(c, 'weight', 'bold') === 'bold' ? '700' : '400'} ${Math.round(size)}px ${FONTS[ps(c, 'font', 'display')] ?? FONT_TITLE}`;

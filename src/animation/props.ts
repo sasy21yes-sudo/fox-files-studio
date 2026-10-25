@@ -1,5 +1,6 @@
 import { TAU, clamp, easeOut, easeOutBack, hash, hash2, lerp, noise1, rng } from './math';
 import { FONT_TITLE, FONT_TYPE, wrapText } from './stage';
+import { tr } from '../i18n/labels';
 import { paintWash } from '../effects/cartoon';
 
 /**
@@ -439,6 +440,8 @@ export function drawPaper(g: G, x: number, y: number, pw: number, ph: number, ro
 
 export function drawStamp(g: G, text: string, x: number, y: number, size: number, rot: number, p: number, color = '#9b2f1f') {
   if (p <= 0) return;
+  // (translated here, so the frame is measured on the words actually drawn)
+  text = tr(text);
   const s = lerp(1.8, 1, easeOutBack(clamp(p)));
   g.save();
   g.translate(x, y);
