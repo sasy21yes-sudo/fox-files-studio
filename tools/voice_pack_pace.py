@@ -1,12 +1,14 @@
 """Bring studio voice packs to explainer pace and an even level, sentence by sentence (pitch kept).
 
-  python tools/voice_pack_pace.py public/voice/it-it_qwen_narratore.json [more packs...] [--sps 6.6] [--max 1.35]
+  python tools/voice_pack_pace.py public/voice/it-it_qwen_narratore.json [more packs...] [--wpm 170] [--max 1.42]
 
 Run it on packs as rendered (tools/render_voice.py / render_voice_qwen.py), never twice: a pack that already
 has "pace" in its json is skipped. For every sentence clip:
-- speed: the clip is sped up (WSOLA, audiotsm) so it speaks about --sps syllables per second (counted from its
-  text, vowel groups), never slower than recorded, at most --max. One factor per sentence: a single factor for
-  the whole pack left some sentences at 9.6 syllables/s and others still slow (review, 2026-10-24).
+- speed: each clip is sped up (WSOLA, audiotsm) in proportion to how slowly it was read (syllables per second,
+  counted from its text as vowel groups), scaled so the whole pack speaks --wpm words per minute, never slower
+  than recorded, at most --max. One factor per sentence: a single factor for the whole pack left some sentences
+  at 9.6 syllables/s and others still slow (review, 2026-10-24). The syllable count only ranks the sentences of
+  one pack: as an absolute target it sent the English packs to 223 wpm.
 - edges: 0.15 s of silence is added around the clip before the stretch and trimmed after, then a 25 ms fade:
   stretching the exact clip lost its last frame and cut the final vowel in 10 of 49 sentences.
 - level: every sentence brought to the pack's median speech level (RMS of its voiced part), so the voice no
@@ -67,8 +69,8 @@ def speech_rms(x, sr):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('packs', nargs='+')
-    ap.add_argument('--sps', type=float, default=6.6, help='target syllables per second while speaking')
-    ap.add_argument('--max', type=float, default=1.35)
+    ap.add_argument('--wpm', type=float, default=170, help='words per minute while speaking')
+    ap.add_argument('--max', type=float, default=1.42)
     a = ap.parse_args()
     for path in a.packs:
         d = json.load(open(path, encoding='utf-8'))
@@ -82,7 +84,15 @@ def main():
         if audio.ndim > 1:
             audio = audio.mean(1)
         clips = {t: audio[int(round(st * sr)):int(round((st + du) * sr))] for t, (st, du, _) in s.items()}
-        speeds = {t: float(np.clip(a.sps / (syllables(t) / max(0.2, s[t][1])), 1.0, a.max)) for t in s}
+        words = sum(len(t.split()) for t in s)
+        slow = {t: max(0.2, du) / syllables(t) for t, (_, du, _) in s.items()}
+        ref_slow = float(np.median(list(slow.values())))
+        goal = words / a.wpm * 60
+        lo, hi = 0.5, 3.0
+        for _ in range(50):  # bisect the scale that makes the pack speak --wpm
+            c = (lo + hi) / 2
+            speeds = {t: float(np.clip(c * slow[t] / ref_slow, 1.0, a.max)) for t in s}
+            lo, hi = (lo, c) if sum(s[t][1] / speeds[t] for t in s) < goal else (c, hi)
         levels = {t: speech_rms(c, sr) for t, c in clips.items()}
         ref = float(np.median(list(levels.values())))
         parts, out, cur = [], {}, 0.0
@@ -104,7 +114,6 @@ def main():
             sf.write(wav, y, sr, subtype='PCM_16')
             # (mono mp3 like tools/render_voice.py; a higher bitrate since this is a second encode)
             subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', wav, '-ac', '1', '-ar', str(sr), '-c:a', 'libmp3lame', '-b:a', '128k', mp3], check=True)
-        words = sum(len(t.split()) for t in s)
         before = words / sum(v[1] for v in s.values()) * 60
         after = words / sum(v[1] for v in out.values()) * 60
         spread = 20 * np.log10(max(levels.values()) / min(levels.values()))
