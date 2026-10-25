@@ -52,7 +52,9 @@
 "Vamos começar pelo que a própria CIA contou ao Senado.": [
 18.8662,
 2.91,
-[]
+[
+1.95
+]
 ],
 "Segundo o depoimento do diretor da CIA, o MKUltra funcionou de 1953 a 1964.": [
 22.1262,
@@ -81,12 +83,16 @@
 "Também citam 185 pesquisadores e assistentes de fora do governo.": [
 36.425,
 3.5754,
-[]
+[
+1.7016
+]
 ],
 "Então, o que todos esses subprojetos faziam de verdade?": [
 40.3504,
 3.0417,
-[]
+[
+0.7299
+]
 ],
 "O diretor os dividiu em categorias.": [
 43.7422,
@@ -143,7 +149,9 @@
 "Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas.": [
 65.7303,
 4.4288,
-[]
+[
+2.2628
+]
 ],
 "Desavisadas quer dizer que elas não sabiam.": [
 70.5091,
@@ -170,7 +178,9 @@
 "O doutor Frank Olson era um funcionário civil do Exército.": [
 83.1254,
 3.2224,
-[]
+[
+1.3887
+]
 ],
 "Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber.": [
 86.6978,
@@ -193,6 +203,7 @@
 96.3817,
 4.8448,
 [
+1.1831,
 2.9331
 ]
 ],
@@ -200,14 +211,18 @@
 101.5765,
 7.5,
 [
-3.355
+1.565,
+3.355,
+5.98
 ]
 ],
 "Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do MKUltra num centro de arquivos inativos.": [
 109.4265,
 6.2314,
 [
-3.1585
+1.8134,
+3.1585,
+4.5634
 ]
 ],
 "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.": [
@@ -221,7 +236,8 @@
 121.0479,
 7.3822,
 [
-3.3495
+3.0121,
+4.6298
 ]
 ],
 "Mas essas caixas nunca foram a história toda.": [
@@ -276,7 +292,9 @@
 "Boa parte da história completa talvez nunca seja conhecida.": [
 161.5347,
 3.3952,
-[]
+[
+1.3492
+]
 ]
 },
 "pace": 1.1601
