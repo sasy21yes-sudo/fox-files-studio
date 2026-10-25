@@ -541,6 +541,52 @@
           "seconds": 156.8,
           "created": "2026-10-22T12:42:51",
           "review": "three fingers up, thumb folded: reads as three, but the folded thumb in front is technically a palm view - flag for Salvatore"
+        },
+        {
+          "version": "v10",
+          "file": "art/incoming/pieces/hands_new_back/three_v10.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/hands_new_back/two_v7.png",
+          "refs": [
+            "art/agent-fox-model-sheet-painted.png@20,672,340,328"
+          ],
+          "instruction": "Keep this glove exactly as it is (same back view, same tucked thumb, same cuff, same size), but ALSO straighten the last curled finger, so all three fingers are raised side by side, counting three. The thumb stays tucked exactly as it is. Exactly three fingers and one thumb.",
+          "corrections": [
+            "it must have 3 fingers"
+          ],
+          "prompt": "Keep this glove exactly as it is (same back view, same tucked thumb, same cuff, same size), but ALSO straighten the last curled finger, so all three fingers are raised side by side, counting three. The thumb stays tucked exactly as it is. Exactly three fingers and one thumb. it must have 3 fingers. Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 763036809,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1200,
+          "height": 880,
+          "seconds": 84.2,
+          "created": "2026-10-25T12:34:55"
+        },
+        {
+          "version": "v11",
+          "file": "art/incoming/pieces/hands_new_back/three_v11.png",
+          "status": "draft",
+          "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
+          "image": "art/incoming/pieces/hands_new_back/two_v7.png",
+          "refs": [
+            "art/agent-fox-model-sheet-painted.png@20,672,340,328"
+          ],
+          "instruction": "Keep this glove exactly as it is (same back view, same tucked thumb, same cuff, same size), but ALSO straighten the last curled finger, so all three fingers are raised side by side, counting three. The thumb stays tucked exactly as it is. Exactly three fingers and one thumb.",
+          "corrections": [
+            "it must have 3 fingers"
+          ],
+          "prompt": "Keep this glove exactly as it is (same back view, same tucked thumb, same cuff, same size), but ALSO straighten the last curled finger, so all three fingers are raised side by side, counting three. The thumb stays tucked exactly as it is. Exactly three fingers and one thumb. it must have 3 fingers. Keep exactly the drawing style of image 1: 1930s rubber-hose cartoon with a hand-painted finish, one single dark-brown ink outline weight, flat colours with one soft cel shade, light from the top-left, same palette, same proportions and same size. Do not redesign the character. Background: flat pure chroma-key green (#00FF00), no shadow, no gradient, no text, no numbers.",
+          "seed": 1204301677,
+          "steps": 8,
+          "megapixels": 1.0,
+          "from": null,
+          "width": 1200,
+          "height": 880,
+          "seconds": 72.2,
+          "created": "2026-10-25T12:36:07"
         }
       ]
     },
@@ -6491,7 +6537,7 @@
         {
           "version": "v1",
           "file": "art/incoming/pieces/rig_mouthheads/m8_v1.png",
-          "status": "approved",
+          "status": "rejected",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/rig_head/p1_v2.png",
           "refs": [
@@ -6508,7 +6554,7 @@
           "height": 1024,
           "seconds": 200.4,
           "created": "2026-10-22T17:34:53",
-          "review": "mouth drawn on the new muzzle, rest of the head unchanged"
+          "review": "replaced in the studio"
         },
         {
           "version": "v2",
@@ -6558,7 +6604,7 @@
         {
           "version": "v4",
           "file": "art/incoming/pieces/rig_mouthheads/m8_v4.png",
-          "status": "draft",
+          "status": "approved",
           "model": "qwen-image-edit-2511 fp8 (local ComfyUI) + lightning 8-step",
           "image": "art/incoming/pieces/rig_head/p1_v2.png",
           "refs": [
@@ -6576,7 +6622,8 @@
           "width": 1024,
           "height": 1024,
           "seconds": 84.3,
-          "created": "2026-10-24T11:48:56"
+          "created": "2026-10-24T11:48:56",
+          "review": "chosen in the studio (model sheet)"
         }
       ]
     },
