@@ -27,6 +27,7 @@ import { TimelineEditor } from '../editor/TimelineEditor';
 import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
 import { TeamPage } from '../editor/TeamPage';
+import { ChannelPage, type ChannelTab } from '../editor/ChannelPage';
 import { Splitters, usePanelSizes } from '../editor/Splitters';
 import { ShortPanel } from '../editor/ShortPanel';
 import { ShortStrip } from '../editor/ShortStrip';
@@ -53,6 +54,7 @@ export function App() {
   const [selection, setSelectionRaw] = useState<Selection>({ kind: 'scene', scene: 0 });
   const [theater, setTheater] = useState(false);
   const panels = usePanelSizes();
+  const [channelTab, setChannelTab] = useState<ChannelTab>('dashboard');
   const [showSources, setShowSources] = useState(false);
   const [showSheet, setShowSheet] = useState(false);
   const [musicBuffer, setMusicBuffer] = useState<AudioBuffer | null>(null);
@@ -683,8 +685,14 @@ export function App() {
             setPage('edit');
             playback.seek(t);
           }}
+          onChannelPreview={() => {
+            setChannelTab('preview');
+            setPage('channel');
+          }}
         />
       )}
+
+      {page === 'channel' && <ChannelPage key={channelTab} project={project} timing={timing} initialTab={channelTab} />}
 
       {page === 'deliver' && (
         <main className="deliver-page">

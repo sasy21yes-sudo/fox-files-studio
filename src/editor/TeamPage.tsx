@@ -34,10 +34,12 @@ const POLL_MS = 3000;
 interface Props {
   /** Open the editor at this second of the episode. */
   onSeek(t: number): void;
+  /** Open the Channel page on the YouTube preview. */
+  onChannelPreview?(): void;
 }
 
 /** The Team page: the review agents' chat, WhatsApp-style, live while they work. Salvatore can write in it too. */
-export function TeamPage({ onSeek }: Props) {
+export function TeamPage({ onSeek, onChannelPreview }: Props) {
   const [messages, setMessages] = useState<TeamMessage[]>([]);
   const [offline, setOffline] = useState(false);
   const [filter, setFilter] = useState<string>('all');
@@ -50,6 +52,20 @@ export function TeamPage({ onSeek }: Props) {
 
   useEffect(() => {
     let stop = false;
+    // Live first: the dev server pushes new messages the moment the chat file changes.
+    if (typeof EventSource !== 'undefined') {
+      const es = new EventSource(`/api/team/stream?since=${last.current}`);
+      es.onopen = () => setOffline(false);
+      es.onmessage = (e) => {
+        const fresh = JSON.parse(e.data) as TeamMessage[];
+        const novel = fresh.filter((m) => m.id > last.current);
+        if (!novel.length) return;
+        last.current = novel[novel.length - 1].id;
+        setMessages((m) => [...m, ...novel]);
+      };
+      es.onerror = () => setOffline(es.readyState === EventSource.CLOSED);
+      return () => es.close();
+    }
     const poll = async () => {
       try {
         const r = await fetch(`/api/team/chat?since=${last.current}`);
@@ -131,8 +147,13 @@ export function TeamPage({ onSeek }: Props) {
       <section className="team-chat" aria-label="Chat">
         <header className="team-head">
           <strong>{filter === 'all' ? 'Review team' : person(filter).name}</strong>
+          {onChannelPreview && (
+            <button className="btn small ghost team-yt" onClick={onChannelPreview} title="The channel page with its banner and icon">
+              YouTube preview
+            </button>
+          )}
           <span className="muted small">
-            {offline ? 'chat not reachable (run npm run dev)' : 'live · agents post with tools/team/chat.mjs'}
+            {offline ? 'chat not reachable (run npm run dev)' : 'live · agents post with tools/team/chat.mjs, read with "new" / "wait"'}
           </span>
         </header>
         <div

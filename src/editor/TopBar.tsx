@@ -2,7 +2,7 @@ import type { Project } from '../types';
 import { FoxGlyph, type SaveStatus } from '../components/Header';
 import type { SyncStatus } from '../data/episodeSync';
 
-export type Page = 'media' | 'edit' | 'deliver' | 'team';
+export type Page = 'media' | 'edit' | 'deliver' | 'team' | 'channel';
 
 interface Props {
   project: Project;
@@ -50,9 +50,9 @@ export function TopBar(p: Props) {
       </div>
 
       <nav className="pages" aria-label="Pages">
-        {(['media', 'edit', 'deliver', 'team'] as const).map((pg) => (
+        {(['media', 'edit', 'deliver', 'team', 'channel'] as const).map((pg) => (
           <button key={pg} className={p.page === pg ? 'on' : ''} onClick={() => p.onPage(pg)} aria-current={p.page === pg}>
-            {pg === 'media' ? 'Media' : pg === 'edit' ? 'Edit' : pg === 'deliver' ? 'Deliver' : 'Team'}
+            {pg === 'media' ? 'Media' : pg === 'edit' ? 'Edit' : pg === 'deliver' ? 'Deliver' : pg === 'team' ? 'Team' : 'Channel'}
           </button>
         ))}
       </nav>

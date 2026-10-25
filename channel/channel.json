@@ -1,0 +1,26 @@
+{
+  "name": "The Fox Files",
+  "handle": "@thefoxfiles",
+  "tagline": {
+    "it": "Storie vere. Documenti veri.",
+    "en": "True stories. Real records.",
+    "es": "Historias reales. Documentos reales.",
+    "fr": "Histoires vraies. Vrais documents.",
+    "pt": "Histórias reais. Documentos reais."
+  },
+  "description": {
+    "it": "Agent Fox apre i fascicoli segreti della storia, in stile cartone anni '30. Ogni fatto viene dai documenti, citati in descrizione.",
+    "en": "Agent Fox opens history's secret files, 1930s-cartoon style. Every fact comes from the records, listed in the description.",
+    "es": "Agent Fox abre los expedientes secretos de la historia, al estilo de los dibujos de los años 30. Cada dato viene de los documentos, citados en la descripción.",
+    "fr": "Agent Fox ouvre les dossiers secrets de l'histoire, façon dessin animé des années 30. Chaque fait vient des archives, citées en description.",
+    "pt": "Agent Fox abre os arquivos secretos da história, no estilo dos desenhos dos anos 30. Cada fato vem dos documentos, citados na descrição."
+  },
+  "thumb": {
+    "it": "SENZA SAPERLO",
+    "en": "THEY NEVER KNEW",
+    "es": "SIN SABERLO",
+    "fr": "À LEUR INSU",
+    "pt": "SEM SABER"
+  },
+  "keywords": "storia, guerra fredda, CIA, documenti declassificati, cartoon, animazione anni 30, The Fox Files"
+}

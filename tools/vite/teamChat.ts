@@ -29,6 +29,26 @@ export function teamChat(): Plugin {
           res.setHeader('Content-Type', 'application/json');
           res.end(JSON.stringify(body));
         };
+        if (req.method === 'GET' && url.pathname === '/stream') {
+          // Live: server-sent events, pushed when the chat file changes (no polling from the page).
+          res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+          let last = Number(url.searchParams.get('since') ?? 0);
+          const push = () => {
+            const fresh = (readChat() as Msg[]).filter((m) => m.id > last);
+            if (!fresh.length) return;
+            last = fresh[fresh.length - 1].id;
+            res.write(`data: ${JSON.stringify(fresh)}\n\n`);
+          };
+          push();
+          fs.mkdirSync(review, { recursive: true });
+          const watcher = fs.watch(review, (_e, name) => name === 'chat.jsonl' && setTimeout(push, 50));
+          const ping = setInterval(() => res.write(': ping\n\n'), 25000);
+          req.on('close', () => {
+            watcher.close();
+            clearInterval(ping);
+          });
+          return;
+        }
         if (req.method === 'GET' && url.pathname === '/chat') {
           const since = Number(url.searchParams.get('since') ?? 0);
           return json(200, { messages: (readChat() as Msg[]).filter((m) => m.id > since) });

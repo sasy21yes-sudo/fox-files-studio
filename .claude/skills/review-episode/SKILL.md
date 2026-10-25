@@ -16,7 +16,7 @@ A full round of eight agents cost ~230-250k tokens EACH on Opus. Rules:
 - Agents run on Sonnet except the rig inspector (Opus, fine visual detail); their files set it.
 - Prompts to agents stay short (the agent file has the method): "Follow `.claude/agents/<name>.md`. Kit: <path>.
   Your chat name: <name>." Everything else goes in the chat brief, written once for all.
-- You read the chat (`read --last 200`, one line a finding), not the reports; open a report only for a finding
+- You read the chat with `new --for producer` (only unseen lines, one per finding), not the reports; open a report only for a finding
   you need the detail of. Look at two contact sheets at most yourself.
 
 ## 1. Material (one kit everyone shares)
@@ -44,7 +44,7 @@ If the agent types are not available in this session (Claude Code started outsid
 general-purpose agent with the same short prompt, model `sonnet` (rig: `opus`).
 
 ## 4. Merge (the collaboration)
-`node tools/team/chat.mjs read --last 200`. Write `<kit>/reports/REPORT.md` in Italian:
+`node tools/team/chat.mjs new --for producer` (repeat until "nothing new"). Write `<kit>/reports/REPORT.md` in Italian:
 1. Verdetto: from the social media manager, adjusted by any B (blocker) from the others (a fact NON SUPPORTATO or
    a broken frame blocks publishing regardless of retention).
 2. Fix list, one line each, deduplicated (the same moment flagged by several agents = one item, list who saw it -

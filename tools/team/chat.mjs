@@ -4,6 +4,8 @@
 //   node tools/team/chat.mjs post <from> "<text>" [--to <name|all>] [--kind finding|fix|question|answer|note]
 //                                [--sev B|I|R] [--at <seconds>] [--img <path under qa-out/review>] [--reply <id>]
 //   node tools/team/chat.mjs read [--for <name>] [--last 30] [--since <id>]
+//   node tools/team/chat.mjs new --for <name>                  only unseen messages for <name> (cheapest)
+//   node tools/team/chat.mjs wait --for <name> [--timeout 120]  block until a message for <name> arrives
 //
 // Messages are capped at MAX_TEXT characters: a finding is one line (time, what, fix); details go in the report.
 // Stored in qa-out/review/chat.jsonl (TEAM_CHAT overrides), one JSON object per line.
@@ -13,7 +15,18 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const CHAT_FILE = process.env.TEAM_CHAT || path.join(root, 'qa-out', 'review', 'chat.jsonl');
-export const MAX_TEXT = 400;
+export const MAX_TEXT = 300;
+/** Others' messages in `new` / `wait` are cut to this (the full text stays in the file and on the Team page). */
+const NEW_CUT = 160;
+const CURSORS = path.join(path.dirname(CHAT_FILE), '.chat-cursors.json');
+const readCursors = () => {
+  try {
+    return JSON.parse(fs.readFileSync(CURSORS, 'utf8'));
+  } catch {
+    return {};
+  }
+};
+const writeCursors = (c) => fs.writeFileSync(CURSORS, JSON.stringify(c));
 const KINDS = ['finding', 'fix', 'question', 'answer', 'note'];
 
 export function readChat(file = CHAT_FILE) {
@@ -79,13 +92,39 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     }
     const { message, truncated } = postChat({ from, text, to: a.to, kind: a.kind, sev: a.sev, at: a.at, img: a.img, reply: a.reply });
     console.log(`posted #${message.id}${truncated ? ` (cut to ${MAX_TEXT} chars: put details in your report)` : ''}`);
-  } else if (cmd === 'read') {
+  } else if (cmd === 'read' || cmd === 'new' || cmd === 'wait') {
+    // new: only what this reader has not seen yet (a cursor per name), own messages left out, others' cut to
+    // NEW_CUT chars - each line costs a few tokens and nothing is ever read twice.
+    // wait: like new, but blocks (up to --timeout s, default 120) until something arrives - a live conversation.
     const who = a.for?.toLowerCase();
-    let list = readChat();
-    if (a.since) list = list.filter((m) => m.id > Number(a.since));
-    if (who) list = list.filter((m) => m.to === 'all' || m.to === who || m.from === who);
-    list = list.slice(-Number(a.last ?? 30));
-    console.log(list.length ? list.map(formatLine).join('\n') : '(no messages)');
+    const fresh = cmd !== 'read';
+    if (fresh && !who) {
+      console.error(`usage: chat.mjs ${cmd} --for <name>`);
+      process.exit(1);
+    }
+    const cursors = fresh ? readCursors() : {};
+    const pick = () => {
+      let list = readChat();
+      const since = fresh ? cursors[who] ?? 0 : Number(a.since ?? 0);
+      list = list.filter((m) => m.id > since);
+      if (who) list = list.filter((m) => (m.to === 'all' || m.to === who || m.from === who) && !(fresh && m.from === who));
+      return list.slice(-Number(a.last ?? 30));
+    };
+    let list = pick();
+    if (cmd === 'wait') {
+      const until = Date.now() + Number(a.timeout ?? 120) * 1000;
+      while (!list.length && Date.now() < until) {
+        await new Promise((r) => setTimeout(r, 1500));
+        list = pick();
+      }
+    }
+    const lines = list.map((m) => (fresh && m.text.length > NEW_CUT ? formatLine({ ...m, text: `${m.text.slice(0, NEW_CUT - 1)}…` }) : formatLine(m)));
+    console.log(lines.length ? lines.join('\n') : '(nothing new)');
+    if (fresh) {
+      const last = readChat().at(-1)?.id ?? 0;
+      cursors[who] = Math.max(cursors[who] ?? 0, list.at(-1)?.id ?? 0, last);
+      writeCursors(cursors);
+    }
   } else {
     console.error('usage: chat.mjs post|read ...');
     process.exit(1);
