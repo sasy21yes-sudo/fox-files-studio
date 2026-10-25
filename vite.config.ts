@@ -7,12 +7,13 @@ import { rigTools } from './tools/vite/rigTools';
 import { episodeSync } from './tools/vite/episodeSync';
 import { voiceRecord } from './tools/vite/voiceRecord';
 import { clipBuild } from './tools/vite/clipBuild';
+import { teamChat } from './tools/vite/teamChat';
 
 // Relative base so the production build works from any folder or static host.
 // claudeScene() and localImage() only exist in `npm run dev`: prompt editing through Claude Code,
 // and image generation through the local ComfyUI.
 export default defineConfig({
   base: './',
-  plugins: [react(), claudeScene(), localImage(), tracer(), rigTools(), episodeSync(), voiceRecord(), clipBuild()],
+  plugins: [react(), claudeScene(), localImage(), tracer(), rigTools(), episodeSync(), voiceRecord(), clipBuild(), teamChat()],
   build: { target: 'es2022', sourcemap: false },
 });

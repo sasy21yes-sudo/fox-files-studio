@@ -26,6 +26,7 @@ import { LeftPanel } from '../editor/LeftPanel';
 import { TimelineEditor } from '../editor/TimelineEditor';
 import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
+import { TeamPage } from '../editor/TeamPage';
 import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
@@ -667,6 +668,15 @@ export function App() {
       />
 
       {page === 'media' && <MediaPage project={project} onOpen={openProject} savedTick={savedTick} onChange={change} />}
+
+      {page === 'team' && (
+        <TeamPage
+          onSeek={(t) => {
+            setPage('edit');
+            playback.seek(t);
+          }}
+        />
+      )}
 
       {page === 'deliver' && (
         <main className="deliver-page">
