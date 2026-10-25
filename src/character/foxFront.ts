@@ -97,7 +97,9 @@ const FACE = makeFaceRig({
 
 /** The front mouths are cut from renders in the order of the mouth chart (tools/comfy/jobs.py MOUTH_SHAPES). */
 export type FrontMouth = 'closed' | 'mbp' | 'mid' | 'open' | 'wide' | 'o' | 'u' | 'fv' | 'l' | 'th' | 'smile' | 'frown';
-const MOUTH_ID: Record<FrontMouth, number> = { closed: 1, mbp: 2, mid: 3, open: 4, wide: 5, o: 6, u: 7, fv: 8, l: 9, th: 10, smile: 11, frown: 12 };
+// (wide uses the open drawing: front/mouth_5 is cropped flat across the top - rig review, 2026-10-25; re-cut it
+// from the render with top margin to bring it back)
+const MOUTH_ID: Record<FrontMouth, number> = { closed: 1, mbp: 2, mid: 3, open: 4, wide: 4, o: 6, u: 7, fv: 8, l: 9, th: 10, smile: 11, frown: 12 };
 /** When a mouth has not been baked yet, the closest one that has. */
 const MOUTH_FALLBACK: Record<FrontMouth, FrontMouth[]> = {
   closed: ['frown', 'mbp'],

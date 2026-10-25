@@ -277,7 +277,8 @@ function foxPose(spec: SceneSpec, s: Stage, light: number, fox: FoxElement, plac
     surprise: take,
     pop,
     ...face,
-    speaking: s.speaking && take < 0.2,
+    // (a take no longer mutes the lips: the mouth froze on "O" for 1.25 s under the voice - rig review, 2026-10-25)
+    speaking: s.speaking,
     viseme: s.viseme,
     mouth: mouth && !s.speaking ? (mouth as MouthShape) : undefined,
     eyes: evalStep(fox.eyes, k, 'open'),

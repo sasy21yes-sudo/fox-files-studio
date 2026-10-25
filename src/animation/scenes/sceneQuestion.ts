@@ -82,18 +82,18 @@ export const sceneQuestion: SceneRenderer = (s) => {
   });
   drawWhip(s, cam);
 
-  // Declassified pages fly in (overlay).
+  // Declassified pages fly in (overlay). (9:16: smaller and further right, clear of his muzzle - rig review, 2026-10-25)
   const pages = [
-    { at: 1.2, x: V ? 0.68 : 0.62, y: V ? 0.5 : 0.62, rot: -0.1, seed: 21 },
-    { at: 1.6, x: V ? 0.84 : 0.8, y: V ? 0.49 : 0.62, rot: 0.08, seed: 22 },
-    { at: 2.0, x: V ? 0.75 : 0.71, y: V ? 0.46 : 0.57, rot: -0.02, seed: 23 },
+    { at: 1.2, x: V ? 0.77 : 0.62, y: V ? 0.5 : 0.62, rot: -0.1, seed: 21 },
+    { at: 1.6, x: V ? 0.9 : 0.8, y: V ? 0.49 : 0.62, rot: 0.08, seed: 22 },
+    { at: 2.0, x: V ? 0.83 : 0.71, y: V ? 0.46 : 0.57, rot: -0.02, seed: 23 },
   ];
   const pagesOut = easeInOut(seg(k, 6.5, 0.3)) * (1 - easeInOut(seg(k, 10.0, 0.4)));
   pages.forEach((p, i) => {
     const q = easeOutBack(seg(k, p.at, 0.6));
     if (q <= 0) return;
     const x = lerp(w * 1.25, w * p.x, q) + pagesOut * w * 0.5;
-    drawPaper(g, x, h * p.y + Math.sin(s.time * 2 + i) * 3 * u, (V ? 300 : 260) * u, (V ? 390 : 340) * u, p.rot * q + (1 - q) * 0.8, u, {
+    drawPaper(g, x, h * p.y + Math.sin(s.time * 2 + i) * 3 * u, (V ? 250 : 260) * u, (V ? 325 : 340) * u, p.rot * q + (1 - q) * 0.8, u, {
       heading: i === 2 ? 'MKULTRA' : 'SUBPROJECT',
       subheading: i === 2 ? 'Finance record (illustration)' : undefined,
       lines: 16,

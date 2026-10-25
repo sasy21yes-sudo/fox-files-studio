@@ -614,7 +614,7 @@ export function drawHeadParts(g: G, pose: FoxPose, surprise: number, earSwing: n
   // --- Mouth state decides how far the jaw drops.
   let shape: MouthShape = pose.mouth ?? 'closed';
   if (pose.speaking && !pose.mouth) shape = pose.viseme ?? speakingMouth(pose.time);
-  if (surprise > 0.5) shape = 'o';
+  if (surprise > 0.5 && !(pose.speaking && !pose.mouth)) shape = 'o';
   const jaw = JAW_DROP[shape];
 
   // --- One continuous head silhouette: skull flowing into the muzzle, cheek fur at the back.
@@ -1956,10 +1956,13 @@ function drawRigArmGloveLayer(g: G, A: RigArm) {
   noodle(g, SLEEVE[A.phys], h.S, h.c, A.hand, 0.82, 1);
 }
 
-/** Old-cartoon "multiples": ghost gloves trailing a fast change of pose. */
+/**
+ * Old-cartoon "multiples": one ghost glove trailing a change of pose, only through its fastest middle (two ghosts
+ * over 85% of every move read as faint duplicate gloves - rig review, 2026-10-25).
+ */
 function drawMultiples(g: G, st: ArmState, phys: Phys, pose: FoxPose) {
-  if (st.from === st.to || st.b <= 0.05 || st.b >= 0.9) return;
-  for (const [lag, al] of [[0.22, 0.18], [0.11, 0.32]] as const) drawGloveRig(g, rigArm({ ...st, b: Math.max(0, st.b - lag) }, phys, pose), al);
+  if (st.from === st.to || st.b <= 0.25 || st.b >= 0.7) return;
+  drawGloveRig(g, rigArm({ ...st, b: st.b - 0.12 }, phys, pose), 0.28);
 }
 
 /** What the editor shows about the last drawn Agent Fox (only filled while a sink is set). */
@@ -2040,7 +2043,8 @@ function foxExpression(pose: FoxPose, lookX: number) {
   const speaking = !!pose.speaking && !pose.mouth;
   let shape: MouthShape = pose.mouth ?? 'closed';
   if (speaking) shape = pose.viseme ?? speakingMouth(time);
-  if (surprise > 0.5) shape = 'o';
+  // (not while he talks: a surprise held the "O" for 1.6 s over the voice - rig review)
+  if (surprise > 0.5 && !speaking) shape = 'o';
   const worry = pose.worry ?? 0;
   const angry = pose.angry ?? 0;
   const skeptic = pose.skeptic ?? 0;
