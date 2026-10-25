@@ -29,6 +29,16 @@ interface Placed {
   end: number;
 }
 
+/** Words a viewer has to read on a card (every text field of the beat). */
+function beatWords(beat: Beat): number {
+  let n = 0;
+  for (const [k, v] of Object.entries(beat)) {
+    if (k === 'cue' || k === 'kind') continue;
+    for (const x of Array.isArray(v) ? v : [v]) if (typeof x === 'string') n += (x.match(/\S+/g) ?? []).length;
+  }
+  return n;
+}
+
 const norm = (s: string) => s.toLowerCase().replace(/[’']/g, "'").replace(/\s+/g, ' ');
 
 /** Where (in time) each beat of a scene starts and ends. */
@@ -53,7 +63,11 @@ export function placeBeats(tl: Timeline, sceneIndex: number): Placed[] {
     const c = cues[ci];
     const len = Math.max(1, norm(c.text).length);
     const start = c.start + ((at - offs[ci]) / len) * (c.end - c.start) - 0.15;
-    placed.push({ beat, start, end: Math.max(c.end + 1.2, start + 3.4) });
+    // Up until its sentence is over (plus a beat) and long enough to read: 0.3 s per word of the card + 1 s.
+    // (cue end + 1.2 s closed cards mid-sentence and left the Kennedy record 4.8 s for 13 words - review.)
+    let se = ci;
+    while (se + 1 < cues.length && !/[.!?…]["»”)]*$/.test(cues[se].text.trim())) se++;
+    placed.push({ beat, start, end: Math.max(cues[se].end + 0.8, start + 0.3 * beatWords(beat) + 1.0, start + 2.4) });
   }
   placed.sort((a, b) => a.start - b.start);
   for (let i = 0; i < placed.length; i++) {
@@ -92,7 +106,7 @@ export function renderBeats(g: G, w: number, h: number, tl: Timeline, sceneIndex
   const cx = V ? w * 0.5 : w * 0.62;
   // 9:16: in the top band, above the character's head (at a third of the height the cards sat on his face in
   // half the pop-ups - review, 2026-10-24).
-  const cy = V ? h * 0.21 : h * 0.42;
+  const cy = V ? h * (active.beat.kind === 'question' || active.beat.kind === 'count' ? 0.17 : 0.21) : h * 0.42;
   const W = V ? w * 0.9 : w * 0.56;
   const s = elastic(inP) * (outP < 1 ? 0.6 + 0.4 * outP : 1);
   g.save();
@@ -190,7 +204,8 @@ function popAt(t: number, at: number, dur = 0.35) {
 
 function drawQuestion(D: Draw, b: Extract<Beat, { kind: 'question' }>) {
   const { g, u, W, t, time } = D;
-  const R = W * 0.42;
+  // (9:16: smaller, the sunburst covered the whole head and reached the platform's top band)
+  const R = W * (D.V ? 0.32 : 0.42);
   g.save();
   g.globalAlpha *= 0.85;
   drawSunburst(g, 0, 0, R * 1.25, time * 0.5, '#5a1f10', '#7a2c14', 20);
@@ -302,7 +317,7 @@ function drawSpan(D: Draw, b: Extract<Beat, { kind: 'span' }>) {
 
 function drawCount(D: Draw, b: Extract<Beat, { kind: 'count' }>) {
   const { g, u, W, t, time } = D;
-  const R = W * 0.3;
+  const R = W * (D.V ? 0.24 : 0.3);
   g.save();
   g.globalAlpha *= 0.9;
   drawSunburst(g, 0, -10 * u, R * 1.35, time * 0.6, '#6e2a12', '#9a4418', 16);

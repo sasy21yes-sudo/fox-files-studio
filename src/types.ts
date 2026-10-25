@@ -29,6 +29,8 @@ export interface Scene {
   transition: TransitionType;
   /** false = no chapter intertitle on this scene even when the episode uses them (cutaways). */
   chapterCard?: boolean;
+  /** Sentences (by how they start, any language) that get an extra breath before them: the reveals. */
+  breaths?: string[];
   /** Narration text in the current language. It drives the voice and the subtitle cues. */
   narration: string;
   /** Narration kept per language, so switching languages never loses an edit. */

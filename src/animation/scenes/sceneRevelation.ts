@@ -35,20 +35,20 @@ export const sceneRevelation: SceneRenderer = (s) => {
   const fly = easeInOut(seg(k, 4.6, 0.7));
   const npX = lerp(w / 2, A.x, fly);
   // (9:16: high and smaller, so the newspaper never sits on Agent Fox's head while he talks)
-  const npY = lerp(V ? h * 0.22 : h * 0.42, A.y, fly);
-  const npW = lerp((V ? 0.72 : 0.36) * w, cardW, fly);
+  const npY = lerp(V ? h * 0.19 : h * 0.42, A.y, fly);
+  const npW = lerp((V ? 0.6 : 0.36) * w, cardW, fly);
 
   const cam = resolveCam(s, [
     wideShot(s, 0),
     foxShot(s, L, 1.55, 'close', { foxX: restFoxX, sx: 0.22, sy: 0.55 }),
     foxShot(s, L, 2.9, 'medium', { foxX: restFoxX, sx: 0.24, sy: 0.55 }),
     wideShot(s, 4.5, 'whip'),
-    // 9:16: the inserts keep Agent Fox whole in the frame with the card (zoomed in, only his glove poked in from
-    // the edge and the captions sat on his face - review, 2026-10-24).
-    insertShot(s, 5.4, A.x, A.y, { zoom: V ? 1.12 : 1.7, sy: V ? 0.22 : 0.45 }),
-    insertShot(s, 8.45, B.x, B.y, { zoom: V ? 1.12 : 1.6, sx: V ? 0.66 : 0.5, sy: V ? 0.24 : 0.42 }),
+    // The inserts keep Agent Fox whole in the frame with the card, in both aspects (zoomed in, only his glove poked
+    // in from the edge and the captions sat on his face - review, 2026-10-24 and 2026-10-25 for 16:9).
+    insertShot(s, 5.4, A.x, A.y, { zoom: V ? 1.12 : 1.22, sx: V ? 0.5 : 0.62, sy: V ? 0.22 : 0.42 }),
+    insertShot(s, 8.45, B.x, B.y, { zoom: V ? 1.12 : 1.06, sx: V ? 0.66 : 0.8, sy: V ? 0.24 : 0.42 }),
     wideShot(s, 11.0, 'whip'),
-    insertShot(s, 12.75, C.x, C.y, { zoom: V ? 1.1 : 1.55, sy: V ? 0.4 : 0.5 }),
+    insertShot(s, 12.75, C.x, C.y, { zoom: V ? 1.1 : 1.15, sx: V ? 0.5 : 0.62, sy: V ? 0.4 : 0.55 }),
     foxShot(s, L, 13.9, 'close', { foxX: restFoxX, sx: 0.32 }),
     wideShot(s, 15.7, 'whip'),
   ]);
@@ -162,7 +162,7 @@ export const sceneRevelation: SceneRenderer = (s) => {
   drawSlamNumber(g, bScreen.x, Math.min(bScreen.y, h * 0.7), u, '7', 'BOXES OF RECORDS', k, 9.9, V ? 90 : 100);
 
   if (paperIn > 0 && fly < 1) {
-    drawNewspaper(g, npX + (V ? 0 : w * 0.08) * (1 - fly), npY, npW, u * lerp(V ? 1.0 : 1.1, 0.5, fly), paperIn, {
+    drawNewspaper(g, npX + (V ? 0 : w * 0.08) * (1 - fly), npY, npW, u * lerp(V ? 0.82 : 1.1, 0.5, fly), paperIn, {
       masthead: 'THE FOX FILES GAZETTE',
       date: '1975  ·  ILLUSTRATED EDITION',
       headline: 'SENATE SETS UP INTELLIGENCE PROBE',

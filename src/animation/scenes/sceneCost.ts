@@ -153,7 +153,7 @@ export const sceneCost: SceneRenderer = (s) => {
   drawBubble(g, cx, cy + (V ? 20 : 30) * u, {
     tag: '1953',
     title: 'DR. FRANK OLSON',
-    lines: ['Army civilian employee at Fort Detrick.', 'Died about a week after unknowingly taking LSD at a meeting called by the CIA.', '— DCI Turner, 1977 testimony'],
+    lines: ['Army civilian employee.', 'Died about a week after unknowingly taking LSD at a meeting called by the CIA.', '— DCI Turner, 1977 testimony'],
     width: (V ? 0.86 : 0.4) * w,
     size: fs * 0.95,
     u,

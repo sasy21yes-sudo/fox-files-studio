@@ -79,7 +79,7 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
     beats: [
       { cue: 'actually doing?', kind: 'question', text: 'What were they actually doing?' },
       { cue: 'Sleep research', kind: 'list', title: 'SOME OF THE CATEGORIES', items: ['DRUGS & ALCOHOL', 'HYPNOSIS', 'SLEEP RESEARCH', 'POLYGRAPHS'] },
-      { cue: 'Some were never told', kind: 'versus', left: 'VOLUNTEERS', right: 'NEVER TOLD', caption: 'Two very different kinds of test subject' },
+      { cue: 'were volunteers', kind: 'versus', left: 'VOLUNTEERS', right: 'NEVER TOLD', caption: 'Two very different kinds of test subject' },
     ],
   },
   {
@@ -132,7 +132,6 @@ export const MKULTRA_SCRIPT: ScriptEntry[] = [
     duration: 46,
     beats: [
       { cue: 'end of unwitting testing', kind: 'span', from: '1963 report', to: '1964', label: 'UNWITTING TESTS END' },
-      { cue: 'Advances, vouchers', kind: 'list', title: 'WHAT SURVIVED', items: ['ADVANCES', 'VOUCHERS', 'ACCOUNTINGS'] },
       { cue: 'Enough to show it happened', kind: 'statement', lines: ['ENOUGH TO SHOW IT HAPPENED.'] },
       { cue: 'Not enough to know everything', kind: 'statement', lines: ['NOT ENOUGH TO KNOW', 'EVERYTHING THAT HAPPENED.'] },
     ],

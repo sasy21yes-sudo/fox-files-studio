@@ -75,7 +75,7 @@ const italian: LocalizedScript = {
       beats: [
         { cue: 'in concreto', kind: 'question', text: 'Cosa facevano davvero?' },
         { cue: 'Ricerca sul sonno', kind: 'list', title: 'ALCUNE CATEGORIE', items: ['DROGHE E ALCOL', 'IPNOSI', 'RICERCA SUL SONNO', 'MACCHINA DELLA VERITÀ'] },
-        { cue: 'non fu mai detto nulla', kind: 'versus', left: 'VOLONTARI', right: 'MAI AVVISATI', caption: 'Due tipi molto diversi di soggetti' },
+        { cue: 'erano volontari', kind: 'versus', left: 'VOLONTARI', right: 'MAI AVVISATI', caption: 'Due tipi molto diversi di soggetti' },
       ],
     },
     cost: {
@@ -115,7 +115,6 @@ const italian: LocalizedScript = {
       keywords: ['1963', '1964', '1973', 'distrutti', 'Richard Helms', 'fascicoli finanziari', 'non venire mai alla luce'],
       beats: [
         { cue: 'fine dei test', kind: 'span', from: 'Rapporto 1963', to: '1964', label: 'FINE DEI TEST SU IGNARI' },
-        { cue: 'Anticipi, giustificativi', kind: 'list', title: 'COSA È SOPRAVVISSUTO', items: ['ANTICIPI', 'GIUSTIFICATIVI', 'RENDICONTI'] },
         { cue: 'Abbastanza per dimostrare', kind: 'statement', lines: ['ABBASTANZA PER DIMOSTRARE', 'CHE È SUCCESSO.'] },
         { cue: 'Non abbastanza per sapere', kind: 'statement', lines: ['NON ABBASTANZA PER SAPERE', 'TUTTO CIÒ CHE È SUCCESSO.'] },
       ],
@@ -167,7 +166,7 @@ const spanish: LocalizedScript = {
       beats: [
         { cue: 'en realidad', kind: 'question', text: '¿Qué hacían en realidad?' },
         { cue: 'Investigación del sueño', kind: 'list', title: 'ALGUNAS CATEGORÍAS', items: ['DROGAS Y ALCOHOL', 'HIPNOSIS', 'INVESTIGACIÓN DEL SUEÑO', 'POLÍGRAFOS'] },
-        { cue: 'nunca se lo dijeron', kind: 'versus', left: 'VOLUNTARIOS', right: 'NUNCA LO SUPIERON', caption: 'Dos tipos muy distintos de sujetos de prueba' },
+        { cue: 'eran voluntarias', kind: 'versus', left: 'VOLUNTARIOS', right: 'NUNCA LO SUPIERON', caption: 'Dos tipos muy distintos de sujetos de prueba' },
       ],
     },
     cost: {
@@ -207,7 +206,6 @@ const spanish: LocalizedScript = {
       keywords: ['1963', '1964', '1973', 'destruidos', 'Richard Helms', 'carpetas financieras', 'nunca llegue a conocerse'],
       beats: [
         { cue: 'fin de las pruebas', kind: 'span', from: 'Informe 1963', to: '1964', label: 'FIN DE LAS PRUEBAS SIN AVISO' },
-        { cue: 'Anticipos, comprobantes', kind: 'list', title: 'LO QUE SOBREVIVIÓ', items: ['ANTICIPOS', 'COMPROBANTES', 'CUENTAS'] },
         { cue: 'Lo suficiente para demostrar', kind: 'statement', lines: ['LO SUFICIENTE PARA DEMOSTRAR', 'QUE OCURRIÓ.'] },
         { cue: 'No lo suficiente para saber', kind: 'statement', lines: ['NO LO SUFICIENTE PARA SABER', 'TODO LO QUE OCURRIÓ.'] },
       ],
@@ -257,7 +255,7 @@ const french: LocalizedScript = {
       beats: [
         { cue: 'concrètement', kind: 'question', text: 'Que faisaient-ils vraiment ?' },
         { cue: 'Recherche sur le sommeil', kind: 'list', title: 'QUELQUES CATÉGORIES', items: ['DROGUES ET ALCOOL', 'HYPNOSE', 'SOMMEIL', 'DÉTECTEUR DE MENSONGE'] },
-        { cue: 'jamais été prévenues', kind: 'versus', left: 'VOLONTAIRES', right: 'JAMAIS PRÉVENUS', caption: 'Deux types de sujets très différents' },
+        { cue: 'étaient volontaires', kind: 'versus', left: 'VOLONTAIRES', right: 'JAMAIS PRÉVENUS', caption: 'Deux types de sujets très différents' },
       ],
     },
     cost: {
@@ -297,7 +295,6 @@ const french: LocalizedScript = {
       keywords: ['1963', '1964', '1973', 'détruits', 'Richard Helms', 'dossiers financiers', 'jamais connue'],
       beats: [
         { cue: 'fin des tests', kind: 'span', from: 'Rapport 1963', to: '1964', label: "FIN DES TESTS À L'INSU" },
-        { cue: 'Des avances, des pièces', kind: 'list', title: 'CE QUI A SURVÉCU', items: ['AVANCES', 'JUSTIFICATIFS', 'COMPTES'] },
         { cue: 'Assez pour montrer', kind: 'statement', lines: ['ASSEZ POUR MONTRER', "QUE C'EST ARRIVÉ."] },
         { cue: 'Pas assez pour savoir', kind: 'statement', lines: ['PAS ASSEZ POUR SAVOIR', 'TOUT CE QUI EST ARRIVÉ.'] },
       ],
@@ -347,7 +344,7 @@ const portuguese: LocalizedScript = {
       beats: [
         { cue: 'faziam de verdade', kind: 'question', text: 'O que faziam de verdade?' },
         { cue: 'Pesquisa sobre o sono', kind: 'list', title: 'ALGUMAS CATEGORIAS', items: ['DROGAS E ÁLCOOL', 'HIPNOSE', 'PESQUISA DO SONO', 'POLÍGRAFOS'] },
-        { cue: 'nunca foram avisadas', kind: 'versus', left: 'VOLUNTÁRIOS', right: 'NUNCA AVISADOS', caption: 'Dois tipos bem diferentes de participante' },
+        { cue: 'eram voluntárias', kind: 'versus', left: 'VOLUNTÁRIOS', right: 'NUNCA AVISADOS', caption: 'Dois tipos bem diferentes de participante' },
       ],
     },
     cost: {
@@ -387,7 +384,6 @@ const portuguese: LocalizedScript = {
       keywords: ['1963', '1964', '1973', 'destruídos', 'Richard Helms', 'pastas financeiras', 'nunca seja conhecida'],
       beats: [
         { cue: 'fim dos testes', kind: 'span', from: 'Relatório 1963', to: '1964', label: 'FIM DOS TESTES SEM AVISO' },
-        { cue: 'Adiantamentos, comprovantes', kind: 'list', title: 'O QUE SOBREVIVEU', items: ['ADIANTAMENTOS', 'COMPROVANTES', 'PRESTAÇÕES DE CONTAS'] },
         { cue: 'O suficiente para mostrar', kind: 'statement', lines: ['O SUFICIENTE PARA MOSTRAR', 'QUE ACONTECEU.'] },
         { cue: 'Não o suficiente para saber', kind: 'statement', lines: ['NÃO O SUFICIENTE PARA SABER', 'TUDO O QUE ACONTECEU.'] },
       ],

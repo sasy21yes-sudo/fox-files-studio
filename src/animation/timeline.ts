@@ -13,10 +13,12 @@ export const WORDS_PER_SECOND = 2.55;
 export const NARRATION_LEAD_IN = 0.7;
 /** Minimum silence kept at the end of a scene. */
 export const NARRATION_TAIL = 0.5;
+/** Extra air before a reveal sentence (Scene.breaths), on top of the usual breath between sentences. */
+export const REVEAL_BREATH = 0.6;
 const ABBREVIATION = /(?:^|\s)(?:Dr|Mr|Mrs|Ms|Sen|Rep|Adm|Gen|Col|Lt|St|Jr|Sr|Prof|No|vs|U\.S|D\.C)\.$/;
 
-/** Longest subtitle cue, in words. Longer sentences are split. */
-const MAX_CUE_WORDS = 13;
+/** Longest subtitle cue, in words. Longer sentences are split. (10: at 13 the 9:16 captions ran to 3 lines.) */
+const MAX_CUE_WORDS = 10;
 
 export interface SceneSpan {
   index: number;
@@ -93,30 +95,26 @@ export function splitSentences(text: string): string[] {
   return sentences;
 }
 
-/** Split one sentence into subtitle-sized cues at a clause boundary near the middle. */
+/**
+ * Split one sentence into subtitle-sized cues at a clause boundary near the middle, recursively, so every cue
+ * has at most MAX_CUE_WORDS words (the old loop only split the remainder: a 25-word sentence gave a 13-word cue).
+ */
 export function splitSentence(sentence: string): string[] {
   const words = sentence.split(' ');
   if (words.length <= MAX_CUE_WORDS) return [sentence];
-  const cues: string[] = [];
-  let remaining = words;
-  while (remaining.length > MAX_CUE_WORDS) {
-    const mid = Math.ceil(remaining.length / 2);
-    let cut = -1;
-    // Only clause breaks in the middle half: a 3-word cue flashes by too fast to read.
-    for (let d = 0; d <= Math.floor(remaining.length / 4) && cut < 0; d++) {
-      for (const i of [mid + d, mid - d]) {
-        if (i > 2 && i < remaining.length - 2 && /[,;:—–]$/.test(remaining[i - 1])) {
-          cut = i;
-          break;
-        }
+  const mid = Math.ceil(words.length / 2);
+  let cut = -1;
+  // Only clause breaks in the middle half: a 3-word cue flashes by too fast to read.
+  for (let d = 0; d <= Math.floor(words.length / 4) && cut < 0; d++) {
+    for (const i of [mid + d, mid - d]) {
+      if (i > 2 && i < words.length - 2 && /[,;:—–]$/.test(words[i - 1])) {
+        cut = i;
+        break;
       }
     }
-    if (cut < 0) cut = mid;
-    cues.push(remaining.slice(0, cut).join(' '));
-    remaining = remaining.slice(cut);
   }
-  if (remaining.length) cues.push(remaining.join(' '));
-  return cues;
+  if (cut < 0) cut = mid;
+  return [...splitSentence(words.slice(0, cut).join(' ')), ...splitSentence(words.slice(cut).join(' '))];
 }
 
 /** Split narration into subtitle-sized cues at sentence and clause boundaries. */
@@ -133,11 +131,11 @@ interface Laid {
  * real length (its cues split where the voice pauses); others are estimated
  * from word counts, one breath (`gap`) between cues.
  */
-function laySentences(sentences: string[], t0: number, wps: number, gap: number, voice?: VoiceTiming | null, squeeze = 1): Laid {
+function laySentences(sentences: string[], t0: number, wps: number, gap: number, voice?: VoiceTiming | null, squeeze = 1, breath?: (s: string) => boolean): Laid {
   const out: Laid = { cues: [], clips: [], end: t0 };
   let t = t0;
   sentences.forEach((sentence, si) => {
-    if (si > 0) t += gap * squeeze;
+    if (si > 0) t += (gap + (breath?.(sentence) ? REVEAL_BREATH : 0)) * squeeze;
     const parts = splitSentence(sentence);
     const clip = voice?.sentence(sentence);
     if (clip) {
@@ -190,7 +188,9 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
     // Explainer pacing: a breath between sentences (recorded clips carry a little air of their own); 0.42 s
     // read as dragging once the packs were brought to explainer pace (review, 2026-10-24).
     const gap = voicedScene ? 0.3 : 0.45;
-    let laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, voice);
+    const marks = (scene.breaths ?? []).map((b) => b.trim().toLowerCase()).filter(Boolean);
+    const breath = marks.length ? (s: string) => marks.some((b) => s.trim().toLowerCase().startsWith(b)) : undefined;
+    let laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, voice, 1, breath);
     const estimatedSpeech = laid.end - start - NARRATION_LEAD_IN;
     let duration = scene.duration;
     let extended = false;
@@ -201,7 +201,7 @@ export function buildTimeline(project: Project, speechRate = project.settings.sp
     }
     const available = Math.max(0.5, duration - NARRATION_LEAD_IN - NARRATION_TAIL);
     const overflow = estimatedSpeech > available + 0.05;
-    if (overflow && !voicedScene) laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, null, available / estimatedSpeech);
+    if (overflow && !voicedScene) laid = laySentences(sentences, start + NARRATION_LEAD_IN, wps, gap, null, available / estimatedSpeech, breath);
     laid.cues.forEach((c, i) =>
       cues.push({ id: `${scene.id}-${i}`, sceneIndex: index, start: c.start, end: c.end, text: c.text, timing: c.exact ? 'exact' : 'estimated' }),
     );
