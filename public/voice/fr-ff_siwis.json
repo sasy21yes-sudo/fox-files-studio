@@ -5,292 +5,299 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "fr-ff_siwis.mp3",
-"duration": 166.73,
+"duration": 182.42,
 "sentences": {
 "La CIA a drogué des gens qui n'en savaient rien.": [
 0.35,
-2.2172,
+2.65,
 []
 ],
 "C'est dans les archives du Sénat.": [
-2.9173,
+3.35,
 1.53,
 []
 ],
 "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA.": [
-4.7973,
-5.0598,
+5.23,
+6.65,
 [
-2.2736
+2.955
 ]
 ],
 "Ses archives avaient été détruites des années plus tôt.": [
-10.2071,
+12.23,
 2.94,
-[]
+[
+2.01
+]
 ],
 "Mais pas toutes.": [
-13.4971,
-0.6967,
+15.52,
+0.94,
 []
 ],
 "Le programme s'appelait MKUltra.": [
-14.5438,
-1.6362,
+16.81,
+1.88,
 []
 ],
 "Alors, qu'est-ce que c'était ?": [
-16.5301,
+19.04,
 1.27,
 []
 ],
 "Et comment le sait-on ?": [
-18.1501,
-1.0738,
+20.66,
+1.17,
 []
 ],
 "Commençons par ce que la CIA elle-même a dit au Sénat.": [
-19.5739,
+22.18,
 2.72,
 [
 1.285
 ]
 ],
-"Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964.": [
-22.6439,
-5.2714,
+"Selon le témoignage de son directeur, MKUltra a duré de 1953 à 1964.": [
+25.25,
+6.82,
 [
-2.8697
+3.315
 ]
 ],
 "Soit onze ans.": [
-28.2653,
-0.6956,
+32.42,
+0.86,
 []
 ],
-"Les archives qui ont survécu recensent 149 sous-projets.": [
-29.3109,
-2.7775,
+"Les archives restantes recensent 149 sous-projets.": [
+33.63,
+3.23,
 []
 ],
-"Elles citent 80 institutions, dont 44 universités et établissements d'enseignement supérieur.": [
-32.4384,
-5.0557,
+"Elles citent 80 institutions, dont 44 universités et écoles supérieures.": [
+37.21,
+4.88,
 [
-1.7041
+1.88
 ]
 ],
 "Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.": [
-37.8442,
-3.7307,
-[]
+42.44,
+4.79,
+[
+2.205
+]
 ],
 "Alors, que faisaient concrètement tous ces sous-projets ?": [
-41.9248,
+47.58,
 2.46,
-[]
+[
+1.495
+]
 ],
 "Le directeur les a classés par catégories.": [
-44.7348,
+50.39,
 2.23,
 []
 ],
 "Parmi elles : drogues et alcool.": [
-47.3148,
+52.97,
 1.57,
 []
 ],
 "Hypnose.": [
-49.2348,
-0.5094,
+54.89,
+0.79,
 []
 ],
 "Recherche sur le sommeil.": [
-50.0943,
-1.2517,
+56.03,
+1.4,
 []
 ],
 "Détecteurs de mensonge.": [
-51.696,
-1.2597,
+57.78,
+1.44,
 []
 ],
-"Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires.": [
-53.3057,
-4.55,
+"Les archives évoquent aussi des drogues destinées aux interrogatoires.": [
+59.57,
+3.63,
 [
-2.27
+1.26
 ]
 ],
 "Le LSD faisait partie des drogues testées.": [
-58.2057,
-1.8334,
+63.55,
+2.21,
 []
 ],
 "Et voici le plus important.": [
-60.3891,
+66.11,
 1.43,
 []
 ],
 "Certaines des personnes testées étaient volontaires.": [
-62.1691,
+67.89,
 2.36,
 []
 ],
 "D'autres n'ont jamais été prévenues.": [
-64.8791,
+70.6,
 1.62,
 []
 ],
 "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu.": [
-66.8491,
+72.57,
 4.79,
 [
-2.75
+2.545
 ]
 ],
 "À leur insu, ça veut dire sans le savoir.": [
-71.9891,
+77.71,
 2.14,
 []
 ],
 "Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York.": [
-74.4791,
-3.9232,
+80.2,
+4.58,
 [
-2.0213
+1.365
 ]
 ],
 "Il n'y avait aucun consentement éclairé.": [
-78.7522,
+85.13,
 1.98,
 []
 ],
 "Un cas montre ce que cela voulait dire.": [
-81.0822,
+87.46,
 1.95,
 []
 ],
 "Le docteur Frank Olson était un employé civil de l'armée.": [
-83.3822,
-2.9737,
-[]
+89.76,
+3.4,
+[
+1.8
+]
 ],
 "En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.": [
-86.706,
-4.6101,
+93.51,
+6.64,
 [
-2.6479
+3.76
 ]
 ],
 "Environ une semaine plus tard, il était mort.": [
-91.6661,
+100.5,
 2.25,
 []
 ],
 "Alors, comment tout cela a-t-il été découvert ?": [
-94.2661,
+103.1,
 2.28,
 []
 ],
 "En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church.": [
-96.8961,
-5.3141,
+105.73,
+7.02,
 [
-3.3028
+1.74,
+4.045
 ]
 ],
-"Sa mission était de découvrir si les agences de renseignement américaines avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.": [
-102.5602,
-8.54,
+"Sa mission : savoir si les services de renseignement américains avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.": [
+113.1,
+7.83,
 [
-1.85,
-6.395
+3.305,
+5.685
 ]
 ],
-"Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un centre d'archives pour dossiers inactifs.": [
-111.4502,
-6.5301,
+"Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un dépôt d'archives inactives.": [
+121.28,
+8.55,
 [
-1.5458,
-2.5,
-4.4014
+3.49,
+6.09
 ]
 ],
-"En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.": [
-118.3302,
-6.25,
+"En août, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.": [
+130.18,
+5.38,
 [
-1.365,
-4.41
+2.765
 ]
 ],
 "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.": [
-124.9302,
-7.1502,
+135.91,
+7.46,
 [
-2.0854,
-3.6826
+2.15,
+3.47,
+6.205
 ]
 ],
 "Mais ces cartons n'ont jamais été toute l'histoire.": [
-132.4304,
+143.72,
 2.49,
 []
 ],
 "Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.": [
-135.2704,
-6.0607,
+146.56,
+8.67,
 [
-1.9331,
-3.0915,
-5.0246
+2.745,
+4.39,
+7.135
 ]
 ],
 "Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.": [
-141.6812,
-5.4389,
+155.58,
+7.68,
 [
-2.7978
+3.895
 ]
 ],
 "Le sénateur Kennedy l'a nommé : Richard Helms.": [
-147.4701,
-2.4097,
+163.61,
+2.52,
 []
 ],
-"Ce qui a survécu, ce sont surtout des dossiers financiers.": [
-150.2298,
-2.96,
+"Il reste surtout des dossiers financiers.": [
+166.48,
+2.05,
 []
 ],
 "Des avances, des pièces justificatives, des comptes.": [
-153.5398,
+168.88,
 2.77,
 []
 ],
 "Alors, que sait-on vraiment ?": [
-156.6598,
+172.0,
 1.32,
 []
 ],
 "Assez pour montrer que c'est arrivé.": [
-158.3298,
+173.67,
 1.7,
 []
 ],
 "Pas assez pour savoir tout ce qui est arrivé.": [
-160.3798,
+175.72,
 2.2,
 []
 ],
 "Une grande partie de l'histoire complète ne sera peut-être jamais connue.": [
-162.9298,
+178.27,
 3.8,
 [
-2.15
+1.565
 ]
 ]
-},
-"pace": 1.1231
+}
 }
