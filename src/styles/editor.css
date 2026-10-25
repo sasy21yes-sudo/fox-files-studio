@@ -1345,3 +1345,8 @@ textarea.itext {
   flex: none;
   width: 160px;
 }
+.hand-poses .chip.on {
+  background: var(--brass);
+  color: #1a140e;
+  border-color: var(--brass);
+}

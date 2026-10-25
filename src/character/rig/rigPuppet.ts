@@ -113,7 +113,7 @@ export function anchoredFlex(
   x: number,
   y: number,
   rot: number,
-  o: { bend?: number; pivot?: number; sx?: number; sy?: number; scale?: number; flipY?: boolean } = {},
+  o: { bend?: number; pivot?: number; sx?: number; sy?: number; scale?: number; flipY?: boolean; ox?: number; oy?: number } = {},
 ) {
   const p = RIG.parts[name];
   const img = images[name];
@@ -125,6 +125,8 @@ export function anchoredFlex(
   g.translate(x, y);
   if (rot) g.rotate(rot);
   g.scale(sx, sy);
+  // (ox, oy: where the part attaches, moved from its baked anchor, in sprite px)
+  if (o.ox || o.oy) g.translate(-(o.ox ?? 0), -(o.oy ?? 0));
   if (Math.abs(bend) < 0.004) {
     g.drawImage(img, p.x, p.y);
     g.restore();

@@ -1604,6 +1604,12 @@ interface ArmDef {
   layer: Layer;
   /** Draw the glove on another layer than the sleeve (e.g. sleeve under the head, hand over the hat). */
   glove?: Layer;
+  /** Hands tab (tweaks.json): mirror the glove ('auto' = the thumb rule), its size, attach point (sprite px from the
+   *  wrist anchor) and an extra turn around it. */
+  mirror?: 'auto' | 'yes' | 'no';
+  handScale?: number;
+  anchor?: [number, number];
+  handTurn?: number;
 }
 const NEAR_MODES: ArmMode[] = ['chin', 'hatChest', 'hold', 'scratch'];
 const FAR_T: Partial<Record<ArmMode, ArmDef>> = {
@@ -1669,6 +1675,8 @@ interface RigArm {
   /** The glove's own layer when it differs from the sleeve's. */
   gloveLayer: Layer | null;
   prop: ArmMode;
+  /** The glove's own adjustments from the Hands tab (tweaks.json): mirror, size, attach point, turn. */
+  glove: { mirror: 'auto' | 'yes' | 'no'; scale: number; anchor: [number, number]; rot: number };
 }
 
 /** Split the choreography (front/back arm modes) onto the near and far arms. */
@@ -1742,6 +1750,7 @@ function rigArm(st: ArmState, phys: Phys, pose: FoxPose): RigArm {
     layer: D.layer,
     gloveLayer: D.glove && D.glove !== D.layer ? D.glove : null,
     prop: mode,
+    glove: { mirror: D.mirror ?? 'auto', scale: D.handScale ?? 1, anchor: D.anchor ?? [0, 0], rot: D.handTurn ?? 0 },
   };
 }
 
@@ -1818,11 +1827,14 @@ function drawGloveRig(g: G, A: RigArm, alpha = 1) {
   const idle = Math.sin(wrist.time * 1.7 + (A.phys === 'far' ? 0 : 1.3)) * 0.05 * (1 - wrist.walk);
   const flex = drag + idle;
   // Mirrored by the thumb rule (gloves.ts): the far hand is the one on the right of the picture.
-  const flip = gloveFlip(A.handName, A.phys === 'far', A.flip);
-  anchoredFlex(g, `hand_${A.handName}${GLOVE_SUFFIX[A.phys]}`, h.hx, h.hy, h.rot + flex * 0.5, {
+  const G = A.glove;
+  const flip = G.mirror === 'auto' ? gloveFlip(A.handName, A.phys === 'far', A.flip) : G.mirror === 'yes';
+  anchoredFlex(g, `hand_${A.handName}${GLOVE_SUFFIX[A.phys]}`, h.hx, h.hy, h.rot + flex * 0.5 + G.rot, {
     bend: flex * 0.7 * (flip ? -1 : 1),
     pivot: 0.42,
-    scale: 1.12,
+    scale: 1.12 * G.scale,
+    ox: G.anchor[0],
+    oy: G.anchor[1],
     sx: 1 + Math.abs(drag) * 0.05,
     sy: 1 - Math.abs(drag) * 0.04,
     flipY: flip,

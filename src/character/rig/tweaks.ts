@@ -11,6 +11,11 @@ export interface ArmTweak {
   hand?: string;
   layer?: 'behind' | 'front' | 'over';
   flip?: boolean;
+  /** Glove (Hands tab): mirror ('auto' = the thumb rule), size factor, attach point in sprite px, extra turn (rad). */
+  mirror?: 'auto' | 'yes' | 'no';
+  handScale?: number;
+  anchor?: [number, number];
+  handTurn?: number;
 }
 
 export const MOTION_DEFAULTS = {

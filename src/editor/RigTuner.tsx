@@ -37,7 +37,7 @@ const FACE_LABELS: Record<keyof typeof FACE_DEFAULTS, [string, number, number, n
   eyeScale: ['Eye size', 0.7, 1.4, 0.01],
 };
 
-function Slider({ label, value, def, min, max, step, onChange }: { label: string; value: number; def: number; min: number; max: number; step: number; onChange(v: number | undefined): void }) {
+export function Slider({ label, value, def, min, max, step, onChange }: { label: string; value: number; def: number; min: number; max: number; step: number; onChange(v: number | undefined): void }) {
   return (
     <label className="tune-row">
       <span>{label}</span>
