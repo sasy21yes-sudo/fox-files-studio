@@ -1,5 +1,102 @@
 {
-  "arms": { "near": {}, "far": {} },
+  "arms": {
+    "near": {
+      "hips": {
+        "handScale": 0.81,
+        "handTurn": 0.17,
+        "anchor": [
+          -29,
+          -7
+        ],
+        "hand": "n_knock"
+      },
+      "chin": {
+        "handScale": 0.94,
+        "handTurn": 0.64,
+        "anchor": [
+          -38,
+          -3
+        ],
+        "mirror": "yes"
+      },
+      "hatChest": {
+        "anchor": [
+          -17,
+          -11
+        ],
+        "handScale": 0.89,
+        "handTurn": 0.14
+      },
+      "scratch": {
+        "handScale": 0.85,
+        "handTurn": 0.54,
+        "anchor": [
+          -23,
+          3
+        ]
+      }
+    },
+    "far": {
+      "point": {
+        "handTurn": -0.02,
+        "anchor": [
+          -11,
+          11
+        ],
+        "handScale": 0.9
+      },
+      "knock": {
+        "mirror": "yes"
+      },
+      "pinch": {
+        "anchor": [
+          -26,
+          -33
+        ],
+        "handTurn": 0.23
+      },
+      "shake": {
+        "mirror": "yes",
+        "handScale": 0.98,
+        "handTurn": 0.37,
+        "anchor": [
+          -21,
+          -7
+        ]
+      },
+      "magnify": {
+        "anchor": [
+          -51,
+          -55
+        ],
+        "handScale": 0.58,
+        "handTurn": 0.1,
+        "hand": "n_magnifier_palm"
+      },
+      "hips": {
+        "anchor": [
+          -14,
+          21
+        ],
+        "handScale": 0.72,
+        "handTurn": -0.15
+      },
+      "one": {
+        "anchor": [
+          -42,
+          -9
+        ],
+        "handTurn": 0.42
+      },
+      "two": {
+        "anchor": [
+          -48,
+          -13
+        ],
+        "handTurn": 0.29
+      }
+    }
+  },
   "motion": {},
   "face": {}
 }
