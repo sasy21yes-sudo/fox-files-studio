@@ -3,6 +3,7 @@ import type { Beat } from '../data/mkultraScript';
 import { sceneBeats } from '../data/projectText';
 import { FONT_SANS, FONT_TITLE, FONT_TYPE, wrapText } from '../animation/stage';
 import { TAU, clamp, easeOut, hash } from '../animation/math';
+import { portrait } from './people';
 import { drawSunburst, elastic } from './cartoon';
 
 /**
@@ -693,7 +694,12 @@ function drawPerson(D: Draw, b: Extract<Beat, { kind: 'person' }>) {
   g.clip();
   // (the hair shape picks from the letters of the name, so each person gets a different sketch)
   const code = [...b.name].reduce((a, c) => a + c.charCodeAt(0), 0);
-  drawSketch(g, px + pw / 2, py + ph * 0.5, ph * 0.34, u, (code % 3) / 3 + 0.01, hash(code));
+  const face = portrait(b.name);
+  if (face) {
+    // The cartoon portrait (redrawn from a public-domain photo), head and shoulders filling the frame.
+    const sc = Math.max(pw / face.width, ph / face.height);
+    g.drawImage(face, px + (pw - face.width * sc) / 2, py + ph - face.height * sc, face.width * sc, face.height * sc);
+  } else drawSketch(g, px + pw / 2, py + ph * 0.5, ph * 0.34, u, (code % 3) / 3 + 0.01, hash(code));
   g.restore();
   g.strokeStyle = INK;
   g.lineWidth = 5 * u;

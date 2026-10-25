@@ -1,3 +1,4 @@
+import { loadPortraits } from '../effects/people';
 import type { MediaItem, Project } from '../types';
 import { loadProjectClips } from './clips';
 
@@ -78,7 +79,7 @@ function decode(id: string): Promise<void> {
 
 /** Decode every image the project lists. Resolves when all are drawable (missing ones are skipped). */
 export async function loadProjectMedia(project: Project): Promise<void> {
-  await Promise.all([...(project.media ?? []).map((m) => decode(m.id)), loadProjectClips(project)]);
+  await Promise.all([...(project.media ?? []).map((m) => decode(m.id)), loadProjectClips(project), loadPortraits()]);
 }
 
 const rid = () => Math.random().toString(36).slice(2, 10);
