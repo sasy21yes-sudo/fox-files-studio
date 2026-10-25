@@ -29,6 +29,7 @@ import { MediaPage } from '../editor/MediaPage';
 import { TeamPage } from '../editor/TeamPage';
 import { Splitters, usePanelSizes } from '../editor/Splitters';
 import { ShortPanel } from '../editor/ShortPanel';
+import { ShortStrip } from '../editor/ShortStrip';
 import { AiPanel } from '../editor/AiPanel';
 import { foxOf, foxTrack, setFoxTrack, updateFox, updateScene, updateShot, updateSpec, type Selection } from '../editor/model';
 import { sceneBeats } from '../data/projectText';
@@ -760,6 +761,9 @@ export function App() {
             <Inspector project={project} timeline={timeline} time={playback.time} selection={sel} onSelect={setSelection} onChange={change} onSeek={playback.seek} />
           )}
           </div>
+          {shortView && shortTl ? (
+            <ShortStrip short={shortTl} time={playback.time} onSeek={playback.seek} />
+          ) : (
           <TimelineEditor
             project={project}
             timeline={timeline}
@@ -770,6 +774,7 @@ export function App() {
             onChange={change}
             musicOn={s.music}
           />
+          )}
         </>
       )}
 

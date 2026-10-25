@@ -71,6 +71,8 @@ export interface Timeline {
   level?: (t: number) => number;
   /** True for the Short's own cut (buildShortTimeline): no chapter cards, spans are clips of scenes. */
   short?: boolean;
+  /** Short cut: when its closing card starts. */
+  endCard?: number;
   /** Cold-open hook at the start of the 9:16 Short (scene spans start after it). */
   hook?: { start: 0; end: number; text: string; keywords: string[] };
 }
@@ -333,9 +335,11 @@ export function toVTT(tl: Timeline): string {
 // ---------- The Short's own cut ----------
 
 /** Lead-in before a Short clip's first word and breath after its last (real s); the last clip holds longer. */
-const SHORT_PRE = 0.25;
-const SHORT_POST = 0.45;
+const SHORT_PRE = 0.35;
+const SHORT_POST = 0.6;
 const SHORT_END = 1.4;
+/** The closing card's length (real s). */
+export const SHORT_END_CARD = 2.4;
 
 /** When sentences from..to of a scene are heard in a timeline: from the voice clips, else from the cues. */
 function sentenceRange(tl: Timeline, span: SceneSpan, from: number, to: number): [number, number] | null {
@@ -390,7 +394,8 @@ export function buildShortTimeline(project: Project, voice?: VoiceTiming | null)
     const b = Math.min(L.end, range[1] + (last ? SHORT_END : SHORT_POST));
     const k = spans.length;
     const shift = cursor - a;
-    spans.push({ ...L, index: k, start: cursor, end: cursor + (b - a), duration: b - a, offset: a - L.start, fullDuration: L.duration, overflow: false, extended: false });
+    const lead = Math.max(-(a - L.start), Math.min(L.duration - (b - a), clip.lead ?? 0));
+    spans.push({ ...L, index: k, start: cursor, end: cursor + (b - a), duration: b - a, offset: a - L.start + lead, fullDuration: L.duration, overflow: false, extended: false });
     // Only the chosen sentences speak: the breath after the last one shows the picture, not the next line.
     const said = (t: number) => t >= range[0] - 0.05 && t < range[1] - 0.05;
     for (const c of long.cues)
@@ -400,6 +405,15 @@ export function buildShortTimeline(project: Project, voice?: VoiceTiming | null)
     cursor += b - a;
   });
   if (!spans.length) return null;
+  // Closing card: the last clip's picture runs on under it.
+  let endCard: number | undefined;
+  if (cut.endCard !== false) {
+    const last = spans[spans.length - 1];
+    last.end += SHORT_END_CARD;
+    last.duration += SHORT_END_CARD;
+    endCard = cursor;
+    cursor += SHORT_END_CARD;
+  }
   const longLevel = long.level;
   const level = longLevel
     ? (t: number) => {
@@ -409,5 +423,5 @@ export function buildShortTimeline(project: Project, voice?: VoiceTiming | null)
         return lt < m.said ? longLevel(lt) : 0;
       }
     : undefined;
-  return { total: cursor, spans, cues, hook: long.hook, lang: long.lang, voiced: long.voiced, clips, level, short: true };
+  return { total: cursor, spans, cues, hook: long.hook, lang: long.lang, voiced: long.voiced, clips, level, short: true, endCard };
 }

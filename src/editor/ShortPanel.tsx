@@ -3,6 +3,7 @@ import { splitSentences, type Timeline } from '../animation/timeline';
 import type { Project, ShortCut } from '../types';
 
 type Change = (fn: (p: Project) => Project, key?: string) => void;
+type Clip = ShortCut['clips'][number];
 
 interface Props {
   project: Project;
@@ -15,30 +16,44 @@ interface Props {
   onChange: Change;
 }
 
-/** Sentence indices of a scene that the cut includes. */
-const picked = (cut: ShortCut | undefined, scene: string) => {
-  const s = new Set<number>();
-  for (const c of cut?.clips ?? []) if (c.scene === scene) for (let i = Math.min(c.from, c.to); i <= Math.max(c.from, c.to); i++) s.add(i);
-  return s;
-};
+const covers = (c: Clip, scene: string, i: number) => c.scene === scene && i >= Math.min(c.from, c.to) && i <= Math.max(c.from, c.to);
 
-/** Clips from the picked sentences: runs of consecutive sentences, in episode order. */
-function clipsOf(project: Project, sel: Map<string, Set<number>>): ShortCut['clips'] {
-  const out: ShortCut['clips'] = [];
-  for (const sc of project.scenes) {
-    const ids = [...(sel.get(sc.id) ?? [])].sort((a, b) => a - b);
-    for (const i of ids) {
-      const last = out[out.length - 1];
-      if (last && last.scene === sc.id && last.to === i - 1) last.to = i;
-      else out.push({ scene: sc.id, from: i, to: i });
-    }
+/**
+ * Tick or untick one sentence, keeping the clips' playing order: unticking splits a clip, ticking extends or
+ * joins the neighbouring clip of the same scene, else adds a clip where it falls in the episode's order.
+ */
+function toggleSentence(project: Project, clips: Clip[], scene: string, i: number): Clip[] {
+  const out = clips.map((c) => ({ ...c }));
+  const at = out.findIndex((c) => covers(c, scene, i));
+  if (at >= 0) {
+    const c = out[at];
+    const parts = [
+      { ...c, from: Math.min(c.from, c.to), to: i - 1 },
+      { ...c, from: i + 1, to: Math.max(c.from, c.to), lead: undefined },
+    ].filter((p) => p.from <= p.to);
+    out.splice(at, 1, ...parts);
+    return out;
+  }
+  const before = out.findIndex((c) => c.scene === scene && c.to === i - 1);
+  const after = out.findIndex((c) => c.scene === scene && c.from === i + 1);
+  if (before >= 0 && after >= 0) {
+    out[before].to = out[after].to;
+    out.splice(after, 1);
+  } else if (before >= 0) out[before].to = i;
+  else if (after >= 0) out[after].from = i;
+  else {
+    const pos = (c: { scene: string; from: number }) => project.scenes.findIndex((s) => s.id === c.scene) * 1000 + c.from;
+    const me = pos({ scene, from: i });
+    const next = out.findIndex((c) => pos(c) > me);
+    out.splice(next < 0 ? out.length : next, 0, { scene, from: i, to: i });
   }
   return out;
 }
 
 /**
- * The Short's own cut: tick the sentences that make the summary (the strongest, catchiest moments); the Short is
- * the hook plus those moments of the episode, picture and voice included, back to back. Nothing is re-recorded.
+ * The Short's own cut: tick the sentences that make the summary (the strongest, catchiest moments) and order the
+ * clips; the Short is the hook plus those moments of the episode, picture and voice included, joined by
+ * readable cuts. Nothing is re-recorded.
  */
 export function ShortPanel({ project, timeline, short, previewing, onPreview, onChange }: Props) {
   const [open, setOpen] = useState(true);
@@ -48,17 +63,19 @@ export function ShortPanel({ project, timeline, short, previewing, onPreview, on
     const c = span && timeline.clips.find((x) => x.text === text && x.start >= span.start - 1e-3 && x.start < span.end);
     return c ? c.duration : null;
   };
-  const setCut = (fn: (c: ShortCut) => ShortCut) => onChange((p) => ({ ...p, short: fn(p.short ?? { enabled: true, clips: [] }) }), `short:${Date.now()}`);
-  const toggle = (scene: string, i: number) =>
+  const setCut = (fn: (c: ShortCut) => ShortCut, key = `short:${Date.now()}`) => onChange((p) => ({ ...p, short: fn(p.short ?? { enabled: true, clips: [] }) }), key);
+  const move = (i: number, d: -1 | 1) =>
     setCut((c) => {
-      const sel = new Map(project.scenes.map((s) => [s.id, picked(c, s.id)]));
-      const s = sel.get(scene)!;
-      if (s.has(i)) s.delete(i);
-      else s.add(i);
-      return { ...c, clips: clipsOf(project, sel) };
+      const clips = [...c.clips];
+      const j = i + d;
+      if (j < 0 || j >= clips.length) return c;
+      [clips[i], clips[j]] = [clips[j], clips[i]];
+      return { ...c, clips };
     });
+  const setLead = (i: number, lead: number) => setCut((c) => ({ ...c, clips: c.clips.map((x, k) => (k === i ? { ...x, lead: lead || undefined } : x)) }), `short-lead:${i}`);
   const total = short?.total ?? 0;
   const verdict = !short ? '' : total <= 60 ? 'good length for a Short' : total <= 90 ? 'long for a Short (30–60 s works best)' : total <= 180 ? 'too long: aim for 30–60 s' : 'over the 3-minute Shorts limit';
+  const sceneOf = (id: string) => project.scenes.find((s) => s.id === id);
 
   return (
     <section className={`ai-panel short-panel ${open ? 'open' : ''}`} aria-label="Short cut">
@@ -70,12 +87,15 @@ export function ShortPanel({ project, timeline, short, previewing, onPreview, on
       {open && (
         <div className="ai-body">
           <p className="help small">
-            The Short can be its own cut: the hook, then only the sentences you tick, with their picture, voice and pop-ups, back to back. Untick everything
-            (or switch it off) and the Short is the whole episode.
+            The Short can be its own cut: the hook, then only the sentences you tick, with their picture, voice and pop-ups. A new topic opens with its
+            chapter tag and a whoosh; a jump inside the same scene with a punch-in.
           </p>
           <div className="row gap small">
             <label className="chk">
               <input type="checkbox" checked={!!cut?.enabled} onChange={(e) => setCut((c) => ({ ...c, enabled: e.target.checked }))} /> Use its own cut
+            </label>
+            <label className="chk" title="A closing card: “full episode on the channel”">
+              <input type="checkbox" checked={cut?.endCard !== false} disabled={!cut?.enabled} onChange={(e) => setCut((c) => ({ ...c, endCard: e.target.checked }))} /> End card
             </label>
             <button className={`btn small ${previewing ? 'primary' : ''}`} disabled={!short} onClick={() => onPreview(!previewing)}>
               {previewing ? '■ Back to the episode' : '▶ Preview the Short'}
@@ -86,28 +106,55 @@ export function ShortPanel({ project, timeline, short, previewing, onPreview, on
               {total.toFixed(1)} s with the hook · {verdict}
             </p>
           )}
+          {cut?.enabled && cut.clips.length > 0 && (
+            <>
+              <h4 className="short-h">Clips, in playing order</h4>
+              <ol className="short-clips">
+                {cut.clips.map((c, i) => {
+                  const sc = sceneOf(c.scene);
+                  const first = sc ? splitSentences(sc.narration)[Math.min(c.from, c.to)] ?? '' : '';
+                  return (
+                    <li key={`${c.scene}-${c.from}-${i}`}>
+                      <span className="short-clip-text">
+                        <b>{sc?.title ?? c.scene}</b> {first.length > 46 ? `${first.slice(0, 44)}…` : first}
+                        {c.to !== c.from ? ` (+${Math.abs(c.to - c.from)})` : ''}
+                      </span>
+                      <label className="short-lead" title="Picture starts later (+) or earlier (−) than the voice, in seconds">
+                        picture
+                        <input type="number" step={0.1} min={-5} max={5} value={c.lead ?? 0} onChange={(e) => setLead(i, Number(e.target.value))} />
+                      </label>
+                      <button className="btn icon ghost small" disabled={i === 0} onClick={() => move(i, -1)} aria-label="Move up">
+                        ↑
+                      </button>
+                      <button className="btn icon ghost small" disabled={i === cut.clips.length - 1} onClick={() => move(i, 1)} aria-label="Move down">
+                        ↓
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+            </>
+          )}
           {cut?.enabled && (
             <div className="short-list">
-              {project.scenes.map((sc, si) => {
-                const sel = picked(cut, sc.id);
-                return (
-                  <div key={sc.id} className="short-scene">
-                    <strong>
-                      {si + 1}. {sc.title}
-                    </strong>
-                    {splitSentences(sc.narration).map((text, i) => {
-                      const d = clipLen(text, si);
-                      return (
-                        <label key={i} className={`short-line ${sel.has(i) ? 'on' : ''}`}>
-                          <input type="checkbox" checked={sel.has(i)} onChange={() => toggle(sc.id, i)} />
-                          <span>{text}</span>
-                          <code>{d !== null ? `${d.toFixed(1)}s` : ''}</code>
-                        </label>
-                      );
-                    })}
-                  </div>
-                );
-              })}
+              {project.scenes.map((sc, si) => (
+                <div key={sc.id} className="short-scene">
+                  <strong>
+                    {si + 1}. {sc.title}
+                  </strong>
+                  {splitSentences(sc.narration).map((text, i) => {
+                    const on = cut.clips.some((c) => covers(c, sc.id, i));
+                    const d = clipLen(text, si);
+                    return (
+                      <label key={i} className={`short-line ${on ? 'on' : ''}`}>
+                        <input type="checkbox" checked={on} onChange={() => setCut((c) => ({ ...c, clips: toggleSentence(project, c.clips, sc.id, i) }))} />
+                        <span>{text}</span>
+                        <code>{d !== null ? `${d.toFixed(1)}s` : ''}</code>
+                      </label>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
           )}
         </div>

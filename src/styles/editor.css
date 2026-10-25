@@ -1470,3 +1470,118 @@ body.resizing-v * {
   font-size: 11px;
   color: var(--muted);
 }
+.short-h {
+  margin: 10px 0 4px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--brass-hi);
+}
+.short-clips {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 12px;
+}
+.short-clips li {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 4px;
+  align-items: center;
+  padding: 2px 0;
+}
+.short-clip-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.short-lead {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+.short-lead input {
+  width: 52px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+/* ---------- Short strip (timeline area while the Short cut plays) ---------- */
+.short-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  min-height: 0;
+}
+.short-strip-head {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+.short-strip-head strong {
+  font-family: var(--font-type);
+  color: var(--brass-hi);
+  letter-spacing: 0.08em;
+}
+.short-strip-bar {
+  position: relative;
+  flex: 1;
+  min-height: 78px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: pointer;
+  overflow: hidden;
+}
+.short-seg {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  border-radius: 6px;
+  background: #5a4128;
+  border: 1px solid #7a5a36;
+  padding: 4px 6px;
+  font-size: 11px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+}
+.short-seg b {
+  color: var(--brass-hi);
+  white-space: nowrap;
+}
+.short-seg span {
+  color: var(--text);
+  opacity: 0.85;
+  line-height: 1.25;
+}
+.short-seg.jump {
+  border-left: 3px dashed var(--amber);
+}
+.short-seg.hook {
+  background: #7a1f14;
+  border-color: #a5392a;
+  color: #fff;
+  font-weight: 700;
+}
+.short-seg.card {
+  background: #3d3228;
+  color: var(--muted);
+}
+.short-playhead {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0574a;
+  pointer-events: none;
+}

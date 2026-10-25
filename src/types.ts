@@ -110,7 +110,11 @@ export interface MediaItem {
  */
 export interface ShortCut {
   enabled: boolean;
-  clips: { scene: string; from: number; to: number }[];
+  /** In playing order. lead: the picture starts this many seconds later (+) or earlier (-) than the voice of the
+   *  clip, e.g. to skip an empty room before Agent Fox walks in. */
+  clips: { scene: string; from: number; to: number; lead?: number }[];
+  /** A closing card inviting to the full episode (default on). */
+  endCard?: boolean;
 }
 
 export interface Project {

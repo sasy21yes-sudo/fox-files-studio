@@ -228,6 +228,14 @@ export function sfxHits(tl: Timeline): Hit[] {
       if (sound) hits.push({ t: b.start, sound, gain: POPUP_GAIN, pan: 0.15, seed: 900000 + span.index * 100 + j });
     }),
   );
+  // Short cut: a whoosh on every new topic, a softer one on a punch-in, so each cut is heard as a cut.
+  if (tl.short)
+    tl.spans.forEach((span, i) => {
+      const prev = tl.spans[i - 1];
+      if (i === 0 && !tl.hook) return;
+      const same = !!prev && prev.scene.id === span.scene.id;
+      hits.push({ t: Math.max(0, span.start - (same ? 0.02 : 0.12)), sound: 'whoosh', gain: same ? 0.35 : 0.6, pan: 0, seed: 700000 + i });
+    });
   for (const span of tl.spans) {
     const cues = (span.scene.spec as { sfx?: SfxCue[] } | null | undefined)?.sfx;
     if (!cues?.length) continue;

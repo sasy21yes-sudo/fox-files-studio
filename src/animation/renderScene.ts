@@ -15,6 +15,7 @@ import { sceneRevelation } from './scenes/sceneRevelation';
 import { sceneKnown } from './scenes/sceneKnown';
 import { renderHook } from './scenes/hook';
 import { renderBeats } from '../effects/beats';
+import { SHORT_IN, SHORT_OUT, drawEndCard, drawPunchFlash, drawTopicTag, punchZoom } from '../effects/shortCut';
 import { renderSpec } from '../scene/renderSpec';
 import { EMPTY_SPEC } from '../data/specs';
 import { isMkScene } from '../data/projectText';
@@ -121,8 +122,19 @@ export function renderFrame(
 
   // Projector gate weave: the whole picture jumps a hair every film frame.
   const weave = gateWeave(time, u);
+  // Short cut: a jump inside the same scene gets a punch-in (a quick zoom that settles) instead of a raw jump.
+  const prevClip = tl.short ? tl.spans[span.index - 1] : undefined;
+  const jump = !!prevClip && prevClip.scene.id === span.scene.id;
   g.save();
   g.translate(weave.x, weave.y);
+  if (jump) {
+    const z = punchZoom(local);
+    if (z !== 1) {
+      g.translate(w / 2, h * 0.45);
+      g.scale(z, z);
+      g.translate(-w / 2, -h * 0.45);
+    }
+  }
   const id = span.scene.id;
   const sink: FoxDebug | null = opts.probe ? { pose: null, face: null, arms: null, joints: {} } : null;
   captureFox(sink);
@@ -144,7 +156,15 @@ export function renderFrame(
   }
   const next = tl.spans[span.index + 1];
   const remaining = span.duration - local;
-  if (next && remaining < TRANSITION_OUT) {
+  if (tl.short) {
+    // New topic: the scene's own wipe (quicker than in the episode) and its chapter tag; same scene: punch-in.
+    const nextJump = !!next && next.scene.id === span.scene.id;
+    if (!jump && local < SHORT_IN) applyTransition(g, w, h, span.scene.transition, local / SHORT_IN, out.focus, true);
+    if (next && !nextJump && remaining < SHORT_OUT) applyTransition(g, w, h, next.scene.transition, remaining / SHORT_OUT, out.focus, false);
+    if (jump) drawPunchFlash(g, w, h, local);
+    else drawTopicTag(g, w, h, u, project.scenes.findIndex((s) => s.id === span.scene.id) + 1, span.scene.title, local);
+    if (tl.endCard !== undefined && time >= tl.endCard) drawEndCard(g, w, h, u, time - tl.endCard);
+  } else if (next && remaining < TRANSITION_OUT) {
     applyTransition(g, w, h, next.scene.transition, remaining / TRANSITION_OUT, out.focus, false);
   } else if (!next && remaining < ENDING_IRIS) {
     applyTransition(g, w, h, 'iris', remaining / ENDING_IRIS, out.focus, false);
