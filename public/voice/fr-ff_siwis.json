@@ -52,7 +52,9 @@
 "Commençons par ce que la CIA elle-même a dit au Sénat.": [
 22.25,
 2.72,
-[]
+[
+1.285
+]
 ],
 "Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964.": [
 25.32,
@@ -74,7 +76,9 @@
 "Elles citent 80 institutions, dont 44 universités et établissements d'enseignement supérieur.": [
 38.48,
 5.99,
-[]
+[
+1.995
+]
 ],
 "Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.": [
 44.82,
@@ -114,7 +118,9 @@
 "Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires.": [
 61.95,
 4.55,
-[]
+[
+2.27
+]
 ],
 "Le LSD faisait partie des drogues testées.": [
 66.85,
@@ -198,6 +204,7 @@
 118.08,
 8.54,
 [
+1.85,
 6.395
 ]
 ],
@@ -205,20 +212,24 @@
 126.97,
 9.34,
 [
-3.55
+2.195,
+3.55,
+6.25
 ]
 ],
 "En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.": [
 136.66,
 6.25,
 [
-1.365
+1.365,
+4.41
 ]
 ],
 "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.": [
 143.26,
 7.89,
 [
+2.285,
 4.035
 ]
 ],
@@ -231,7 +242,9 @@
 154.34,
 8.67,
 [
-4.39
+2.745,
+4.39,
+7.135
 ]
 ],
 "Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.": [
@@ -274,7 +287,9 @@
 "Une grande partie de l'histoire complète ne sera peut-être jamais connue.": [
 187.9,
 3.8,
-[]
+[
+2.15
+]
 ]
 }
 }
