@@ -240,7 +240,7 @@ const french: LocalizedScript = {
     question: {
       title: 'Les archives',
       narration:
-        "Commençons par ce que la CIA elle-même a dit au Sénat. Selon le témoignage du directeur de la CIA, MKUltra a duré de 1953 à 1964. Soit onze ans. Les archives qui ont survécu recensent 149 sous-projets. Elles citent 80 institutions, dont 44 universités et établissements d'enseignement supérieur. Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.",
+        "Commençons par ce que la CIA elle-même a dit au Sénat. Selon le témoignage de son directeur, MKUltra a duré de 1953 à 1964. Soit onze ans. Les archives restantes recensent 149 sous-projets. Elles citent 80 institutions, dont 44 universités et écoles supérieures. Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.",
       keywords: ['1953', '1964', 'onze ans', '149 sous-projets', '80 institutions', '44', '185'],
       beats: [
         { cue: 'Soit onze ans', kind: 'span', from: '1953', to: '1964', label: '11 ANS' },
@@ -250,7 +250,7 @@ const french: LocalizedScript = {
     experiments: {
       title: 'Les expériences',
       narration:
-        "Alors, que faisaient concrètement tous ces sous-projets ? Le directeur les a classés par catégories. Parmi elles : drogues et alcool. Hypnose. Recherche sur le sommeil. Détecteurs de mensonge. Les archives évoquent aussi des drogues destinées à faciliter les interrogatoires. Le LSD faisait partie des drogues testées. Et voici le plus important. Certaines des personnes testées étaient volontaires. D'autres n'ont jamais été prévenues.",
+        "Alors, que faisaient concrètement tous ces sous-projets ? Le directeur les a classés par catégories. Parmi elles : drogues et alcool. Hypnose. Recherche sur le sommeil. Détecteurs de mensonge. Les archives évoquent aussi des drogues destinées aux interrogatoires. Le LSD faisait partie des drogues testées. Et voici le plus important. Certaines des personnes testées étaient volontaires. D'autres n'ont jamais été prévenues.",
       keywords: ['catégories', 'LSD', 'interrogatoires', 'volontaires', 'jamais été prévenues'],
       beats: [
         { cue: 'concrètement', kind: 'question', text: 'Que faisaient-ils vraiment ?' },
@@ -272,7 +272,7 @@ const french: LocalizedScript = {
     revelation: {
       title: 'La révélation',
       narration:
-        "Alors, comment tout cela a-t-il été découvert ? En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church. Sa mission était de découvrir si les agences de renseignement américaines avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique. Puis, en 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un centre d'archives pour dossiers inactifs. En août de la même année, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe. Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.",
+        "Alors, comment cela a-t-il été découvert ? En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church. Sa mission : savoir si les services de renseignement américains avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique. En 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un dépôt d'archives inactives. En août, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe. Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.",
       keywords: ['Frank Church', "d'illégal, d'inapproprié ou de contraire à l'éthique", 'sept cartons', 'audition conjointe', 'Edward Kennedy'],
       beats: [
         { cue: 'été découvert', kind: 'question', text: "Comment l'a-t-on su ?" },
@@ -291,7 +291,7 @@ const french: LocalizedScript = {
     known: {
       title: "Ce que l'on sait",
       narration:
-        "Mais ces cartons n'ont jamais été toute l'histoire. Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964. Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque. Le sénateur Kennedy l'a nommé : Richard Helms. Ce qui a survécu, ce sont surtout des dossiers financiers. Des avances, des pièces justificatives, des comptes. Alors, que sait-on vraiment ? Assez pour montrer que c'est arrivé. Pas assez pour savoir tout ce qui est arrivé. Une grande partie de l'histoire complète ne sera peut-être jamais connue.",
+        "Mais ces cartons n'ont jamais été toute l'histoire. Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964. Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque. Le sénateur Kennedy l'a nommé : Richard Helms. Il reste surtout des dossiers financiers. Des avances, des pièces justificatives, des comptes. Alors, que sait-on vraiment ? Assez pour montrer que c'est arrivé. Pas assez pour savoir tout ce qui est arrivé. Une grande partie de l'histoire complète ne sera peut-être jamais connue.",
       keywords: ['1963', '1964', '1973', 'détruits', 'Richard Helms', 'dossiers financiers', 'jamais connue'],
       beats: [
         { cue: 'fin des tests', kind: 'span', from: 'Rapport 1963', to: '1964', label: "FIN DES TESTS À L'INSU" },
@@ -301,9 +301,14 @@ const french: LocalizedScript = {
     },
   },
   say: [
-    ['MKUltra', 'ème ka ultra'],
+    ['MKUltra', 'èm ka ultra'],
+    ['Frank', 'Franque'],
+    ['Olson', 'Olsonne'],
+    ['Edward', 'Èdouard'],
+    ['Kennedy', 'Kénédi'],
+    ['Helms', 'Hèlmz'],
     ['Church', 'Tcheurtch'],
-    ['New York', 'Niou York'],
+    ['New York', 'Niou Yorque'],
     ['CIA', 'cé i a'],
   ],
 };

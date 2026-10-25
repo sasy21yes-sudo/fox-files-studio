@@ -70,7 +70,8 @@ export function withCamera(s: Stage, zoom: number, panX: number, panY: number, d
 
 /** Word-wrap text to a maximum width using the current font. */
 export function wrapText(g: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = tr(text).split(/\s+/).filter(Boolean);
+  // (French puts a space before ? ! : ; - keep the sign on the word's line; [ \t\n], since \s matches the NBSP)
+  const words = tr(text).replace(/ ([?!:;»])/g, '\u00a0$1').split(/[ \t\n]+/).filter(Boolean);
   const lines: string[] = [];
   let line = '';
   for (const word of words) {

@@ -19,6 +19,7 @@ const ABBREVIATION = /(?:^|\s)(?:Dr|Mr|Mrs|Ms|Sen|Rep|Adm|Gen|Col|Lt|St|Jr|Sr|Pr
 
 /** Longest subtitle cue, in words. Longer sentences are split. (10: at 13 the 9:16 captions ran to 3 lines.) */
 const MAX_CUE_WORDS = 10;
+const MAX_CUE_CHARS = 52;
 
 export interface SceneSpan {
   index: number;
@@ -95,25 +96,57 @@ export function splitSentences(text: string): string[] {
   return sentences;
 }
 
+// Cues never end on these (articles, prepositions, conjunctions of the five languages): "un employé de | la CIA"
+// and "en pisos | francos" read badly and gave 1-second cues (localization review, 2026-10-25).
+const FUNCTION_WORDS = new Set(
+  ('a an the of to in on at by for and or that ' +
+    'un une le la les de du des à au aux en dans sur par pour et ou que qui ' +
+    'una el los las del al por para y o ' +
+    'uno lo il i gli di della dello dei delle alla al su per e che ' +
+    'um uma os as do da dos das em no na nos nas ' +
+    // auxiliaries and possessives: "avaient été | détruites", "à leur | insu"
+    'has have had was were ont avaient avait été leur leurs ses son sa ces ce se había habían propia sus su sua suoi seus ' +
+    'six sept seven siete seis sette sei sete').split(' '),
+);
+// Two-word terms of this script that must not be split across cues.
+const KEEP_TOGETHER = new Set([
+  'safe houses', 'case sicure', 'pisos francos', 'casas seguras', 'programma segreto', 'inspecteur général',
+  'ispettore generale', 'cia director',
+]);
+// A cut just before these opens a clause, so it is preferred.
+const CLAUSE_STARTS = new Set('that which when who que qui dont lors quand donde cuando sin che dove senza onde sem'.split(' '));
+
 /**
- * Split one sentence into subtitle-sized cues at a clause boundary near the middle, recursively, so every cue
- * has at most MAX_CUE_WORDS words (the old loop only split the remainder: a 25-word sentence gave a 13-word cue).
+ * Split one sentence into subtitle-sized cues, recursively, so every cue has at most MAX_CUE_WORDS words and
+ * MAX_CUE_CHARS characters (ten French words did not fit two lines in 9:16) and, where it can, at least 4 words.
+ * The cut goes near the middle, preferably at a clause break, never after a function word or a number, inside a
+ * name ("Frank Church") or inside a KEEP_TOGETHER term.
  */
 export function splitSentence(sentence: string): string[] {
   const words = sentence.split(' ');
-  if (words.length <= MAX_CUE_WORDS) return [sentence];
-  const mid = Math.ceil(words.length / 2);
+  if ((words.length <= MAX_CUE_WORDS && sentence.length <= MAX_CUE_CHARS) || words.length < 8) return [sentence];
+  const mid = words.length / 2;
+  const bare = (w: string) => w.toLowerCase().replace(/[^\p{L}']/gu, '');
+  const cap = (w: string) => /^[\p{Lu}]/u.test(w);
   let cut = -1;
-  // Only clause breaks in the middle half: a 3-word cue flashes by too fast to read.
-  for (let d = 0; d <= Math.floor(words.length / 4) && cut < 0; d++) {
-    for (const i of [mid + d, mid - d]) {
-      if (i > 2 && i < words.length - 2 && /[,;:—–]$/.test(words[i - 1])) {
-        cut = i;
-        break;
-      }
+  let best = Infinity;
+  for (let i = 3; i <= words.length - 3; i++) {
+    const before = words[i - 1];
+    if (FUNCTION_WORDS.has(bare(before)) && !/[,;:—–]$/.test(before)) continue;
+    if (cap(before) && cap(words[i]) && !/[,;:—–]$/.test(before)) continue;
+    if (/^\d+$/.test(before) || KEEP_TOGETHER.has(`${bare(before)} ${bare(words[i])}`)) continue;
+    let score = Math.abs(i - mid) + (i < 4 || i > words.length - 4 ? 2 : 0);
+    if (/[,;:—–]$/.test(before)) score -= words.length / 4;
+    else if (CLAUSE_STARTS.has(bare(words[i]))) score -= 1.5;
+    if (score < best) {
+      best = score;
+      cut = i;
     }
   }
-  if (cut < 0) cut = mid;
+  if (cut < 0) {
+    if (words.length <= MAX_CUE_WORDS) return [sentence];
+    cut = Math.round(mid);
+  }
   return [...splitSentence(words.slice(0, cut).join(' ')), ...splitSentence(words.slice(cut).join(' '))];
 }
 

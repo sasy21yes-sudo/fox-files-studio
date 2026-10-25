@@ -210,7 +210,8 @@ export function drawSubtitle(g: CanvasRenderingContext2D, w: number, h: number, 
 
   // Tokenise with character offsets so highlighting survives wrapping.
   const tokens: { text: string; hi: boolean; width: number }[] = [];
-  const re = /\S+/g;
+  // (a French " ?" stays with its word instead of wrapping alone)
+  const re = /\S+(?: [?!:;»](?=\s|$))*/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(cue.text))) {
     const hi = mask.slice(m.index, m.index + m[0].length).some(Boolean);

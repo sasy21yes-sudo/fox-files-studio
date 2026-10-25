@@ -12,6 +12,7 @@ release into voice/models/ unless --model-dir points somewhere else.
 from __future__ import annotations
 
 import os
+import re
 import urllib.request
 from pathlib import Path
 
@@ -51,7 +52,11 @@ def engine(model_dir: Path = MODEL_DIR):
 
 def synth(text: str, voice: str, lang: str, speed: float = 1.0, model_dir: Path = MODEL_DIR) -> np.ndarray:
     """Speak one sentence. Returns mono float32 at 24 kHz, edges trimmed."""
-    samples, sr = engine(model_dir).create(text, voice=voice, speed=speed, lang=lang)
+    # espeak marks words it takes for another language as "(en)…(fr)" and kokoro-onnx keeps the markers, so the
+    # French voice said "en"/"fr" around Frank, Kennedy, Helms, York (review, 2026-10-25): phonemize, strip, speak.
+    k = engine(model_dir)
+    ph = re.sub(r"\([a-z]{2,3}(?:-[a-z]+)?\)", "", k.tokenizer.phonemize(text, lang))
+    samples, sr = k.create(ph, voice=voice, speed=speed, lang=lang, is_phonemes=True)
     assert sr == SAMPLE_RATE, sr
     return trim(np.asarray(samples, dtype=np.float32))
 
@@ -79,7 +84,9 @@ def trim(x: np.ndarray, pad: float = 0.04) -> np.ndarray:
 
 def find_splits(x: np.ndarray, parts: list[str]) -> list[float]:
     """Where the subtitle parts of a sentence change: the voice's pause nearest
-    the point proportional to the text length (long sentences split at commas)."""
+    the point proportional to the text length (long sentences split at commas).
+    A part that does not end on punctuation is cut where the voice may not pause, so there a pause only wins
+    when it is close to that point: a long comma pause 0.45 s early showed "Entonces, ¿qué hacían" at 35 chars/s."""
     if len(parts) < 2:
         return []
     hop = 240  # 10 ms
@@ -89,12 +96,14 @@ def find_splits(x: np.ndarray, parts: list[str]) -> list[float]:
     cum = np.cumsum(lens)[:-1] / lens.sum()
     quiet = rms < max(rms.max() * 0.06, 1e-4)
     splits: list[float] = []
-    for c in cum:
+    for k, c in enumerate(cum):
         target = c * dur
+        clause = parts[k].rstrip()[-1:] in ',;:—–'
+        weight = 1.0 if clause else 5.0
         win = max(0.35, dur * 0.18)
         lo, hi = int((target - win) * 100), int((target + win) * 100)
         lo, hi = max(1, lo), min(len(rms) - 1, hi)
-        best, best_score = target, -1e9
+        best, best_score = target, -1e9 if clause else 0.0
         i = lo
         while i < hi:
             if quiet[i]:
@@ -102,7 +111,7 @@ def find_splits(x: np.ndarray, parts: list[str]) -> list[float]:
                 while j < hi and quiet[j]:
                     j += 1
                 mid = (i + j) / 2 / 100
-                score = (j - i) / 100 * 2.0 - abs(mid - target)  # long pauses near the target win
+                score = (j - i) / 100 * 2.0 - weight * abs(mid - target)  # long pauses near the target win
                 if score > best_score:
                     best, best_score = mid, score
                 i = j
