@@ -255,11 +255,10 @@ export function App() {
         const lh = episodeHash(local);
         if (rh === lh) markSynced(local);
         else if (base === null) {
-          if ((remote.updated ?? 0) > (local.updated ?? 0)) take(remote, 'Loaded the newer episode from the repository');
-          else {
-            await pushEpisode(local);
-            markSynced(local);
-          }
+          // This browser never synced: the repository wins. Comparing `updated` let a fresh browser's default
+          // project (created "now") overwrite the edited episode (2026-10-25); a differing local version is kept.
+          stashProject({ ...local, id: `${local.id}-local-${Math.random().toString(36).slice(2, 6)}`, episodeTitle: `${local.episodeTitle} (local copy)`, updated: Date.now() });
+          take(remote, 'Loaded the episode from the repository (this browser had not synced it yet; yours is kept as "(local copy)")');
         } else if (rh !== base && lh === base) take(remote, 'Loaded the changes from the repository');
         else if (rh === base) {
           await pushEpisode(local);

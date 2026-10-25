@@ -26,6 +26,10 @@ import { loadEnv, type Plugin } from 'vite';
 const QWEN_VOICES = ['it_qwen_narratore', 'it_qwen_narratrice'];
 const DEFAULT_QWEN_PYTHON = 'C:/Users/Admin/AI/tts/.venv/Scripts/python.exe';
 const DEFAULT_KOKORO_PYTHON = 'C:/Users/Admin/AI/kokoro/.venv/Scripts/python.exe';
+/** Python with audiotsm + soundfile for tools/voice_pack_pace.py (FOX_PACE_PYTHON). */
+const DEFAULT_PACE_PYTHON = 'C:/Users/Admin/AI/tts/voxcpm/Scripts/python.exe';
+/** Words per minute each language's packs are paced to (French and Spanish run longer: they must fit 180 s). */
+const PACE_WPM: Record<string, number> = { it: 170, en: 170, pt: 170, es: 174, fr: 185 };
 
 interface Job {
   state: 'idle' | 'waiting' | 'running' | 'done' | 'error';
@@ -71,6 +75,14 @@ export function voiceRecord(): Plugin {
       const env = loadEnv(server.config.mode, root, '');
       const qwenPython = env.FOX_TTS_PYTHON || (fs.existsSync(DEFAULT_QWEN_PYTHON) ? DEFAULT_QWEN_PYTHON : '');
       const kokoroPython = env.FOX_KOKORO_PYTHON || (fs.existsSync(DEFAULT_KOKORO_PYTHON) ? DEFAULT_KOKORO_PYTHON : '');
+      const pacePython = env.FOX_PACE_PYTHON || DEFAULT_PACE_PYTHON;
+      // voice_pack_pace.py encodes with ffmpeg: add the winget install to PATH when ffmpeg is not on it.
+      const wingetFfmpeg = path.join(process.env.LOCALAPPDATA ?? '', 'Microsoft', 'WinGet', 'Packages');
+      if (fs.existsSync(wingetFfmpeg)) {
+        const pkg = fs.readdirSync(wingetFfmpeg).find((d) => d.startsWith('Gyan.FFmpeg'));
+        const bin = pkg && fs.readdirSync(path.join(wingetFfmpeg, pkg)).map((d) => path.join(wingetFfmpeg, pkg, d, 'bin')).find((d) => fs.existsSync(path.join(d, 'ffmpeg.exe')));
+        if (bin && !(process.env.PATH ?? '').includes(bin)) process.env.PATH = `${bin}${path.delimiter}${process.env.PATH ?? ''}`;
+      }
       /** "lang:voice" for every studio voice this computer can record. */
       const recordable = async (): Promise<string[]> => {
         const { STUDIO_VOICES } = (await server.ssrLoadModule('/src/audio/studioVoices.ts')) as {
@@ -143,6 +155,11 @@ export function voiceRecord(): Plugin {
             ? await run(qwenPython, ['-u', 'tools/render_voice_qwen.py', '--voice', voice, '--cues', cues])
             : await run(kokoroPython, ['-u', 'tools/render_voice.py', '--cues', cues, '--only', `${lang}:${voice}`]);
           if (code !== 0) throw new Error(job.log.filter((l) => /error|Error|Traceback/.test(l)).slice(-1)[0] ?? 'the voice script failed');
+          // The scripts write the pack at the voice's own pace (Qwen ~124 wpm): bring it to explainer pace like the
+          // shipped packs, or an edit in the studio slows the whole episode down (229 s instead of 175, 2026-10-25).
+          say('pacing the pack (tools/voice_pack_pace.py)');
+          const pack = path.join(root, 'public', 'voice', `${lang}-${voice}.json`);
+          if ((await run(pacePython, ['-u', 'tools/voice_pack_pace.py', pack, '--wpm', String(PACE_WPM[lang] ?? 170)])) !== 0) throw new Error('could not pace the new pack');
           job.version++;
           job.state = 'done';
           say('done: the voice pack was rewritten');
