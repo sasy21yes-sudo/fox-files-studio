@@ -1350,3 +1350,11 @@ textarea.itext {
   color: #1a140e;
   border-color: var(--brass);
 }
+.hand-baked {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  background: #2a1d12;
+  border-radius: 6px;
+  flex: none;
+}

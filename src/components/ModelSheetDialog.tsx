@@ -1,7 +1,8 @@
 import { ClipLab } from '../editor/ClipLab';
 import { useEffect, useRef, useState } from 'react';
 import { RigTuner } from '../editor/RigTuner';
-import { HandLab } from '../editor/HandLab';
+import { HandsTab } from '../editor/HandLab';
+import { ShoeLab } from '../editor/ShoeLab';
 import { MouthLab } from '../editor/MouthLab';
 import { SHEET_H, SHEET_W, drawModelSheet } from '../character/modelSheet';
 import { loadCanvasFonts } from '../app/fonts';
@@ -9,7 +10,7 @@ import { loadCanvasFonts } from '../app/fonts';
 /** Agent Fox model sheet, drawn live by the same rig the episode uses. */
 export function ModelSheetDialog({ onClose }: { onClose(): void }) {
   const ref = useRef<HTMLCanvasElement>(null);
-  const [tab, setTab] = useState<'sheet' | 'tune' | 'hands' | 'mouths' | 'clips'>('sheet');
+  const [tab, setTab] = useState<'sheet' | 'tune' | 'hands' | 'shoes' | 'mouths' | 'clips'>('sheet');
 
   useEffect(() => {
     if (tab !== 'sheet') return;
@@ -51,9 +52,9 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
         <header className="modal-head">
           <h2 id="sheet-title">Agent Fox · model sheet</h2>
           <div className="segmented compact sheet-tabs">
-            {(['sheet', 'tune', 'hands', 'mouths', 'clips'] as const).map((k) => (
+            {(['sheet', 'tune', 'hands', 'shoes', 'mouths', 'clips'] as const).map((k) => (
               <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>
-                {k === 'sheet' ? 'Sheet' : k === 'tune' ? 'Tune poses & motion' : k === 'hands' ? 'Hands' : k === 'mouths' ? 'Mouths' : 'Clips (frame by frame)'}
+                {k === 'sheet' ? 'Sheet' : k === 'tune' ? 'Tune poses & motion' : k === 'hands' ? 'Hands' : k === 'shoes' ? 'Shoes' : k === 'mouths' ? 'Mouths' : 'Clips (frame by frame)'}
               </button>
             ))}
           </div>
@@ -87,7 +88,8 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
           </>
         )}
         {tab === 'tune' && <RigTuner />}
-        {tab === 'hands' && <HandLab />}
+        {tab === 'hands' && <HandsTab />}
+        {tab === 'shoes' && <ShoeLab />}
         {tab === 'mouths' && <MouthLab />}
         {tab === 'clips' && <ClipLab />}
       </div>

@@ -6,6 +6,9 @@
  *   GET  /api/rig/piece?file=art/incoming/pieces/rig_.../x.png -> the render (rig pieces only)
  *   POST /api/rig/mouths/regenerate      { key, count, note }  -> renders new versions (local ComfyUI)
  *   POST /api/rig/mouths/apply           { key, version }      -> approves it, rebuilds the mouth sheet and re-bakes the rig
+ *   GET  /api/rig/hands                                        -> every new glove (back of hand / palm): key, versions
+ *   POST /api/rig/hands/regenerate       { key, count, note }  -> renders new versions (local ComfyUI)
+ *   POST /api/rig/hands/apply            { key, version }      -> approves it and re-bakes the rig's gloves
  *
  * The assets checkout (tools, art, manifest) is FOX_ASSETS_DIR (default ../fox-files-studio); its
  * Python scripts run with `python`, the upscaler with ComfyUI's embedded python (CUDA).
@@ -18,6 +21,8 @@ import { loadEnv, type Plugin } from 'vite';
 
 const LIP = ['rest', 'm/b/p', 'consonant', 'A (wide)', 'E/I', 'O', 'U/W (pucker)', 'F/V', 'L/T/D/N', 'TH (tongue)', 'smile', 'serious'];
 const EMO = ['scream', 'gasp', 'whisper', 'smirk', 'gritted', 'laugh', 'frown', 'disgust', 'nervous', 'grin', 'jawdrop'];
+/** The new gloves (tools/comfy/jobs.py hands_new_back / hands_new_front; tools/bake_rig.py NEW_GLOVES). */
+const HAND_PIECES = ['one', 'two', 'three', 'pinch_paper', 'pencil', 'magnifier', 'stop', 'chin', 'fist_tremble', 'relaxed', 'knock'];
 
 function body(req: IncomingMessage): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -56,6 +61,19 @@ export function rigTools(): Plugin {
       const rigDir = path.join(s.config.root, 'src', 'character', 'rig');
       const manifest = () => JSON.parse(fs.readFileSync(path.join(assets, 'art', 'incoming', 'manifest.json'), 'utf8')).sheets as Record<string, { versions: { version: string; file: string; status: string; review?: string }[] }>;
       const sheetOf = (key: string) => (/^m\d+$/.test(key) ? `rig_mouthheads/${key}` : `rig_emotions/${key}`);
+      /** "hands_new_back/one" -> its sheet and piece, or null. */
+      const handKey = (key: string) => {
+        const m = /^(hands_new_(?:back|front))\/([a-z_]+)$/.exec(key);
+        return m && HAND_PIECES.includes(m[2]) ? { sheet: m[1], piece: m[2] } : null;
+      };
+      /** Mark one version approved in the manifest, and the one it replaces rejected. */
+      const approve = async (key: string, version: string) => {
+        for (const v of manifest()[key]?.versions ?? []) {
+          if (v.status === 'approved' && v.version !== version)
+            await run('python', ['tools/comfy/edit.py', '--mark', key, v.version, 'rejected', '--note', 'replaced in the studio'], assets);
+        }
+        await run('python', ['tools/comfy/edit.py', '--mark', key, version, 'approved', '--note', 'chosen in the studio (model sheet)'], assets);
+      };
       let busy = false;
 
       s.middlewares.use('/api/rig', async (req, res) => {
@@ -75,9 +93,55 @@ export function rigTools(): Plugin {
           }
           if (req.method === 'GET' && req.url?.startsWith('/piece')) {
             const file = new URL(req.url, 'http://x').searchParams.get('file') ?? '';
-            if (!/^art\/incoming\/pieces\/rig_[a-z]+\/[\w-]+\.png$/.test(file)) return json(res, 400, { error: 'bad file' });
+            if (!/^art\/incoming\/pieces\/(rig_[a-z]+|hands_new_(back|front))\/[\w-]+\.png$/.test(file)) return json(res, 400, { error: 'bad file' });
             res.setHeader('Content-Type', 'image/png');
             return res.end(fs.readFileSync(path.join(assets, file)));
+          }
+          if (req.method === 'GET' && req.url?.startsWith('/hands')) {
+            const m = manifest();
+            const list = (['back', 'front'] as const).flatMap((side) =>
+              HAND_PIECES.map((piece) => {
+                const key = `hands_new_${side}/${piece}`;
+                return {
+                  key,
+                  piece,
+                  side,
+                  sprite: `n_${piece}${side === 'front' ? '_palm' : ''}`,
+                  versions: (m[key]?.versions ?? []).map((v) => ({ version: v.version, file: v.file, status: v.status, review: v.review ?? '' })),
+                };
+              }),
+            );
+            return json(res, 200, { hands: list, busy });
+          }
+          if (req.method === 'POST' && req.url?.startsWith('/hands/regenerate')) {
+            if (busy) return json(res, 409, { error: 'Another image job is running.' });
+            const b = JSON.parse(await body(req)) as { key: string; count?: number; note?: string };
+            const k = handKey(b.key);
+            if (!k) return json(res, 400, { error: 'bad key' });
+            busy = true;
+            try {
+              const args = [path.join(assets, 'tools', 'comfy', 'run_jobs.py'), k.sheet, '--pieces', k.piece, '--count', String(Math.min(4, b.count ?? 2)), '--front'];
+              if (b.note?.trim()) args.push('--correction', b.note.trim());
+              return json(res, 200, { ok: true, log: await run('python', args, assets) });
+            } finally {
+              busy = false;
+            }
+          }
+          if (req.method === 'POST' && req.url?.startsWith('/hands/apply')) {
+            if (busy) return json(res, 409, { error: 'Another image job is running.' });
+            const b = JSON.parse(await body(req)) as { key: string; version: string };
+            const k = handKey(b.key);
+            if (!k || !/^v\d+$/.test(b.version)) return json(res, 400, { error: 'bad key or version' });
+            busy = true;
+            try {
+              await approve(b.key, b.version);
+              // The bake cuts the glove from its approved render (without the cuff), anchors it at the wrist and
+              // writes hand_n_<piece>[_palm][_back].webp.
+              const log = await run('python', ['tools/bake_rig.py'], assets, { ...process.env, FOX_PARTS: 'art/parts_v4', FOX_RIG_OUT: rigDir });
+              return json(res, 200, { ok: true, log });
+            } finally {
+              busy = false;
+            }
           }
           if (req.method === 'POST' && req.url?.startsWith('/mouths/regenerate')) {
             if (busy) return json(res, 409, { error: 'Another mouth job is running.' });
@@ -99,13 +163,7 @@ export function rigTools(): Plugin {
             const b = JSON.parse(await body(req)) as { key: string; version: string };
             busy = true;
             try {
-              const key = sheetOf(b.key);
-              const m = manifest();
-              for (const v of m[key]?.versions ?? []) {
-                if (v.status === 'approved' && v.version !== b.version)
-                  await run('python', ['tools/comfy/edit.py', '--mark', key, v.version, 'rejected', '--note', 'replaced in the studio'], assets);
-              }
-              await run('python', ['tools/comfy/edit.py', '--mark', key, b.version, 'approved', '--note', 'chosen in the studio (model sheet)'], assets);
+              await approve(sheetOf(b.key), b.version);
               let log = await run('python', ['tools/comfy/rig_mouths.py'], assets);
               log += await run(comfyPy, ['-s', 'tools/upscale.py', 'tools/weights/RealESRGAN_x4plus_anime_6B.pth', 'art/parts_v4/mouths.jpg', 'art/parts_v4/up/mouths.png'], assets);
               log += await run('python', ['tools/bake_rig.py'], assets, { ...process.env, FOX_PARTS: 'art/parts_v4', FOX_RIG_OUT: rigDir });

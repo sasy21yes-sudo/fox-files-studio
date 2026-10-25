@@ -53,13 +53,23 @@ export const FACE_DEFAULTS = {
   eyeScale: 1,
 };
 
+/** A shoe (Shoes tab): attach point [along the foot, up/down] in sprite px, size factor, extra turn (rad). */
+export interface ShoeTweak {
+  anchor?: [number, number];
+  shoeScale?: number;
+  shoeTurn?: number;
+}
+
 export interface RigTweaks {
   arms: { near: Record<string, ArmTweak>; far: Record<string, ArmTweak> };
+  /** Per leg; missing in older tweaks.json files. */
+  legs?: { near?: ShoeTweak; far?: ShoeTweak };
   motion: Partial<typeof MOTION_DEFAULTS>;
   face: Partial<typeof FACE_DEFAULTS>;
 }
 
-let current: RigTweaks = structuredClone(saved as RigTweaks);
+// (JSON infers mirror as string and anchor as number[]: the editor only writes valid values)
+let current: RigTweaks = structuredClone(saved as unknown as RigTweaks);
 const listeners = new Set<() => void>();
 
 export const tweaks = () => current;

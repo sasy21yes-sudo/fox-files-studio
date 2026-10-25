@@ -3,6 +3,7 @@ import { builtInArm, captureFox, drawFox, type ArmMode, type FoxDebug, type FoxP
 import { RIG } from '../character/rig/rigPuppet';
 import { setTweaks, tweaks, type ArmTweak, type RigTweaks } from '../character/rig/tweaks';
 import { ARM_MODES } from '../scene/elements';
+import { HandDrawings } from './HandDrawings';
 import { Slider } from './RigTuner';
 
 type Side = 'near' | 'far';
@@ -253,5 +254,22 @@ export function HandLab() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** The model sheet's Hands tab: fit each glove on its arm, or regenerate the glove drawings (like Mouths). */
+export function HandsTab() {
+  const [view, setView] = useState<'fit' | 'drawings'>('fit');
+  return (
+    <>
+      <div className="segmented compact" style={{ marginBottom: 10 }}>
+        {(['fit', 'drawings'] as const).map((v) => (
+          <button key={v} className={view === v ? 'on' : ''} onClick={() => setView(v)}>
+            {v === 'fit' ? 'Fit on the arm' : 'Drawings (regenerate)'}
+          </button>
+        ))}
+      </div>
+      {view === 'fit' ? <HandLab /> : <HandDrawings />}
+    </>
   );
 }

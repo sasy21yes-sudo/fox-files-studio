@@ -2237,10 +2237,15 @@ function drawFoxSheetRig(g: G, pose: FoxPose): void {
     // heel lands, instead of the whole shoe pivoting like a rigid block.
     const toeOff = stance ? Math.max(0, (u - 0.6) / 0.4) : Math.max(0, 1 - u / 0.25);
     const land = stance ? Math.max(0, 1 - u / 0.18) : 0;
-    anchoredFlex(g, `shoe_${name}`, sx, sy, footRot * 0.5, {
+    // Shoes tab (tweaks.json legs): attach point, size and turn of each shoe.
+    const st = tweaks().legs?.[name] ?? {};
+    mark(g, `shoe_${name}`, [sx, sy]);
+    anchoredFlex(g, `shoe_${name}`, sx, sy, footRot * 0.5 + (st.shoeTurn ?? 0), {
       bend: -0.45 * Math.sin(Math.min(1, toeOff) * Math.PI * 0.5) * walk,
       pivot: 0.58,
-      scale: 1.1, // chunky shoes, like the master's
+      scale: 1.1 * (st.shoeScale ?? 1), // chunky shoes, like the master's
+      ox: st.anchor?.[0],
+      oy: st.anchor?.[1],
       sx: 1 + 0.06 * land * walk,
       sy: 1 - 0.08 * land * walk,
     });
