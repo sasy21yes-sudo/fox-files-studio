@@ -5,273 +5,281 @@
 "engine": "Qwen3-TTS 1.7B (VoiceDesign reference + Base clone)",
 "sampleRate": 24000,
 "audio": "it-it_qwen_narratore.mp3",
-"duration": 166.761,
+"duration": 223.261,
 "sentences": {
 "La CIA ha drogato persone che non ne sapevano nulla.": [
 0.35,
-2.8373,
+3.9052,
 []
 ],
 "È scritto negli atti del Senato.": [
-3.5373,
-1.5787,
+4.6052,
+2.2095,
 []
 ],
 "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA.": [
-5.466,
-5.568,
+7.1647,
+7.5878,
 [
-2.6296
+3.55
 ]
 ],
 "I suoi documenti erano stati distrutti anni prima.": [
-11.384,
-2.2187,
+15.1025,
+3.0619,
 []
 ],
 "Ma non tutti.": [
-13.9527,
-0.5973,
+18.5144,
+0.8787,
 []
 ],
 "Il programma si chiamava MKUltra.": [
-14.9,
-2.2187,
+19.743,
+3.0802,
 []
 ],
 "Quindi, che cos'era?": [
-17.4687,
-1.3227,
+23.1732,
+1.8695,
 []
 ],
 "E come facciamo a saperlo?": [
-19.1413,
-1.216,
+25.3927,
+1.7093,
 []
 ],
 "Partiamo da ciò che la CIA stessa disse al Senato.": [
-20.7073,
-2.4747,
+27.452,
+3.4213,
 []
 ],
 "Secondo la testimonianza del direttore della CIA, MKUltra andò avanti dal 1953 al 1964.": [
-23.532,
-7.7653,
+31.2233,
+10.553,
 [
-3.8667
+5.22
 ]
 ],
 "Sono undici anni.": [
-31.6473,
-1.1947,
+42.1262,
+1.6807,
 []
 ],
 "I documenti sopravvissuti elencano 149 sottoprogetti.": [
-33.192,
-3.328,
+44.1569,
+4.5805,
 []
 ],
 "Citano 80 istituzioni, e 44 di queste erano college e università.": [
-36.87,
-3.9467,
-[]
+49.0875,
+5.4159,
+[
+2.59
+]
 ],
 "Citano anche 185 ricercatori e assistenti esterni al governo.": [
-41.1667,
-3.8613,
+54.8534,
+5.2903,
 []
 ],
 "Ma cosa facevano, in concreto, tutti questi sottoprogetti?": [
-45.378,
-2.88,
+60.4937,
+3.9547,
 []
 ],
 "Il direttore li divise in categorie.": [
-48.608,
-1.4507,
+64.7983,
+2.0238,
 []
 ],
 "Tra queste: droghe e alcol.": [
-50.4087,
-1.856,
+67.1721,
+2.5788,
 []
 ],
 "Ipnosi.": [
-52.6147,
-0.5973,
+70.1009,
+0.8854,
 []
 ],
 "Ricerca sul sonno.": [
-53.562,
-1.024,
+71.3363,
+1.4646,
 []
 ],
 "Macchina della verità.": [
-54.936,
-0.832,
+73.1509,
+1.201,
 []
 ],
 "Gli atti parlano anche di droghe pensate come aiuto negli interrogatori.": [
-56.118,
-3.456,
-[]
+74.7019,
+4.7458,
+[
+2.015
+]
 ],
 "Tra le droghe testate c'era l'LSD.": [
-59.924,
-1.8987,
+79.7977,
+2.6299,
 []
 ],
 "E qui arriva la parte più importante.": [
-62.1727,
-1.8133,
+82.7776,
+2.512,
 []
 ],
 "Alcune delle persone testate erano volontari.": [
-64.336,
-2.24,
+85.6395,
+3.1026,
 []
 ],
 "Ad altre non fu mai detto nulla.": [
-66.926,
-1.5147,
+89.0921,
+2.1123,
 []
 ],
 "Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare.": [
-68.7907,
-3.9893,
+91.5544,
+5.4713,
 []
 ],
 "Ignare significa che non lo sapevano.": [
-73.13,
-1.6853,
+97.3757,
+2.3618,
 []
 ],
 "Alcuni di quei test avvennero in case sicure a San Francisco e a New York.": [
-75.1653,
-3.5627,
+100.0875,
+4.8955,
 [
-1.9148
+2.585
 ]
 ],
 "Non c'era alcun consenso informato.": [
-79.078,
-1.8133,
+105.333,
+2.5235,
 []
 ],
 "Un caso mostra cosa significasse.": [
-81.2413,
-1.6213,
+108.2066,
+2.2526,
 []
 ],
 "Il dottor Frank Olson era un dipendente civile dell'Esercito.": [
-83.2127,
-3.2,
+110.8092,
+4.411,
 []
 ],
 "Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa.": [
-86.7627,
-5.9093,
+115.5702,
+8.0622,
 [
-3.8667
+5.22
 ]
 ],
 "Circa una settimana dopo, era morto.": [
-93.022,
-2.112,
+123.9824,
+2.9392,
 []
 ],
 "Quindi, come venne fuori tutto questo?": [
-95.484,
-1.664,
+127.2716,
+2.333,
 []
 ],
 "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Church.": [
-97.498,
-5.888,
+129.9546,
+8.0306,
 [
-3.7519
+5.065
 ]
 ],
 "Il suo compito era scoprire se le agenzie di intelligence americane avessero fatto qualcosa di illegale, scorretto o immorale.": [
-103.736,
-6.016,
+138.3353,
+8.1928,
 [
-2.9889
+4.035
 ]
 ],
 "Poi, nel 1977, un dipendente della CIA trovò sette scatole di documenti di MKUltra in un archivio di documenti dismessi.": [
-110.102,
-7.7227,
+146.8781,
+10.4995,
 [
-3.4852
+4.705
 ]
 ],
 "Quell'agosto, i senatori interrogarono il direttore della CIA in un'audizione congiunta.": [
-118.1747,
-4.736,
-[]
+157.7276,
+6.4627,
+[
+3.86
+]
 ],
 "Il senatore Edward Kennedy disse che la CIA aveva drogato cittadini americani senza che lo sapessero e senza il loro consenso.": [
-123.2607,
-6.464,
+164.5403,
+8.8078,
 [
-3.463
+2.595,
+4.675
 ]
 ],
 "Ma quelle scatole non erano mai state tutta la storia.": [
-130.0747,
-2.3893,
+173.6981,
+3.2902,
 []
 ],
 "Un rapporto del 1963 dell'Ispettore generale della CIA portò alla fine dei test su persone ignare nel 1964.": [
-132.814,
-7.36,
+177.3383,
+10.0081,
 [
-4.2519
+5.74
 ]
 ],
 "E nel 1973, i file di MKUltra furono distrutti su autorizzazione dell'allora direttore della CIA.": [
-140.524,
-6.3787,
+187.6964,
+8.6878,
 [
-2.6667
+3.6
 ]
 ],
 "Il senatore Kennedy fece il suo nome: Richard Helms.": [
-147.2527,
-3.2853,
+196.7342,
+4.5175,
 []
 ],
 "Ciò che sopravvisse erano soprattutto fascicoli finanziari.": [
-150.888,
-2.5173,
+201.6017,
+3.4653,
 []
 ],
 "Anticipi, giustificativi, rendiconti.": [
-153.7553,
-2.4107,
+205.417,
+3.3419,
 []
 ],
 "Quindi, cosa sappiamo davvero?": [
-156.516,
-1.4933,
+209.1089,
+2.1069,
 []
 ],
 "Abbastanza per dimostrare che è successo.": [
-158.3593,
-1.9413,
+211.5658,
+2.7107,
 []
 ],
 "Non abbastanza per sapere tutto ciò che è successo.": [
-160.6507,
-2.3893,
+214.6265,
+3.3103,
 []
 ],
 "Gran parte della storia completa potrebbe non venire mai alla luce.": [
-163.39,
-3.3707,
-[]
+218.2869,
+4.6242,
+[
+2.285
 ]
-},
-"pace": 1.35
+]
+}
 }
