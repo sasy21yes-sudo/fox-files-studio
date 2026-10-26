@@ -5,398 +5,282 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "en-am_michael.mp3",
-"duration": 190.416,
+"duration": 155.223,
 "sentences": {
 "The CIA drugged people who never knew.": [
 0.35,
-2.1284,
+2.0922,
 []
 ],
 "It's in the Senate record.": [
-2.8284,
+2.7922,
 1.37,
 []
 ],
-"1977.": [
-4.5484,
-1.2608,
-[]
-],
-"The United States Senate opens a hearing on a secret CIA program.": [
-6.1592,
-4.46,
+"In 1977, the United States Senate held a hearing about a secret CIA program.": [
+4.5122,
+4.6865,
 [
-2.095
+2.3976
 ]
 ],
-"The problem?": [
-10.9692,
-0.6118,
-[]
-],
-"The files had been destroyed years earlier.": [
-11.931,
-2.1397,
+"Its files had been destroyed years earlier.": [
+9.5487,
+2.091,
 []
 ],
 "But not all of them.": [
-14.4207,
-1.0262,
+11.9897,
+1.0111,
 []
 ],
 "The program was called MKUltra.": [
-15.7969,
-1.6978,
+13.3507,
+1.6607,
 []
 ],
-"What was it, really?": [
-17.8447,
-1.04,
+"So what was it?": [
+15.3614,
+0.7922,
 []
 ],
 "And how do we know?": [
-19.2347,
-1.0252,
+16.5036,
+1.0106,
 []
 ],
 "Let's start with what the CIA itself told the Senate.": [
-20.6099,
-2.7951,
+17.8642,
+2.7373,
 [
-1.1659
+1.1396
 ]
 ],
-"MKUltra ran from 1953 to 1964.": [
-23.755,
-3.8421,
-[]
-],
-"Eleven years.": [
-27.9471,
-0.8212,
-[]
-],
-"The records that survived list 149 subprojects, at 80 institutions.": [
-29.1183,
-3.8634,
+"According to the CIA director's testimony, MKUltra ran from 1953 to 1964.": [
+20.9515,
+5.7834,
 [
-1.7852
+3.3134
 ]
 ],
-"More than half were colleges and universities.": [
-33.3317,
-2.97,
+"That's eleven years.": [
+27.0849,
+1.0218,
 []
 ],
-"So what were they actually doing?": [
-36.6517,
-1.72,
+"The surviving records list 149 subprojects.": [
+28.4568,
+2.8607,
 []
 ],
-"Drugs and alcohol.": [
-38.7217,
-1.0336,
+"They name 80 institutions, and 44 of them were colleges and universities.": [
+31.6675,
+4.4641,
+[
+1.6871
+]
+],
+"They also name 185 researchers and assistants from outside the government.": [
+36.4816,
+4.2586,
+[
+1.7789
+]
+],
+"So what were all these subprojects actually doing?": [
+41.0902,
+2.83,
+[]
+],
+"The director sorted them into categories.": [
+44.2702,
+2.39,
+[]
+],
+"Among them: drugs and alcohol.": [
+47.0102,
+1.6552,
 []
 ],
 "Hypnosis.": [
-40.1053,
-0.6068,
+49.0153,
+0.5906,
 []
 ],
-"Sleep experiments.": [
-41.0621,
-1.0351,
+"Sleep research.": [
+49.9559,
+0.7488,
 []
 ],
-"Lie detectors.": [
-42.4472,
-0.8116,
+"Polygraphs.": [
+51.0547,
+0.5994,
 []
 ],
-"And drugs meant to help interrogations.": [
-43.6088,
-2.1343,
-[]
-],
-"And yes: LSD too.": [
-46.0931,
-1.0688,
-[]
-],
-"Now, here's the part that matters.": [
-47.5118,
-1.6938,
-[]
-],
-"Some people were volunteers.": [
-49.5556,
-1.74,
-[]
-],
-"Others never knew a thing.": [
-51.6456,
-1.42,
-[]
-],
-"According to the testimony, six subprojects tested drugs on people who had no idea.": [
-53.4156,
-5.2158,
+"The record also covers drugs meant as aids to interrogation.": [
+52.0041,
+3.5977,
 [
-1.4601,
-4.214
+1.7909
 ]
 ],
-"Some of the tests happened in safe houses, in San Francisco and New York.": [
-58.9814,
-4.6,
+"LSD was among the drugs tested.": [
+55.9518,
+1.5381,
+[]
+],
+"And here is the part that matters most.": [
+57.8398,
+2.0798,
+[]
+],
+"Some of the people tested were volunteers.": [
+60.2697,
+2.55,
+[]
+],
+"Some were never told.": [
+63.1697,
+1.3,
+[]
+],
+"The testimony counted six subprojects that tested drugs on unwitting people.": [
+64.8197,
+4.4413,
 [
-2.365
+2.2046
 ]
 ],
-"No consent.": [
-63.9314,
-0.6421,
-[]
-],
-"What did that mean, in real life?": [
-64.9235,
-1.7037,
-[]
-],
-"Look at Frank Olson.": [
-66.9772,
-1.0279,
-[]
-],
-"He was a civilian employee of the Army.": [
-68.3551,
-2.23,
-[]
-],
-"In 1953, at a meeting called by the CIA, he was given LSD.": [
-70.9351,
-4.0127,
+"Some of those tests happened in safe houses in San Francisco and New York City.": [
+69.611,
+5.04,
 [
-2.9401
+2.795
 ]
 ],
-"Without being told.": [
-75.2978,
-0.8288,
+"There was no informed consent.": [
+75.001,
+1.87,
 []
 ],
-"About a week later, he was dead.": [
-76.4767,
+"One case shows what that meant.": [
+77.221,
 1.7,
 []
 ],
-"And then there's Montreal.": [
-78.5267,
-1.2557,
+"Dr. Frank Olson was an Army civilian employee.": [
+79.271,
+2.5319,
 []
 ],
-"In 1957, the CIA funds the research of a psychiatrist: Dr. Ewen Cameron, head of psychiatry at McGill.": [
-80.1323,
-6.4874,
+"In 1953, at a meeting called by the CIA, he was given LSD without knowing it.": [
+82.1529,
+4.6314,
 [
-1.4592,
-3.5211
+2.9542
 ]
 ],
-"The idea?": [
-86.9697,
-0.5933,
+"About a week later, he was dead.": [
+87.1343,
+1.7,
 []
 ],
-"Make a patient listen to the same message.": [
-87.9131,
-2.34,
+"So how did any of this come out?": [
+89.1843,
+1.69,
 []
 ],
-"Again.": [
-90.6031,
-0.4074,
-[]
-],
-"And again.": [
-91.3605,
-0.5892,
-[]
-],
-"And see what it does to their behavior.": [
-92.2997,
-2.04,
-[]
-],
-"The technical name was “psychic driving”.": [
-94.6897,
-2.41,
-[]
-],
-"The plan also looked for drugs that could break down patterns of behavior.": [
-97.4497,
-3.8923,
+"In January 1975, the Senate created a special committee, chaired by Senator Frank Church.": [
+91.2243,
+5.1197,
 [
-1.6287
+1.6062,
+3.6255
 ]
 ],
-"On the list: curare.": [
-101.6919,
-1.31,
-[]
-],
-"LSD.": [
-103.3519,
-0.5567,
-[]
-],
-"And ways to keep the patient inert while the message played.": [
-104.2587,
-3.38,
+"Its job was to find out whether America's intelligence agencies had done anything illegal, improper or unethical.": [
+96.694,
+7.8961,
 [
-1.607
+2.9329,
+5.0983
 ]
 ],
-"The money went through a cover organization.": [
-107.9887,
-2.35,
-[]
-],
-"And Cameron?": [
-110.6887,
-0.88,
-[]
-],
-"He wasn't supposed to know the U.S. government was behind it.": [
-111.9187,
-3.4589,
+"Then, in 1977, a CIA employee found seven boxes of MKUltra records at a retired records center.": [
+104.9401,
+6.5728,
 [
-1.5689
+3.2458
 ]
 ],
-"In 1992, Canada offers 100,000 dollars to Cameron's former patients at the Allan Memorial Institute who went through so-called “depatterning”.": [
-115.7276,
-8.0789,
+"That August, senators questioned the CIA director at a joint hearing.": [
+111.8628,
+4.0293,
 [
-1.7659,
-3.8732,
-5.6955
+1.9274
 ]
 ],
-"Okay, but how did all of this come out?": [
-124.1565,
-2.01,
-[]
-],
-"January 1975.": [
-126.5165,
-1.7728,
-[]
-],
-"The Senate sets up a special committee, led by Senator Frank Church.": [
-128.6392,
-4.1,
+"Senator Edward Kennedy said the CIA had drugged American citizens without their knowledge or consent.": [
+116.2422,
+6.3887,
 [
-2.075
+3.038
 ]
 ],
-"The mission: find out whether American intelligence had done anything illegal, improper or unethical.": [
-133.0892,
-6.82,
+"But those boxes were never the full story.": [
+122.9809,
+2.56,
+[]
+],
+"A 1963 report by the CIA's Inspector General led to the end of unwitting testing in 1964.": [
+125.8909,
+6.6368,
 [
-3.477
+3.4648
 ]
 ],
-"Then, in 1977, a CIA employee finds seven boxes of MKUltra records, at a center for retired files.": [
-140.2592,
-6.7861,
+"And in 1973, MKUltra files were destroyed on the authority of the CIA director at the time.": [
+132.8777,
+5.544,
 [
-2.0289,
-5.1866
+2.6186
 ]
 ],
-"In August, senators question the CIA director.": [
-147.3953,
-2.802,
+"Senator Kennedy named him: Richard Helms.": [
+138.7717,
+2.5078,
 []
 ],
-"And Senator Edward Kennedy puts it plainly: the CIA had drugged American citizens.": [
-150.5473,
-5.4214,
-[
-2.5347
-]
-],
-"Without their knowledge.": [
-156.3187,
-1.27,
+"What survived was mostly finance folders.": [
+141.6294,
+2.513,
 []
 ],
-"Without their consent.": [
-157.9387,
-1.0279,
+"Advances, vouchers, accountings.": [
+144.4924,
+1.6562,
 []
 ],
-"But those boxes aren't the whole story.": [
-159.3167,
-2.29,
-[]
-],
-"A 1963 report by the CIA's Inspector General leads, in 1964, to an end of the tests on unwitting people.": [
-161.9567,
-7.2981,
-[
-3.6937,
-4.9711
-]
-],
-"And in 1973, the MKUltra files are destroyed, with the OK of the director at the time.": [
-169.6047,
-5.4207,
-[
-3.6092
-]
-],
-"Kennedy names him: Richard Helms.": [
-175.3755,
-1.9083,
-[]
-],
-"What survived?": [
-177.6337,
-0.8127,
-[]
-],
-"Mostly finance paperwork.": [
-178.7964,
-1.76,
-[]
-],
-"Advances, receipts, accountings.": [
-180.9064,
-1.6898,
-[]
-],
-"So what do we really know?": [
-182.9462,
-1.54,
-[]
-],
-"Enough to say it happened.": [
-184.8362,
-1.34,
-[]
-],
-"Not enough to know everything.": [
-186.5262,
+"So what do we actually know?": [
+146.4987,
 1.63,
 []
 ],
-"And the rest, maybe, we'll never know.": [
-188.5062,
-1.9102,
+"Enough to show it happened.": [
+148.4787,
+1.37,
+[]
+],
+"Not enough to know everything that happened.": [
+150.1987,
+2.39,
+[]
+],
+"Much of the full story may never be known.": [
+152.9387,
+2.2843,
 []
 ]
 },
-"pace": 1.147
+"pace": 1.1591
 }
