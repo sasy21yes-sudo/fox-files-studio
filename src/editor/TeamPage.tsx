@@ -14,21 +14,33 @@ interface TeamMessage {
   text: string;
 }
 
+/** A review running on the dev server (tools/vite/teamReview.ts). */
+interface Job {
+  state: 'kit' | 'review' | 'done' | 'error';
+  lang: string;
+  aspect: string;
+  startedAt: number;
+  finishedAt?: number;
+  error?: string;
+}
+
 /** Who is in the chat: the agents in .claude/agents, the producer (Claude) and Salvatore. */
-const ROSTER: Record<string, { name: string; role: string; color: string }> = {
-  producer: { name: 'Producer', role: 'Claude, merges and fixes', color: '#d9b465' },
-  rig: { name: 'Rig', role: 'rig-animation-inspector', color: '#d08a3a' },
-  viewer: { name: 'Viewer', role: 'first-time-viewer', color: '#8fb3d9' },
-  social: { name: 'Social', role: 'social-media-manager', color: '#c77dba' },
-  editor: { name: 'Editor', role: 'video-editor', color: '#7fc4a8' },
-  sound: { name: 'Sound', role: 'sound-designer', color: '#9b8fe0' },
-  facts: { name: 'Facts', role: 'fact-checker', color: '#e0c25a' },
-  art: { name: 'Art', role: 'art-director', color: '#e08a7a' },
-  l10n: { name: 'L10n', role: 'localization-qa', color: '#7dbbd0' },
-  salvatore: { name: 'Salvatore', role: 'director', color: '#7d9b5a' },
+const ROSTER: Record<string, { name: string; role: string; does: string; color: string }> = {
+  producer: { name: 'Producer', role: 'Claude, coordina e corregge', does: 'Coordina tutta la squadra: sceglie gli agenti che servono e unisce i risultati', color: '#d9b465' },
+  rig: { name: 'Rig', role: 'animazione del personaggio', does: 'Guanti, braccia, bocca, occhi, cappello e movimenti di Agent Fox', color: '#d08a3a' },
+  viewer: { name: 'Spettatore', role: 'prima visione', does: 'Ti dice dove si annoierebbe, si confonderebbe o chiuderebbe il video', color: '#8fb3d9' },
+  social: { name: 'Social', role: 'YouTube e Short', does: 'Gancio iniziale, titolo, miniatura, Short: è pronto da pubblicare?', color: '#c77dba' },
+  editor: { name: 'Montatore', role: 'montaggio e ritmo', does: 'Tagli, inquadrature, tempi dei pop-up e dei sottotitoli', color: '#7fc4a8' },
+  sound: { name: 'Suono', role: 'voce, musica, effetti', does: 'Volumi, voce sopra la musica, effetti sonori al momento giusto', color: '#9b8fe0' },
+  facts: { name: 'Fatti', role: 'verifica delle fonti', does: 'Controlla ogni fatto, numero e citazione contro le fonti', color: '#e0c25a' },
+  art: { name: 'Art director', role: 'stile e immagini', does: 'Coerenza con lo stile anni 30, inquadrature, leggibilità dei testi', color: '#e08a7a' },
+  l10n: { name: 'Lingue', role: 'traduzioni e accessibilità', does: 'Le 5 lingue: testi tradotti, che stanno nei riquadri, pronuncia', color: '#7dbbd0' },
+  salvatore: { name: 'Salvatore', role: 'regista', does: '', color: '#7d9b5a' },
 };
-const person = (id: string) => ROSTER[id] ?? { name: id, role: '', color: '#998a70' };
-const SEV: Record<string, string> = { B: 'blocker', I: 'important', R: 'polish' };
+const person = (id: string) => ROSTER[id] ?? { name: id, role: '', does: '', color: '#998a70' };
+const SEV: Record<string, string> = { B: 'bloccante', I: 'importante', R: 'rifinitura' };
+const KIND_NOTE: Record<string, string> = { question: 'domanda', answer: 'risposta', note: 'nota' };
+const LANGS = ['it', 'en', 'es', 'fr', 'pt'] as const;
 const POLL_MS = 3000;
 
 interface Props {
@@ -37,6 +49,11 @@ interface Props {
   /** Open the Channel page on the YouTube preview. */
   onChannelPreview?(): void;
 }
+
+const since = (t: number) => {
+  const m = Math.round((Date.now() - t) / 60000);
+  return m < 1 ? 'adesso' : `${m} min fa`;
+};
 
 /** The Team page: the review agents' chat, WhatsApp-style, live while they work. Salvatore can write in it too. */
 export function TeamPage({ onSeek, onChannelPreview }: Props) {
@@ -50,6 +67,9 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
   const [deep, setDeep] = useState(false);
   const [typing, setTyping] = useState<Record<string, boolean>>({});
   const [askError, setAskError] = useState<string | null>(null);
+  const [jobs, setJobs] = useState<Record<string, Job>>({});
+  const [lang, setLang] = useState<string>('it');
+  const [aspect, setAspect] = useState<string>('16:9');
   const dm = filter !== 'all';
   const last = useRef(0);
   const list = useRef<HTMLDivElement>(null);
@@ -93,6 +113,17 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
     };
   }, []);
 
+  // Reviews in progress (a few bytes every few seconds).
+  useEffect(() => {
+    const poll = () =>
+      void fetch('/api/team/jobs')
+        .then(async (r) => (r.ok ? setJobs((await r.json()) as Record<string, Job>) : undefined))
+        .catch(() => undefined);
+    poll();
+    const id = window.setInterval(poll, 4000);
+    return () => window.clearInterval(id);
+  }, []);
+
   // Everyone: the whole team chat. An agent: the private chat between Salvatore and that agent only.
   const shown = useMemo(
     () => (filter === 'all' ? messages : messages.filter((m) => (m.from === 'salvatore' && m.to === filter) || (m.from === filter && m.to === 'salvatore'))),
@@ -105,10 +136,18 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
     return c;
   }, [messages]);
   const open = messages.filter((m) => m.kind === 'finding' && !messages.some((x) => x.kind === 'fix' && x.reply === m.id));
+  const working = (id: string) => jobs[id]?.state === 'kit' || jobs[id]?.state === 'review';
 
   useEffect(() => {
     if (stick.current && list.current) list.current.scrollTop = list.current.scrollHeight;
   }, [shown.length]);
+
+  const startReview = async (agent: string) => {
+    setAskError(null);
+    const r = await fetch('/api/team/review', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agent, lang, aspect }) }).catch(() => null);
+    if (!r?.ok) setAskError((await r?.json().catch(() => null))?.error ?? 'Il server non risponde (npm run dev).');
+    else setJobs((j) => ({ ...j, [agent]: { state: 'kit', lang, aspect, startedAt: Date.now() } }));
+  };
 
   const send = async () => {
     if (!text.trim()) return;
@@ -136,47 +175,83 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
     }
   };
 
+  const status = (id: string) => {
+    const j = jobs[id];
+    if (typing[id]) return 'sta scrivendo…';
+    if (j?.state === 'kit') return `prepara il kit · ${since(j.startedAt)}`;
+    if (j?.state === 'review') return `review in corso · ${since(j.startedAt)}`;
+    return person(id).role;
+  };
+
   return (
     <main className="team-page">
-      <aside className="team-people" aria-label="Team">
+      <aside className="team-people" aria-label="Squadra">
         <button className={`team-person ${filter === 'all' ? 'on' : ''}`} onClick={() => setFilter('all')}>
           <span className="team-avatar" style={{ background: '#3d3228' }}>★</span>
           <span>
-            <strong>Everyone</strong>
+            <strong>Tutti</strong>
             <small>
-              team chat · {messages.length} messages · {open.length} open findings
+              chat di squadra · {messages.length} messaggi · {open.length} problemi aperti
             </small>
           </span>
         </button>
         {Object.entries(ROSTER)
           .filter(([id]) => id !== 'salvatore')
           .map(([id, p]) => (
-          <button key={id} className={`team-person ${filter === id ? 'on' : ''}`} onClick={() => setFilter(id)} title={`Private chat with ${p.name} (${p.role})`}>
-            <span className="team-avatar" style={{ background: p.color }}>
-              {p.name[0]}
-            </span>
-            <span>
-              <strong>{p.name}</strong>
-              <small>{typing[id] ? 'is writing…' : p.role}</small>
-            </span>
-            {counts[id] ? <span className="team-count">{counts[id]}</span> : null}
-          </button>
-        ))}
+            <button key={id} className={`team-person ${filter === id ? 'on' : ''}`} onClick={() => setFilter(id)} title={`Chat privata con ${p.name}: ${p.does}`}>
+              <span className={`team-avatar ${working(id) ? 'busy' : ''}`} style={{ background: p.color }}>
+                {p.name[0]}
+              </span>
+              <span>
+                <strong>{p.name}</strong>
+                <small className={working(id) ? 'team-working' : ''}>{status(id)}</small>
+              </span>
+              {counts[id] ? <span className="team-count">{counts[id]}</span> : null}
+            </button>
+          ))}
       </aside>
 
       <section className="team-chat" aria-label="Chat">
         <header className="team-head">
-          <strong>{filter === 'all' ? 'Everyone' : `${person(filter).name} · private chat`}</strong>
-          {dm && typing[filter] && <span className="team-typing">{person(filter).name} is writing…</span>}
+          <strong>{filter === 'all' ? 'Tutti' : `${person(filter).name} · chat privata`}</strong>
+          {dm && typing[filter] && <span className="team-typing">{person(filter).name} sta scrivendo…</span>}
           {onChannelPreview && (
-            <button className="btn small ghost team-yt" onClick={onChannelPreview} title="The channel page with its banner and icon">
-              YouTube preview
+            <button className="btn small ghost team-yt" onClick={onChannelPreview} title="La pagina del canale con banner e icona">
+              Anteprima YouTube
             </button>
           )}
-          <span className="muted small">
-            {offline ? 'chat not reachable (run npm run dev)' : 'live · agents post with tools/team/chat.mjs, read with "new" / "wait"'}
-          </span>
+          <span className="muted small">{offline ? 'chat non raggiungibile (avvia npm run dev)' : 'in diretta'}</span>
         </header>
+
+        {dm && (
+          <div className="team-review-bar">
+            <div>
+              <strong>{person(filter).name}</strong> <span className="muted">· {person(filter).does}</span>
+            </div>
+            <div className="team-review-actions">
+              <select className="isel" value={lang} onChange={(e) => setLang(e.target.value)} title="Lingua del video da controllare">
+                {LANGS.map((l) => (
+                  <option key={l} value={l}>
+                    {l.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+              <select className="isel" value={aspect} onChange={(e) => setAspect(e.target.value)} title="Formato">
+                <option value="16:9">16:9 YouTube</option>
+                <option value="9:16">9:16 Short</option>
+              </select>
+              <button
+                className="btn small primary"
+                disabled={working(filter)}
+                onClick={() => void startReview(filter)}
+                title={filter === 'producer' ? 'Review di squadra: il producer sceglie e fa lavorare gli agenti che servono (costa di più)' : 'L’agente prepara il kit se serve, controlla il video e scrive qui i problemi'}
+              >
+                {working(filter) ? (jobs[filter].state === 'kit' ? 'Prepara il kit…' : 'Review in corso…') : '▶ Avvia review'}
+              </button>
+            </div>
+          </div>
+        )}
+
         <div
           className="team-list"
           ref={list}
@@ -185,12 +260,16 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
             stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
           }}
         >
-          {!shown.length && <p className="muted team-empty">No messages yet. Start a review (“/review-episode”) and the team talks here.</p>}
+          {!shown.length && (
+            <p className="muted team-empty">
+              {dm ? `Scrivi a ${person(filter).name} o premi “Avvia review”: per esempio “fai la review della scena dell’ospedale”.` : 'Nessun messaggio. Apri un agente a sinistra e avvia una review: la squadra parla qui.'}
+            </p>
+          )}
           {shown.map((m, i) => {
             const p = person(m.from);
             const mine = m.from === 'salvatore';
-            const day = new Date(m.ts).toLocaleDateString();
-            const newDay = i === 0 || new Date(shown[i - 1].ts).toLocaleDateString() !== day;
+            const day = new Date(m.ts).toLocaleDateString('it-IT');
+            const newDay = i === 0 || new Date(shown[i - 1].ts).toLocaleDateString('it-IT') !== day;
             const quoted = m.reply ? byId.get(m.reply) : undefined;
             return (
               <div key={m.id}>
@@ -206,7 +285,8 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
                       {!mine && <strong style={{ color: p.color }}>{p.name}</strong>}
                       {m.to !== 'all' && <span className="muted"> → {person(m.to).name}</span>}
                       {m.sev && <span className={`team-sev sev-${m.sev}`}>{SEV[m.sev]}</span>}
-                      {m.kind === 'fix' && <span className="team-sev sev-fix">fixed</span>}
+                      {m.kind === 'fix' && <span className="team-sev sev-fix">corretto</span>}
+                      {!m.sev && KIND_NOTE[m.kind] && !mine && <span className="muted"> · {KIND_NOTE[m.kind]}</span>}
                     </div>
                     {quoted && (
                       <div className="team-quote" style={{ borderColor: person(quoted.from).color }}>
@@ -215,7 +295,7 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
                     )}
                     <p>
                       {m.at !== undefined && (
-                        <button className="team-at" onClick={() => onSeek(m.at!)} title="Open the editor here">
+                        <button className="team-at" onClick={() => onSeek(m.at!)} title="Apri l'editor in questo punto">
                           {m.at.toFixed(1)} s
                         </button>
                       )}
@@ -228,9 +308,11 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
                     )}
                     <div className="team-foot">
                       <button className="team-reply" onClick={() => setReplyTo(m)}>
-                        Reply
+                        Rispondi
                       </button>
-                      <span>#{m.id} · {new Date(m.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span>
+                        #{m.id} · {new Date(m.ts).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -242,18 +324,18 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
           {replyTo && (
             <div className="team-quote composing" style={{ borderColor: person(replyTo.from).color }}>
               <strong>{person(replyTo.from).name}</strong> {replyTo.text.slice(0, 100)}
-              <button className="btn small ghost" onClick={() => setReplyTo(null)} aria-label="Cancel reply">
+              <button className="btn small ghost" onClick={() => setReplyTo(null)} aria-label="Annulla risposta">
                 ×
               </button>
             </div>
           )}
           {dm && (
             <div className="row gap small team-dm-opts">
-              <label className="chk" title="The agent answers now (Claude Code, Sonnet, low effort: a few thousand tokens)">
-                <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> Live answer
+              <label className="chk" title="L'agente risponde subito (Claude Code, Sonnet, poco ragionamento: poche migliaia di token). Se gli chiedi una review, la avvia davvero.">
+                <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> Risposta immediata
               </label>
-              <label className="chk" title="It may open the project's files to answer (Read, Grep, Glob): more tokens">
-                <input type="checkbox" checked={deep} disabled={!live} onChange={(e) => setDeep(e.target.checked)} /> May read the files
+              <label className="chk" title="Può aprire i file del progetto per rispondere (Read, Grep, Glob): più token">
+                <input type="checkbox" checked={deep} disabled={!live} onChange={(e) => setDeep(e.target.checked)} /> Può leggere i file
               </label>
               {askError && <span className="warn-text">{askError}</span>}
             </div>
@@ -265,8 +347,8 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
               value={text}
               placeholder={
                 dm
-                  ? `Write to ${person(filter).name}… (Enter sends)${live ? ' - it answers here' : ' - it reads it at the next review'}`
-                  : 'Write to everyone… (Enter sends, Shift+Enter new line). The team reads it at the next round.'
+                  ? `Scrivi a ${person(filter).name}… (Invio per mandare)${live ? ' - risponde qui; “fai la review” la avvia' : ' - lo leggerà alla prossima review'}`
+                  : 'Scrivi a tutti… (Invio manda, Maiusc+Invio va a capo). La squadra lo legge al prossimo giro.'
               }
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => {
@@ -277,7 +359,7 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
               }}
             />
             <button className="btn primary" onClick={() => void send()} disabled={!text.trim()}>
-              Send
+              Invia
             </button>
           </div>
         </footer>

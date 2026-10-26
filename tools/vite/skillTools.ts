@@ -3,14 +3,19 @@
  *
  *   GET  /api/tools/skills -> [{ id, name, description, body, scripts: [{ file, usage }], source }]
  *   POST /api/tools/run    <- { skill, script, args: string[] } -> { code, stdout, stderr }
+ *   POST /api/tools/ask    <- { skill, text } -> { answer, cost }   (Claude follows the skill, answers in Italian)
  *
  * Only Python files inside that skill's folder run, with python and an argument list (no shell); 90 s at most.
+ * "ask" runs the local Claude Code CLI headless with the skill's SKILL.md as its instructions, in the repository,
+ * Sonnet at medium effort, tools to read files, search the web and run Python (the skill's scripts): no editing.
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import path from 'node:path';
-import type { Plugin } from 'vite';
+import os from 'node:os';
+import { loadEnv, type Plugin } from 'vite';
+import { SESSION_VARS, findClaudeCode } from './claudeScene';
 
 const body = (req: IncomingMessage) =>
   new Promise<string>((resolve, reject) => {
@@ -56,6 +61,8 @@ export function skillTools(): Plugin {
     configureServer(server) {
       const root = server.config.root;
       const dir = path.join(root, '.claude', 'skills');
+      const bin = findClaudeCode(loadEnv(server.config.mode, root, ''));
+      const asking = new Set<string>();
       server.middlewares.use('/api/tools', async (req, res) => {
         try {
           const url = new URL(req.url ?? '/', 'http://x');
@@ -103,6 +110,43 @@ export function skillTools(): Plugin {
               p.on('error', (e) => resolve({ code: -1, stdout: '', stderr: String(e) }));
             });
             return json(res, 200, result);
+          }
+          if (req.method === 'POST' && url.pathname === '/ask') {
+            const b = JSON.parse(await body(req)) as { skill: string; text: string };
+            if (!/^[\w-]+$/.test(b.skill) || !fs.existsSync(path.join(dir, b.skill, 'SKILL.md'))) return json(res, 400, { error: 'skill sconosciuta' });
+            if (!b.text?.trim()) return json(res, 400, { error: 'scrivi cosa vuoi fare' });
+            if (!bin) return json(res, 503, { error: 'Claude Code non trovato su questo computer.' });
+            if (asking.has(b.skill)) return json(res, 409, { error: 'sta già lavorando a una richiesta' });
+            asking.add(b.skill);
+            try {
+              const md = fs.readFileSync(path.join(dir, b.skill, 'SKILL.md'), 'utf8').replace(/^---[\s\S]*?---\s*/, '');
+              const sys = path.join(os.tmpdir(), `fox-skill-${b.skill}.md`);
+              fs.writeFileSync(
+                sys,
+                `${md}\n\n# Now\nYou run from the studio's Tools page for Salvatore, who may not know this skill. The skill's folder is .claude/skills/${b.skill}/ (its scripts run with python). The project is The Fox Files (episodes/, channel/channel.json, src/data/sources.ts). Do what he asks following the skill, then answer in Italian, in plain words, with headings and short lists. Never invent facts or numbers; say what you could not check. Never send, publish or post anything.`,
+              );
+              const tools = ['Read', 'Glob', 'Grep', 'WebSearch', 'WebFetch', 'Bash(python:*)', 'Bash(py:*)'];
+              const env = Object.fromEntries(Object.entries(process.env).filter(([k]) => !SESSION_VARS.test(k)));
+              const out = await new Promise<string>((resolve, reject) => {
+                const p = spawn(bin, ['-p', '--output-format', 'json', '--system-prompt-file', sys, '--model', 'claude-sonnet-5-5', '--effort', 'medium', '--allowedTools', ...tools, '--setting-sources', '', '--strict-mcp-config', '--disable-slash-commands', '--no-session-persistence'], { cwd: root, env, windowsHide: true });
+                let o = '';
+                let e = '';
+                const timer = setTimeout(() => p.kill(), 10 * 60000);
+                p.stdout.setEncoding('utf8').on('data', (c: string) => (o += c));
+                p.stderr.setEncoding('utf8').on('data', (c: string) => (e += c));
+                p.on('error', reject);
+                p.on('close', () => {
+                  clearTimeout(timer);
+                  o.trim() ? resolve(o) : reject(new Error(e.trim().split('\n').slice(-2).join(' ') || 'nessuna risposta'));
+                });
+                p.stdin.end(b.text.trim());
+              });
+              const j = JSON.parse(out) as { result?: string; is_error?: boolean; total_cost_usd?: number };
+              if (j.is_error || !j.result?.trim()) return json(res, 502, { error: j.result || 'nessuna risposta' });
+              return json(res, 200, { answer: j.result.trim(), cost: j.total_cost_usd });
+            } finally {
+              asking.delete(b.skill);
+            }
           }
           json(res, 404, { error: 'not found' });
         } catch (e) {

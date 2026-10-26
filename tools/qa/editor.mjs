@@ -63,11 +63,11 @@ await p.locator('button', { hasText: '+ New episode' }).click();
 await p.waitForTimeout(1500);
 await shot('08_new_episode');
 // Deliver page.
-await p.locator('.pages button', { hasText: 'Deliver' }).click();
+await p.locator('.pages button', { hasText: 'Esporta' }).click();
 await p.waitForTimeout(1200);
 await shot('09_deliver');
 // Vertical format on the new episode.
-await p.locator('.pages button', { hasText: 'Edit' }).click();
+await p.locator('.pages button', { hasText: 'Montaggio' }).click();
 await p.waitForTimeout(400);
 const lib = await p.evaluate(() => JSON.parse(localStorage.getItem('fox-files-studio:library') || 'null'));
 console.log({ lanesAfterAdd, lanesAfterUndo, library: lib?.projects?.map((e) => e.title) });

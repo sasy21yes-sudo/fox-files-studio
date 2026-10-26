@@ -268,20 +268,20 @@ export function App() {
         const rh = episodeHash(remote);
         const lh = episodeHash(local);
         if (rh === lh) markSynced(local);
-        else if (startedFromTemplate) take(remote, 'Loaded the episode from the repository');
+        else if (startedFromTemplate) take(remote, 'Caricato l’episodio dal repository');
         else if (base === null) {
           // This browser never synced: the repository wins. Comparing `updated` let a fresh browser's default
           // project (created "now") overwrite the edited episode (2026-10-25); a differing local version is kept.
           stashProject({ ...local, id: `${local.id}-local-${Math.random().toString(36).slice(2, 6)}`, episodeTitle: `${local.episodeTitle} (local copy)`, updated: Date.now() });
-          take(remote, 'Loaded the episode from the repository (this browser had not synced it yet; yours is kept as "(local copy)")');
-        } else if (rh !== base && lh === base) take(remote, 'Loaded the changes from the repository');
+          take(remote, 'Caricato l’episodio dal repository (questo browser non era ancora sincronizzato; la tua versione resta come "(local copy)")');
+        } else if (rh !== base && lh === base) take(remote, 'Caricate le modifiche dal repository');
         else if (rh === base) {
           await pushEpisode(local);
           markSynced(local);
         } else {
           const id = `${local.id}-local-${Math.random().toString(36).slice(2, 6)}`;
           stashProject({ ...local, id, episodeTitle: `${local.episodeTitle} (local copy)`, updated: Date.now() });
-          take(remote, 'Both changed: loaded the repository version, yours is kept as "(local copy)"');
+          take(remote, 'Modificato da entrambe le parti: caricata la versione del repository, la tua resta come "(local copy)"');
         }
       }
       syncReady.current = true;

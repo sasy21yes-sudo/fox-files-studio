@@ -7,6 +7,8 @@
  * file (.claude/agents/<file>.md) as its system prompt and only the last lines of that private chat plus the team
  * brief as context: Sonnet, low effort, no tools - a few thousand tokens a reply. deep: true lets it read the
  * repository (Read, Grep, Glob only) for questions about the episode's files, at a higher cost.
+ * When the message asks the agent to start a review, the reply says so (structured output) and the review really
+ * runs (teamReview.ts: kit, then the agent with its own tools), its findings and summary arriving in the chat.
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -15,19 +17,21 @@ import os from 'node:os';
 import path from 'node:path';
 import { loadEnv, type Plugin } from 'vite';
 import { SESSION_VARS, findClaudeCode } from './claudeScene';
+import { AGENTS, startReview } from './teamReview';
 // @ts-expect-error - plain ESM tool without types
 import { readChat, postChat, formatLine } from '../team/chat.mjs';
 
-/** Chat name -> agent file (and the producer, who speaks for the review skill). */
-const AGENTS: Record<string, string> = {
-  rig: 'rig-animation-inspector',
-  viewer: 'first-time-viewer',
-  social: 'social-media-manager',
-  editor: 'video-editor',
-  sound: 'sound-designer',
-  facts: 'fact-checker',
-  art: 'art-director',
-  l10n: 'localization-qa',
+/** The reply: the chat answer, and whether Salvatore asked for a review to start now. */
+const REPLY_SCHEMA = {
+  type: 'object',
+  properties: {
+    reply: { type: 'string' },
+    start_review: { type: 'boolean' },
+    lang: { type: 'string', enum: ['it', 'en', 'es', 'fr', 'pt'] },
+    aspect: { type: 'string', enum: ['16:9', '9:16'] },
+  },
+  required: ['reply', 'start_review'],
+  additionalProperties: false,
 };
 
 interface Msg {
@@ -78,7 +82,8 @@ export function teamAsk(): Plugin {
             const brief = all.filter((m) => m.from === 'producer' && (m.to === 'all' || m.to === who)).slice(-3);
             const question = all.find((m) => m.id === b.id);
             const role = fs.readFileSync(file, 'utf8').replace(/^---[\s\S]*?---\s*/, '');
-            const system = `${role}\n\n# Now: the studio's Team chat\nYou are chatting privately with Salvatore, the owner, on the studio's Team page. Answer in Italian, plainly, in at most 6 short sentences (or a short list). Say what you would check or change and where (file, second); if a question needs a measurement you cannot make in this chat, say which one and offer to run it in the next review. Never invent facts, numbers or quotes.`;
+            const system = `${role}\n\n# Now: the studio's Team chat\nYou are chatting privately with Salvatore, the owner, on the studio's Team page. Answer in Italian, plainly, in at most 6 short sentences (or a short list). Say what you would check or change and where (file, second); if a question needs a measurement you cannot make in this chat, say which one and offer to run it in the next review. Never invent facts, numbers or quotes.
+If Salvatore asks you to start, do or redo a review or a check now ("fai la review", "controlla", "inizia", "ricontrolla"...), set start_review true and reply with one short line saying what you are going to check: the studio then really runs your review with your tools and you post the findings here. Set lang/aspect only if he names them. For a plain question, start_review is false.`;
             const user = [
               brief.length ? `Team brief:\n${brief.map(formatLine).join('\n')}` : '',
               `Your private chat with Salvatore (oldest first):\n${dm.map(formatLine).join('\n')}`,
@@ -89,7 +94,7 @@ export function teamAsk(): Plugin {
             const sys = path.join(work, `${who}.md`);
             fs.writeFileSync(sys, system);
             const tools = b.deep ? ['Read', 'Grep', 'Glob'] : [];
-            const args = ['-p', '--output-format', 'json', '--system-prompt-file', sys, '--model', 'claude-sonnet-5-5', '--effort', 'low', '--tools', tools.join(','), ...(tools.length ? ['--allowedTools', ...tools] : []), '--setting-sources', '', '--strict-mcp-config', '--disable-slash-commands', '--no-session-persistence'];
+            const args = ['-p', '--output-format', 'json', '--system-prompt-file', sys, '--model', 'claude-sonnet-5-5', '--effort', 'low', '--json-schema', JSON.stringify(REPLY_SCHEMA), '--tools', tools.join(','), ...(tools.length ? ['--allowedTools', ...tools] : []), '--setting-sources', '', '--strict-mcp-config', '--disable-slash-commands', '--no-session-persistence'];
             const childEnv = Object.fromEntries(Object.entries(process.env).filter(([k]) => !SESSION_VARS.test(k)));
             const out = await new Promise<string>((resolve, reject) => {
               const child = spawn(bin, args, { cwd: b.deep ? root : work, env: childEnv, windowsHide: true });
@@ -105,11 +110,21 @@ export function teamAsk(): Plugin {
               });
               child.stdin.end(user);
             });
-            const j = JSON.parse(out) as { result?: string; is_error?: boolean; usage?: Record<string, number>; total_cost_usd?: number };
-            if (j.is_error || !j.result?.trim()) return json(res, 502, { error: j.result || 'no answer' });
+            const j = JSON.parse(out) as {
+              result?: string;
+              is_error?: boolean;
+              structured_output?: { reply: string; start_review: boolean; lang?: string; aspect?: string };
+              usage?: Record<string, number>;
+              total_cost_usd?: number;
+            };
+            const r = j.structured_output;
+            const text = (r?.reply ?? j.result ?? '').trim();
+            if (j.is_error || !text) return json(res, 502, { error: j.result || 'no answer' });
             // The chat keeps one line per message; the full answer lives in the chat file up to its cap.
-            const { message } = postChat({ from: who, to: 'salvatore', kind: 'answer', reply: b.id, text: j.result.trim(), max: 1200 });
-            return json(res, 200, { reply: message, usage: j.usage, cost: j.total_cost_usd });
+            const { message } = postChat({ from: who, to: 'salvatore', kind: 'answer', reply: b.id, text, max: 1200 });
+            const failed = r?.start_review ? startReview(root, bin, { agent: who, lang: r.lang, aspect: r.aspect, request: question?.text, reply: b.id }) : null;
+            if (failed) postChat({ from: who, to: 'salvatore', kind: 'note', reply: b.id, text: `Non posso partire adesso: ${failed}` });
+            return json(res, 200, { reply: message, review: !!r?.start_review && !failed, usage: j.usage, cost: j.total_cost_usd });
           } finally {
             busy.delete(who);
           }

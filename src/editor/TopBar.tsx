@@ -24,10 +24,10 @@ interface Props {
 }
 
 const SAVE_LABEL: Record<SaveStatus, string> = {
-  saved: 'Saved',
-  saving: 'Saving…',
-  unavailable: 'Not saved (storage off)',
-  error: 'Save failed',
+  saved: 'Salvato',
+  saving: 'Salvataggio…',
+  unavailable: 'Non salvato (memoria disattivata)',
+  error: 'Salvataggio non riuscito',
 };
 
 /** Top bar of the editor: project, undo/redo, save state and page switcher. */
@@ -40,28 +40,28 @@ export function TopBar(p: Props) {
         <div className="brand-text">
           <span className="brand-name">Fox Files Studio</span>
           {mk ? (
-            <span className="project-name" title="The MKUltra episode: its title comes from the translated script">
+            <span className="project-name" title="L’episodio MKUltra: il titolo viene dal copione tradotto">
               {p.project.episodeTitle}
             </span>
           ) : (
-            <input className="project-rename" value={p.project.episodeTitle} onChange={(e) => p.onRename(e.target.value)} aria-label="Episode title" />
+            <input className="project-rename" value={p.project.episodeTitle} onChange={(e) => p.onRename(e.target.value)} aria-label="Titolo dell’episodio" />
           )}
         </div>
       </div>
 
-      <nav className="pages" aria-label="Pages">
+      <nav className="pages" aria-label="Pagine">
         {(['media', 'edit', 'deliver', 'team', 'channel', 'tools'] as const).map((pg) => (
           <button key={pg} className={p.page === pg ? 'on' : ''} onClick={() => p.onPage(pg)} aria-current={p.page === pg}>
-            {pg === 'media' ? 'Media' : pg === 'edit' ? 'Edit' : pg === 'deliver' ? 'Deliver' : pg === 'team' ? 'Team' : pg === 'channel' ? 'Channel' : 'Tools'}
+            {pg === 'media' ? 'Media' : pg === 'edit' ? 'Montaggio' : pg === 'deliver' ? 'Esporta' : pg === 'team' ? 'Team' : pg === 'channel' ? 'Canale' : 'Strumenti'}
           </button>
         ))}
       </nav>
 
       <div className="top-actions">
-        <button className="btn icon ghost" onClick={p.onUndo} disabled={!p.canUndo} title="Undo (Ctrl+Z)" aria-label="Undo">
+        <button className="btn icon ghost" onClick={p.onUndo} disabled={!p.canUndo} title="Annulla (Ctrl+Z)" aria-label="Annulla">
           ↶
         </button>
-        <button className="btn icon ghost" onClick={p.onRedo} disabled={!p.canRedo} title="Redo (Ctrl+Shift+Z)" aria-label="Redo">
+        <button className="btn icon ghost" onClick={p.onRedo} disabled={!p.canRedo} title="Ripeti (Ctrl+Maiusc+Z)" aria-label="Ripeti">
           ↷
         </button>
         <span className={`save-pill save-${p.saveStatus}`} role="status" aria-live="polite">
@@ -73,13 +73,13 @@ export function TopBar(p: Props) {
           Agent Fox
         </button>
         <button className="btn ghost" onClick={p.onSources}>
-          Sources
+          Fonti
         </button>
         <button className={`btn ${p.theater ? 'active' : ''}`} onClick={p.onToggleTheater} aria-pressed={p.theater}>
-          {p.theater ? 'Exit preview' : 'Preview'}
+          {p.theater ? 'Chiudi anteprima' : 'Anteprima'}
         </button>
-        <button className="btn primary" onClick={() => p.onPage('deliver')} title="Export the video (YouTube 16:9 and Short 9:16), subtitles and soundtrack">
-          Export
+        <button className="btn primary" onClick={() => p.onPage('deliver')} title="Esporta il video (YouTube 16:9 e Short 9:16), sottotitoli e colonna sonora">
+          Esporta video
         </button>
       </div>
     </header>
@@ -92,10 +92,10 @@ const clock = (t: number) => new Date(t).toLocaleTimeString([], { hour: '2-digit
 function RepoPill({ repo, note }: { repo: SyncStatus; note: string | null }) {
   const tone = repo.error ? 'error' : note ? 'saving' : 'saved';
   const where = repo.git ? `${repo.branch ?? '?'}${repo.push ? '' : ' (local only)'}` : 'files only';
-  const label = repo.error ? 'Repo: sync error' : note ?? (repo.lastSync ? `Repo · ${where} · ${clock(repo.lastSync)}` : `Repo · ${where}`);
+  const label = repo.error ? 'Repo: errore di sincronizzazione' : note ?? (repo.lastSync ? `Repo · ${where} · ${clock(repo.lastSync)}` : `Repo · ${where}`);
   const title = [
-    'The episode is also written to episodes/ in the repository and synced with git, so it can be edited remotely with Claude Code.',
-    repo.git ? `Branch ${repo.branch}${repo.upstream ? '' : ' (not on the remote yet)'}.` : 'Git is off (FOX_EPISODE_GIT=off): files only.',
+    'L’episodio viene scritto anche in episodes/ nel repository e sincronizzato con git, così si può modificare a distanza con Claude Code.',
+    repo.git ? `Branch ${repo.branch}${repo.upstream ? '' : ' (non ancora sul remoto)'}.` : 'Git disattivato (FOX_EPISODE_GIT=off): solo file.',
     repo.lastCommit ? `Last commit ${repo.lastCommit}.` : '',
     repo.error ?? '',
   ]
