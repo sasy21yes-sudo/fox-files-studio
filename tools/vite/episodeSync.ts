@@ -290,6 +290,11 @@ export function episodeSync(): Plugin {
               const body = JSON.parse((await readBody(req, 50 << 20)).toString('utf8'));
               if (!body || body.id !== id || !Array.isArray(body.scenes)) return sendJson(res, 400, { error: 'not an episode' });
               delete body.mediaData;
+              // Who writes what (an untouched template overwrote the episode several times, 2026-10-26).
+              fs.appendFileSync(
+                path.join(root, 'qa-out', 'episode_puts.log'),
+                `${new Date().toISOString()} ${id} scenes=${body.scenes.length} lang=${body.settings?.language} ua=${String(req.headers['user-agent']).slice(-50)}\n`,
+              );
               const text = JSON.stringify(body, null, 2) + '\n';
               const h = hash(text);
               if (known.get(id) !== h || !fs.existsSync(fileOf(id))) {
