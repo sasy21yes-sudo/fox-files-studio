@@ -162,7 +162,7 @@ const ARM: Record<string, ArmPose> = {
   magnify: { t: [-60, 20], rot: -1.2, hand: 'n_magnifier', front: true },
   pencil: { t: [-140, 230], rot: -2.3, hand: 'n_pencil', front: true },
   // Below the mouth, not over it.
-  chin: { t: [-205, 100], rot: -1.9, hand: 'n_chin', front: true },
+  chin: { t: [-205, 140], rot: -1.9, hand: 'n_chin', front: true },
   hold: { t: [-170, 250], rot: -0.3, hand: 'n_knock', front: true },
   hatChest: { t: [-200, 230], rot: -0.4, hand: 'n_knock', front: true },
   scratch: { t: [-90, -360], rot: -2.0, hand: 'open', front: true, under: true },

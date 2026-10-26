@@ -1,0 +1,262 @@
+{
+  "_note": "Narration v2 (direct YouTube tone) + the hospital scene, in five languages. Facts: src/data/sources.ts. Applied to the episode by tools/qa/apply_script.mjs.",
+  "order": ["file", "question", "experiments", "cost", "scene-5asb3j", "scene-hosp57", "revelation", "scene-l8nb63", "known"],
+  "scenes": {
+    "file": {
+      "narrations": {
+        "it": "1977. Il Senato degli Stati Uniti apre un'audizione su un programma segreto della CIA. Il problema? I documenti erano stati distrutti anni prima. Ma non tutti. Il programma si chiamava MKUltra. Cos'era davvero? E come facciamo a saperlo?",
+        "en": "1977. The United States Senate opens a hearing on a secret CIA program. The problem? The files had been destroyed years earlier. But not all of them. The program was called MKUltra. What was it, really? And how do we know?",
+        "es": "1977. El Senado de Estados Unidos abre una audiencia sobre un programa secreto de la CIA. ¿El problema? Los documentos habían sido destruidos años antes. Pero no todos. El programa se llamaba MKUltra. ¿Qué era en realidad? ¿Y cómo lo sabemos?",
+        "fr": "1977. Le Sénat des États-Unis ouvre une audition sur un programme secret de la CIA. Le problème ? Les dossiers avaient été détruits des années plus tôt. Mais pas tous. Le programme s'appelait MKUltra. C'était quoi, au juste ? Et comment le sait-on ?",
+        "pt": "1977. O Senado dos Estados Unidos abre uma audiência sobre um programa secreto da CIA. O problema? Os documentos tinham sido destruídos anos antes. Mas não todos. O programa se chamava MKUltra. O que era, de verdade? E como a gente sabe disso?"
+      },
+      "beats": {
+        "it": [
+          { "cue": "Ma non tutti", "kind": "statement", "lines": ["DOCUMENTI: DISTRUTTI NEL 1973", "ALCUNI: RITROVATI NEL 1977"] },
+          { "cue": "E come facciamo a saperlo?", "kind": "question", "text": "Cos'era? Come lo sappiamo?" }
+        ],
+        "en": [
+          { "cue": "But not all of them", "kind": "statement", "lines": ["FILES: DESTROYED IN 1973", "SOME: FOUND IN 1977"] },
+          { "cue": "And how do we know?", "kind": "question", "text": "What was it? How do we know?" }
+        ],
+        "es": [
+          { "cue": "Pero no todos", "kind": "statement", "lines": ["DOCUMENTOS: DESTRUIDOS EN 1973", "ALGUNOS: HALLADOS EN 1977"] },
+          { "cue": "¿Y cómo lo sabemos?", "kind": "question", "text": "¿Qué era? ¿Cómo lo sabemos?" }
+        ],
+        "fr": [
+          { "cue": "Mais pas tous", "kind": "statement", "lines": ["DOSSIERS : DÉTRUITS EN 1973", "CERTAINS : RETROUVÉS EN 1977"] },
+          { "cue": "Et comment le sait-on ?", "kind": "question", "text": "C'était quoi ? Comment le sait-on ?" }
+        ],
+        "pt": [
+          { "cue": "Mas não todos", "kind": "statement", "lines": ["DOCUMENTOS: DESTRUÍDOS EM 1973", "ALGUNS: ACHADOS EM 1977"] },
+          { "cue": "E como a gente sabe disso?", "kind": "question", "text": "O que era? Como sabemos?" }
+        ]
+      }
+    },
+    "question": {
+      "narrations": {
+        "it": "Partiamo da quello che ha detto la CIA stessa, davanti al Senato. MKUltra è andato avanti dal 1953 al 1964. Undici anni. Nei documenti rimasti ci sono 149 sottoprogetti, in 80 istituzioni. Più della metà erano università e college.",
+        "en": "Let's start with what the CIA itself told the Senate. MKUltra ran from 1953 to 1964. Eleven years. The records that survived list 149 subprojects, at 80 institutions. More than half were colleges and universities.",
+        "es": "Empecemos por lo que dijo la propia CIA ante el Senado. MKUltra duró de 1953 a 1964. Once años. En los documentos que quedaron hay 149 subproyectos, en 80 instituciones. Más de la mitad eran universidades.",
+        "fr": "Partons de ce que la CIA elle-même a dit devant le Sénat. MKUltra a duré de 1953 à 1964. Onze ans. Dans les documents qui restent, il y a 149 sous-projets, dans 80 institutions. Plus de la moitié étaient des universités.",
+        "pt": "Vamos começar pelo que a própria CIA disse ao Senado. O MKUltra durou de 1953 a 1964. Onze anos. Nos documentos que sobraram, há 149 subprojetos, em 80 instituições. Mais da metade eram universidades."
+      },
+      "beats": {
+        "it": [
+          { "cue": "Undici anni", "kind": "span", "from": "1953", "to": "1964", "label": "UNDICI ANNI" },
+          { "cue": "149 sottoprogetti", "kind": "count", "value": 149, "label": "SOTTOPROGETTI", "note": "in 80 istituzioni" }
+        ],
+        "en": [
+          { "cue": "Eleven years", "kind": "span", "from": "1953", "to": "1964", "label": "ELEVEN WHOLE YEARS" },
+          { "cue": "149 subprojects", "kind": "count", "value": 149, "label": "SUBPROJECTS", "note": "at 80 institutions" }
+        ],
+        "es": [
+          { "cue": "Once años", "kind": "span", "from": "1953", "to": "1964", "label": "ONCE AÑOS" },
+          { "cue": "149 subproyectos", "kind": "count", "value": 149, "label": "SUBPROYECTOS", "note": "en 80 instituciones" }
+        ],
+        "fr": [
+          { "cue": "Onze ans", "kind": "span", "from": "1953", "to": "1964", "label": "ONZE ANS" },
+          { "cue": "149 sous-projets", "kind": "count", "value": 149, "label": "SOUS-PROJETS", "note": "dans 80 institutions" }
+        ],
+        "pt": [
+          { "cue": "Onze anos", "kind": "span", "from": "1953", "to": "1964", "label": "ONZE ANOS" },
+          { "cue": "149 subprojetos", "kind": "count", "value": 149, "label": "SUBPROJETOS", "note": "em 80 instituições" }
+        ]
+      }
+    },
+    "experiments": {
+      "narrations": {
+        "it": "Ma cosa facevano, in pratica? Droghe e alcol. Ipnosi. Esperimenti sul sonno. Macchina della verità. E droghe pensate per aiutare gli interrogatori. E sì: anche l'LSD. Ora, la parte che conta. Alcuni erano volontari. Altri non hanno mai saputo niente.",
+        "en": "So what were they actually doing? Drugs and alcohol. Hypnosis. Sleep experiments. Lie detectors. And drugs meant to help interrogations. And yes: LSD too. Now, here's the part that matters. Some people were volunteers. Others never knew a thing.",
+        "es": "¿Pero qué hacían, en la práctica? Drogas y alcohol. Hipnosis. Experimentos con el sueño. Detector de mentiras. Y drogas pensadas para ayudar en los interrogatorios. Y sí: también LSD. Ahora, lo importante. Algunos eran voluntarios. Otros nunca supieron nada.",
+        "fr": "Mais concrètement, ils faisaient quoi ? Drogues et alcool. Hypnose. Expériences sur le sommeil. Détecteur de mensonges. Et des drogues censées aider les interrogatoires. Et oui : du LSD aussi. Maintenant, le point important. Certains étaient volontaires. D'autres n'ont jamais rien su.",
+        "pt": "Mas o que eles faziam, na prática? Drogas e álcool. Hipnose. Experimentos com o sono. Detector de mentiras. E drogas pensadas para ajudar em interrogatórios. E sim: LSD também. Agora, a parte que importa. Alguns eram voluntários. Outros nunca souberam de nada."
+      },
+      "beats": {
+        "it": [
+          { "cue": "Droghe e alcol", "kind": "list", "items": ["DROGHE E ALCOL", "IPNOSI", "SONNO", "MACCHINA DELLA VERITÀ", "DROGHE DA INTERROGATORIO"] },
+          { "cue": "Alcuni erano volontari", "kind": "versus", "left": "VOLONTARI", "right": "MAI AVVISATI" }
+        ],
+        "en": [
+          { "cue": "Drugs and alcohol", "kind": "list", "items": ["DRUGS & ALCOHOL", "HYPNOSIS", "SLEEP", "LIE DETECTORS", "INTERROGATION DRUGS"] },
+          { "cue": "Some people were volunteers", "kind": "versus", "left": "VOLUNTEERS", "right": "NEVER TOLD" }
+        ],
+        "es": [
+          { "cue": "Drogas y alcohol", "kind": "list", "items": ["DROGAS Y ALCOHOL", "HIPNOSIS", "SUEÑO", "DETECTOR DE MENTIRAS", "DROGAS PARA INTERROGAR"] },
+          { "cue": "Algunos eran voluntarios", "kind": "versus", "left": "VOLUNTARIOS", "right": "NUNCA AVISADOS" }
+        ],
+        "fr": [
+          { "cue": "Drogues et alcool", "kind": "list", "items": ["DROGUES ET ALCOOL", "HYPNOSE", "SOMMEIL", "DÉTECTEUR DE MENSONGES", "DROGUES D'INTERROGATOIRE"] },
+          { "cue": "Certains étaient volontaires", "kind": "versus", "left": "VOLONTAIRES", "right": "JAMAIS PRÉVENUS" }
+        ],
+        "pt": [
+          { "cue": "Drogas e álcool", "kind": "list", "items": ["DROGAS E ÁLCOOL", "HIPNOSE", "SONO", "DETECTOR DE MENTIRAS", "DROGAS DE INTERROGATÓRIO"] },
+          { "cue": "Alguns eram voluntários", "kind": "versus", "left": "VOLUNTÁRIOS", "right": "NUNCA AVISADOS" }
+        ]
+      }
+    },
+    "cost": {
+      "narrations": {
+        "it": "Secondo la testimonianza, sei sottoprogetti hanno testato droghe su persone che non ne sapevano niente. Alcuni test avvenivano in case sicure, a San Francisco e a New York. Nessun consenso.",
+        "en": "According to the testimony, six subprojects tested drugs on people who had no idea. Some of the tests happened in safe houses, in San Francisco and New York. No consent.",
+        "es": "Según el testimonio, seis subproyectos probaron drogas en personas que no sabían nada. Algunas pruebas se hicieron en pisos francos, en San Francisco y Nueva York. Sin consentimiento.",
+        "fr": "D'après le témoignage, six sous-projets ont testé des drogues sur des gens qui n'en savaient rien. Certains tests ont eu lieu dans des planques, à San Francisco et à New York. Sans consentement.",
+        "pt": "Segundo o depoimento, seis subprojetos testaram drogas em pessoas que não sabiam de nada. Alguns testes aconteceram em casas seguras, em San Francisco e Nova York. Sem consentimento."
+      },
+      "beats": {
+        "it": [{ "cue": "sei sottoprogetti", "kind": "waffle", "total": 149, "hit": 6, "label": "6 SU 149 SOTTOPROGETTI", "note": "testarono droghe su persone che non sapevano" }],
+        "en": [{ "cue": "six subprojects", "kind": "waffle", "total": 149, "hit": 6, "label": "6 OF 149 SUBPROJECTS", "note": "tested drugs on people who didn't know" }],
+        "es": [{ "cue": "seis subproyectos", "kind": "waffle", "total": 149, "hit": 6, "label": "6 DE 149 SUBPROYECTOS", "note": "probaron drogas en personas que no lo sabían" }],
+        "fr": [{ "cue": "six sous-projets", "kind": "waffle", "total": 149, "hit": 6, "label": "6 SUR 149 SOUS-PROJETS", "note": "ont testé des drogues sur des gens qui ne savaient pas" }],
+        "pt": [{ "cue": "seis subprojetos", "kind": "waffle", "total": 149, "hit": 6, "label": "6 DE 149 SUBPROJETOS", "note": "testaram drogas em quem não sabia" }]
+      }
+    },
+    "scene-5asb3j": {
+      "narrations": {
+        "it": "Cosa voleva dire, in concreto? Guarda Frank Olson. Lavorava come civile per l'Esercito. Nel 1953, a una riunione organizzata dalla CIA, gli danno dell'LSD. Senza dirglielo. Circa una settimana dopo, era morto.",
+        "en": "What did that mean, in real life? Look at Frank Olson. He was a civilian employee of the Army. In 1953, at a meeting called by the CIA, he was given LSD. Without being told. About a week later, he was dead.",
+        "es": "¿Qué significaba eso, en concreto? Mira a Frank Olson. Era un empleado civil del Ejército. En 1953, en una reunión organizada por la CIA, le dan LSD. Sin decírselo. Más o menos una semana después, estaba muerto.",
+        "fr": "Qu'est-ce que ça voulait dire, concrètement ? Prenez Frank Olson. Il était employé civil de l'Armée. En 1953, lors d'une réunion organisée par la CIA, on lui donne du LSD. Sans le lui dire. Environ une semaine plus tard, il était mort.",
+        "pt": "O que isso queria dizer, na prática? Olha o Frank Olson. Ele era funcionário civil do Exército. Em 1953, numa reunião organizada pela CIA, deram LSD para ele. Sem avisar. Cerca de uma semana depois, ele estava morto."
+      },
+      "beats": {
+        "*": [{ "cue": "Frank Olson", "kind": "person", "name": "Frank Olson", "role": "ARMY CIVILIAN EMPLOYEE", "year": "1953" }]
+      }
+    },
+    "scene-hosp57": {
+      "titles": { "en": "The Hospital", "it": "L'ospedale", "es": "El hospital", "fr": "L'hôpital", "pt": "O hospital" },
+      "narrations": {
+        "it": "E poi c'è Montréal. Nel 1957 la CIA finanzia la ricerca di uno psichiatra: il dottor Ewen Cameron, capo di psichiatria alla McGill. L'idea? Far ascoltare a un paziente lo stesso messaggio. Ancora. E ancora. E ancora. E vedere cosa cambia nel suo comportamento. Il nome tecnico era «psychic driving». Il piano cercava anche sostanze capaci di spezzare gli schemi di comportamento. Nella lista: curaro. LSD. E modi per rendere il paziente inerte, mentre il messaggio andava avanti. I soldi passavano da una società di copertura. E Cameron? Non doveva sapere che dietro c'era il governo americano. Nel 1992, il Canada offre 100.000 dollari agli ex pazienti di Cameron all'Allan Memorial Institute, quelli sottoposti alla cosiddetta «destrutturazione».",
+        "en": "And then there's Montreal. In 1957, the CIA funds the research of a psychiatrist: Dr. Ewen Cameron, head of psychiatry at McGill. The idea? Make a patient listen to the same message. Again. And again. And again. And see what it does to their behavior. The technical name was “psychic driving”. The plan also looked for drugs that could break down patterns of behavior. On the list: curare. LSD. And ways to keep the patient inert while the message played. The money went through a cover organization. And Cameron? He wasn't supposed to know the U.S. government was behind it. In 1992, Canada offers 100,000 dollars to Cameron's former patients at the Allan Memorial Institute who went through so-called “depatterning”.",
+        "es": "Y luego está Montreal. En 1957, la CIA financia la investigación de un psiquiatra: el doctor Ewen Cameron, jefe de psiquiatría en McGill. ¿La idea? Hacer que un paciente escuche el mismo mensaje. Otra vez. Y otra. Y otra. Y ver cómo cambia su comportamiento. El nombre técnico era «psychic driving». El plan también buscaba sustancias capaces de romper los patrones de comportamiento. En la lista: curare. LSD. Y formas de dejar al paciente inerte mientras sonaba el mensaje. El dinero pasaba por una organización tapadera. ¿Y Cameron? No debía saber que detrás estaba el gobierno de Estados Unidos. En 1992, Canadá ofrece 100.000 dólares a los ex pacientes de Cameron en el Allan Memorial Institute sometidos a la llamada «desestructuración».",
+        "fr": "Et puis, il y a Montréal. En 1957, la CIA finance les recherches d'un psychiatre : le docteur Ewen Cameron, à la tête de la psychiatrie à McGill. L'idée ? Faire écouter à un patient le même message. Encore. Et encore. Et encore. Et voir ce que ça change à son comportement. Le nom technique : le « psychic driving ». Le plan cherchait aussi des substances capables de briser les schémas de comportement. Sur la liste : du curare. Du LSD. Et des moyens de rendre le patient inerte pendant que le message tournait. L'argent passait par une organisation écran. Et Cameron ? Il ne devait pas savoir que le gouvernement américain était derrière. En 1992, le Canada offre 100 000 dollars aux anciens patients de Cameron à l'Institut Allan Memorial qui avaient subi la « déstructuration ».",
+        "pt": "E aí tem Montreal. Em 1957, a CIA financia a pesquisa de um psiquiatra: o doutor Ewen Cameron, chefe de psiquiatria na McGill. A ideia? Fazer um paciente ouvir a mesma mensagem. De novo. E de novo. E de novo. E ver o que muda no comportamento dele. O nome técnico era “psychic driving”. O plano também buscava substâncias capazes de quebrar os padrões de comportamento. Na lista: curare. LSD. E jeitos de deixar o paciente inerte enquanto a mensagem tocava. O dinheiro passava por uma organização de fachada. E o Cameron? Ele não devia saber que o governo americano estava por trás. Em 1992, o Canadá oferece 100 mil dólares aos ex-pacientes de Cameron no Allan Memorial Institute que passaram pela chamada “desestruturação”."
+      },
+      "beats": {
+        "it": [
+          { "cue": "Ewen Cameron", "kind": "person", "name": "Ewen Cameron", "role": "HEAD OF PSYCHIATRY · McGILL", "year": "1957" },
+          { "cue": "Nella lista", "kind": "list", "title": "NEL MEMO DEL 1957", "items": ["ARTANE", "ANECTINE", "BULBOCAPNINA", "CURARO", "LSD-25"] },
+          { "cue": "Non doveva sapere", "kind": "record", "tag": "CIA · 26 FEB 1957", "who": "MKULTRA, Subproject 68", "text": "Il dott. Cameron… e il suo staff resteranno del tutto all'oscuro dell'interesse del governo degli Stati Uniti.", "highlight": "del tutto all'oscuro", "note": "Traduzione dal memorandum della CIA" },
+          { "cue": "Nel 1992", "kind": "statement", "lines": ["CANADA, 1992:", "100.000 DOLLARI AGLI EX PAZIENTI"] }
+        ],
+        "en": [
+          { "cue": "Ewen Cameron", "kind": "person", "name": "Ewen Cameron", "role": "HEAD OF PSYCHIATRY · McGILL", "year": "1957" },
+          { "cue": "On the list", "kind": "list", "title": "IN THE 1957 MEMO", "items": ["ARTANE", "ANECTINE", "BULBOCAPNINE", "CURARE", "LSD-25"] },
+          { "cue": "He wasn't supposed to know", "kind": "record", "tag": "CIA · FEB 26, 1957", "who": "MKULTRA, Subproject 68", "text": "Dr. Cameron… and his staff will remain completely unwitting of U.S. Government interest.", "highlight": "completely unwitting", "note": "Quoted from the CIA memorandum" },
+          { "cue": "In 1992", "kind": "statement", "lines": ["CANADA, 1992:", "$100,000 TO FORMER PATIENTS"] }
+        ],
+        "es": [
+          { "cue": "Ewen Cameron", "kind": "person", "name": "Ewen Cameron", "role": "HEAD OF PSYCHIATRY · McGILL", "year": "1957" },
+          { "cue": "En la lista", "kind": "list", "title": "EN EL MEMO DE 1957", "items": ["ARTANE", "ANECTINE", "BULBOCAPNINA", "CURARE", "LSD-25"] },
+          { "cue": "No debía saber", "kind": "record", "tag": "CIA · 26 FEB 1957", "who": "MKULTRA, Subproject 68", "text": "El Dr. Cameron… y su equipo seguirán completamente ajenos al interés del gobierno de EE. UU.", "highlight": "completamente ajenos", "note": "Traducción del memorando de la CIA" },
+          { "cue": "En 1992", "kind": "statement", "lines": ["CANADÁ, 1992:", "100.000 DÓLARES A EX PACIENTES"] }
+        ],
+        "fr": [
+          { "cue": "Ewen Cameron", "kind": "person", "name": "Ewen Cameron", "role": "HEAD OF PSYCHIATRY · McGILL", "year": "1957" },
+          { "cue": "Sur la liste", "kind": "list", "title": "DANS LE MÉMO DE 1957", "items": ["ARTANE", "ANECTINE", "BULBOCAPNINE", "CURARE", "LSD-25"] },
+          { "cue": "Il ne devait pas savoir", "kind": "record", "tag": "CIA · 26 FÉV. 1957", "who": "MKULTRA, Subproject 68", "text": "Le Dr Cameron… et son équipe resteront dans l'ignorance complète de l'intérêt du gouvernement américain.", "highlight": "dans l'ignorance complète", "note": "Traduction du mémorandum de la CIA" },
+          { "cue": "En 1992", "kind": "statement", "lines": ["CANADA, 1992 :", "100 000 DOLLARS AUX ANCIENS PATIENTS"] }
+        ],
+        "pt": [
+          { "cue": "Ewen Cameron", "kind": "person", "name": "Ewen Cameron", "role": "HEAD OF PSYCHIATRY · McGILL", "year": "1957" },
+          { "cue": "Na lista", "kind": "list", "title": "NO MEMORANDO DE 1957", "items": ["ARTANE", "ANECTINE", "BULBOCAPNINA", "CURARE", "LSD-25"] },
+          { "cue": "Ele não devia saber", "kind": "record", "tag": "CIA · 26 FEV 1957", "who": "MKULTRA, Subproject 68", "text": "O Dr. Cameron… e sua equipe continuarão totalmente sem saber do interesse do governo dos EUA.", "highlight": "totalmente sem saber", "note": "Tradução do memorando da CIA" },
+          { "cue": "Em 1992", "kind": "statement", "lines": ["CANADÁ, 1992:", "100 MIL DÓLARES A EX-PACIENTES"] }
+        ]
+      }
+    },
+    "revelation": {
+      "narrations": {
+        "it": "Ok, ma come è venuto fuori tutto questo? Gennaio 1975. Il Senato crea una commissione speciale, guidata dal senatore Frank Church. La missione: capire se l'intelligence americana aveva fatto qualcosa di illegale, di scorretto o di immorale.",
+        "en": "Okay, but how did all of this come out? January 1975. The Senate sets up a special committee, led by Senator Frank Church. The mission: find out whether American intelligence had done anything illegal, improper or unethical.",
+        "es": "Vale, ¿pero cómo salió todo esto a la luz? Enero de 1975. El Senado crea una comisión especial, dirigida por el senador Frank Church. La misión: averiguar si la inteligencia estadounidense había hecho algo ilegal, indebido o poco ético.",
+        "fr": "D'accord, mais comment tout ça a-t-il été découvert ? Janvier 1975. Le Sénat crée une commission spéciale, dirigée par le sénateur Frank Church. La mission : savoir si le renseignement américain avait fait quelque chose d'illégal, d'inapproprié ou de contraire à l'éthique.",
+        "pt": "Tá, mas como tudo isso veio à tona? Janeiro de 1975. O Senado cria uma comissão especial, liderada pelo senador Frank Church. A missão: descobrir se a inteligência americana tinha feito algo ilegal, impróprio ou antiético."
+      },
+      "beats": {
+        "it": [
+          { "cue": "venuto fuori", "kind": "question", "text": "Come è venuto fuori?" },
+          { "cue": "illegale, di scorretto", "kind": "list", "items": ["ILLEGALE?", "SCORRETTO?", "IMMORALE?"] },
+          { "cue": "Frank Church", "kind": "person", "name": "Frank Church", "role": "SENATOR · CHAIRED THE 1975 COMMITTEE", "year": "1975" }
+        ],
+        "en": [
+          { "cue": "come out?", "kind": "question", "text": "How did it come out?" },
+          { "cue": "illegal, improper or unethical", "kind": "list", "items": ["ILLEGAL?", "IMPROPER?", "UNETHICAL?"] },
+          { "cue": "Frank Church", "kind": "person", "name": "Frank Church", "role": "SENATOR · CHAIRED THE 1975 COMMITTEE", "year": "1975" }
+        ],
+        "es": [
+          { "cue": "salió todo esto a la luz", "kind": "question", "text": "¿Cómo salió a la luz?" },
+          { "cue": "ilegal, indebido o poco ético", "kind": "list", "items": ["¿ILEGAL?", "¿INDEBIDO?", "¿POCO ÉTICO?"] },
+          { "cue": "Frank Church", "kind": "person", "name": "Frank Church", "role": "SENATOR · CHAIRED THE 1975 COMMITTEE", "year": "1975" }
+        ],
+        "fr": [
+          { "cue": "été découvert", "kind": "question", "text": "Comment l'a-t-on su ?" },
+          { "cue": "d'illégal, d'inapproprié", "kind": "list", "items": ["ILLÉGAL ?", "INAPPROPRIÉ ?", "CONTRAIRE À L'ÉTHIQUE ?"] },
+          { "cue": "Frank Church", "kind": "person", "name": "Frank Church", "role": "SENATOR · CHAIRED THE 1975 COMMITTEE", "year": "1975" }
+        ],
+        "pt": [
+          { "cue": "veio à tona", "kind": "question", "text": "Como veio à tona?" },
+          { "cue": "ilegal, impróprio ou antiético", "kind": "list", "items": ["ILEGAL?", "IMPRÓPRIO?", "ANTIÉTICO?"] },
+          { "cue": "Frank Church", "kind": "person", "name": "Frank Church", "role": "SENATOR · CHAIRED THE 1975 COMMITTEE", "year": "1975" }
+        ]
+      }
+    },
+    "scene-l8nb63": {
+      "narrations": {
+        "it": "Poi, nel 1977, un dipendente della CIA trova sette scatole di documenti di MKUltra, in un archivio di vecchie carte. Ad agosto, i senatori interrogano il direttore della CIA. E il senatore Edward Kennedy lo dice chiaro: la CIA aveva drogato cittadini americani. Senza che lo sapessero. Senza il loro consenso.",
+        "en": "Then, in 1977, a CIA employee finds seven boxes of MKUltra records, at a center for retired files. In August, senators question the CIA director. And Senator Edward Kennedy puts it plainly: the CIA had drugged American citizens. Without their knowledge. Without their consent.",
+        "es": "Luego, en 1977, un empleado de la CIA encuentra siete cajas de documentos de MKUltra, en un archivo de papeles viejos. En agosto, los senadores interrogan al director de la CIA. Y el senador Edward Kennedy lo dice claro: la CIA había drogado a ciudadanos estadounidenses. Sin que lo supieran. Sin su consentimiento.",
+        "fr": "Puis, en 1977, un employé de la CIA retrouve sept cartons de documents de MKUltra, dans un centre de vieilles archives. En août, les sénateurs interrogent le directeur de la CIA. Et le sénateur Edward Kennedy le dit clairement : la CIA avait drogué des citoyens américains. À leur insu. Sans leur consentement.",
+        "pt": "Aí, em 1977, um funcionário da CIA encontra sete caixas de documentos do MKUltra, num arquivo de papéis antigos. Em agosto, os senadores interrogam o diretor da CIA. E o senador Edward Kennedy diz com todas as letras: a CIA tinha drogado cidadãos americanos. Sem que eles soubessem. Sem o consentimento deles."
+      },
+      "beats": {
+        "it": [{ "cue": "Edward Kennedy lo dice chiaro", "kind": "record", "tag": "SENATO USA · 3 AGO 1977", "who": "Sen. Edward Kennedy", "text": "La CIA ha drogato cittadini americani senza che lo sapessero e senza il loro consenso.", "highlight": "senza che lo sapessero e senza il loro consenso", "note": "Parafrasi dal verbale dell'audizione" }],
+        "en": [{ "cue": "Edward Kennedy puts it plainly", "kind": "record", "tag": "U.S. SENATE · AUG 3, 1977", "who": "Sen. Edward Kennedy", "text": "The CIA drugged American citizens without their knowledge or consent.", "highlight": "without their knowledge or consent", "note": "Paraphrase of the hearing record" }],
+        "es": [{ "cue": "Edward Kennedy lo dice claro", "kind": "record", "tag": "SENADO DE EE. UU. · 3 AGO 1977", "who": "Sen. Edward Kennedy", "text": "La CIA drogó a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.", "highlight": "sin su conocimiento ni su consentimiento", "note": "Paráfrasis del acta de la audiencia" }],
+        "fr": [{ "cue": "Edward Kennedy le dit clairement", "kind": "record", "tag": "SÉNAT DES ÉTATS-UNIS · 3 AOÛT 1977", "who": "Sén. Edward Kennedy", "text": "La CIA a drogué des citoyens américains à leur insu et sans leur consentement.", "highlight": "à leur insu et sans leur consentement", "note": "Paraphrase du compte rendu de l'audition" }],
+        "pt": [{ "cue": "Edward Kennedy diz com todas as letras", "kind": "record", "tag": "SENADO DOS EUA · 3 AGO 1977", "who": "Sen. Edward Kennedy", "text": "A CIA drogou cidadãos americanos sem o conhecimento nem o consentimento deles.", "highlight": "sem o conhecimento nem o consentimento deles", "note": "Paráfrase do registro da audiência" }]
+      }
+    },
+    "known": {
+      "narrations": {
+        "it": "Ma quelle scatole non sono tutta la storia. Un rapporto del 1963 dell'Ispettore generale della CIA porta, nel 1964, a fermare i test su persone ignare. E nel 1973 i file di MKUltra vengono distrutti, con l'ok del direttore di allora. Kennedy fa il suo nome: Richard Helms. Cosa è rimasto? Soprattutto carte contabili. Anticipi, ricevute, rendiconti. Quindi, cosa sappiamo davvero? Abbastanza per dire che è successo. Non abbastanza per sapere tutto. E il resto, forse, non lo sapremo mai.",
+        "en": "But those boxes aren't the whole story. A 1963 report by the CIA's Inspector General leads, in 1964, to an end of the tests on unwitting people. And in 1973, the MKUltra files are destroyed, with the OK of the director at the time. Kennedy names him: Richard Helms. What survived? Mostly finance paperwork. Advances, receipts, accountings. So what do we really know? Enough to say it happened. Not enough to know everything. And the rest, maybe, we'll never know.",
+        "es": "Pero esas cajas no son toda la historia. Un informe de 1963 del Inspector General de la CIA lleva, en 1964, a parar las pruebas con personas que no sabían nada. Y en 1973, los archivos de MKUltra se destruyen, con el visto bueno del director de entonces. Kennedy dice su nombre: Richard Helms. ¿Qué quedó? Sobre todo papeles de contabilidad. Anticipos, recibos, rendiciones de cuentas. Entonces, ¿qué sabemos de verdad? Lo suficiente para decir que pasó. No lo suficiente para saberlo todo. Y el resto, quizá, no lo sabremos nunca.",
+        "fr": "Mais ces cartons ne racontent pas toute l'histoire. Un rapport de 1963 de l'Inspecteur général de la CIA mène, en 1964, à l'arrêt des tests sur des gens non avertis. Et en 1973, les dossiers de MKUltra sont détruits, avec l'accord du directeur de l'époque. Kennedy cite son nom : Richard Helms. Qu'est-ce qui reste ? Surtout des papiers comptables. Des avances, des reçus, des relevés de dépenses. Alors, qu'est-ce qu'on sait vraiment ? Assez pour dire que c'est arrivé. Pas assez pour tout savoir. Et le reste, on ne le saura peut-être jamais.",
+        "pt": "Mas essas caixas não são a história toda. Um relatório de 1963 do Inspetor-Geral da CIA leva, em 1964, ao fim dos testes em pessoas que não sabiam. E em 1973, os arquivos do MKUltra são destruídos, com o aval do diretor da época. Kennedy diz o nome dele: Richard Helms. O que sobrou? Principalmente papéis de contabilidade. Adiantamentos, recibos, prestações de contas. Então, o que a gente sabe de verdade? O suficiente para dizer que aconteceu. Não o suficiente para saber tudo. E o resto, talvez, a gente nunca vá saber."
+      },
+      "beats": {
+        "it": [
+          { "cue": "fermare i test", "kind": "span", "from": "Rapporto 1963", "to": "1964", "label": "FINE DEI TEST SU IGNARI" },
+          { "cue": "Richard Helms", "kind": "person", "name": "Richard Helms", "role": "CIA DIRECTOR IN 1973", "year": "1973" },
+          { "cue": "Abbastanza per dire", "kind": "statement", "lines": ["ABBASTANZA PER DIRE", "CHE È SUCCESSO."] },
+          { "cue": "Non abbastanza per sapere", "kind": "statement", "lines": ["NON ABBASTANZA", "PER SAPERE TUTTO."] }
+        ],
+        "en": [
+          { "cue": "an end of the tests", "kind": "span", "from": "1963 report", "to": "1964", "label": "END OF UNWITTING TESTING" },
+          { "cue": "Richard Helms", "kind": "person", "name": "Richard Helms", "role": "CIA DIRECTOR IN 1973", "year": "1973" },
+          { "cue": "Enough to say it happened", "kind": "statement", "lines": ["ENOUGH TO SAY", "IT HAPPENED."] },
+          { "cue": "Not enough to know everything", "kind": "statement", "lines": ["NOT ENOUGH TO KNOW", "EVERYTHING."] }
+        ],
+        "es": [
+          { "cue": "parar las pruebas", "kind": "span", "from": "Informe 1963", "to": "1964", "label": "FIN DE LAS PRUEBAS SIN AVISO" },
+          { "cue": "Richard Helms", "kind": "person", "name": "Richard Helms", "role": "CIA DIRECTOR IN 1973", "year": "1973" },
+          { "cue": "Lo suficiente para decir", "kind": "statement", "lines": ["LO SUFICIENTE PARA DECIR", "QUE PASÓ."] },
+          { "cue": "No lo suficiente para saberlo", "kind": "statement", "lines": ["NO LO SUFICIENTE", "PARA SABERLO TODO."] }
+        ],
+        "fr": [
+          { "cue": "l'arrêt des tests", "kind": "span", "from": "Rapport 1963", "to": "1964", "label": "FIN DES TESTS À L'INSU" },
+          { "cue": "Richard Helms", "kind": "person", "name": "Richard Helms", "role": "CIA DIRECTOR IN 1973", "year": "1973" },
+          { "cue": "Assez pour dire", "kind": "statement", "lines": ["ASSEZ POUR DIRE", "QUE C'EST ARRIVÉ."] },
+          { "cue": "Pas assez pour tout savoir", "kind": "statement", "lines": ["PAS ASSEZ", "POUR TOUT SAVOIR."] }
+        ],
+        "pt": [
+          { "cue": "ao fim dos testes", "kind": "span", "from": "Relatório 1963", "to": "1964", "label": "FIM DOS TESTES SEM AVISO" },
+          { "cue": "Richard Helms", "kind": "person", "name": "Richard Helms", "role": "CIA DIRECTOR IN 1973", "year": "1973" },
+          { "cue": "O suficiente para dizer", "kind": "statement", "lines": ["O SUFICIENTE PARA DIZER", "QUE ACONTECEU."] },
+          { "cue": "Não o suficiente para saber", "kind": "statement", "lines": ["NÃO O SUFICIENTE", "PARA SABER TUDO."] }
+        ]
+      }
+    }
+  }
+}

@@ -53,6 +53,32 @@ export const SOURCES: Source[] = [
       'The committee examined whether intelligence agencies had engaged in illegal, improper or unethical activities.',
     ],
   },
+  {
+    id: 'cia-sp68-1957',
+    title: 'Memorandum for the Record — Subject: MKULTRA, Subproject 68',
+    publisher: 'Central Intelligence Agency (CIA Reading Room, document 00234482)',
+    date: 'February 26, 1957',
+    url: 'https://archive.org/details/cia-readingroom-document-00234482',
+    claims: [
+      'Subproject 68 funded a two-year research program, from March 18, 1957, by Dr. Ewen Cameron, Chairman of the Department of Psychiatry at McGill University, Montreal, Canada.',
+      'The program studied “the effects upon human behavior of the repetition of verbal signals”; one aim was to improve the technique of “(hetero)psychic driving”.',
+      'Its aims included “chemical agents which will break down the ongoing patterns of behavior” and methods of inactivating the patient during the period of driving (exposure to repetition).',
+      'The drugs listed include Artane, Anectine, bulbocapnine, curare and LSD-25.',
+      'The money passed through the Society for the Investigation of Human Ecology, Inc., described as a cover organization; the cost was $38,180 over two years.',
+      'The memo states that Dr. Cameron and his staff “will remain completely unwitting of U.S. Government interest”.',
+    ],
+  },
+  {
+    id: 'canada-ami-1992',
+    title: 'Info Source — Régime d’aide aux personnes déstructurées à l’Institut Allan Memorial',
+    publisher: 'Department of Justice Canada',
+    date: 'Accessed October 2026',
+    url: 'https://justice.gc.ca/fra/trans/aiprp-atip/infosource/p5.html',
+    claims: [
+      'Former patients of Dr. Ewen Cameron at the Allan Memorial Institute who had undergone a treatment called “depatterning” (déstructuration) could apply for an ex gratia payment of $100,000.',
+      'The plan was established by Order in Council P.C. 1992-2302 of November 16, 1992, and ended on January 31, 1994.',
+    ],
+  },
 ];
 
 export const sourceById = (id: string): Source | undefined => SOURCES.find((s) => s.id === id);

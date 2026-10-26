@@ -38,18 +38,32 @@
      ]
     },
     {
-     "text": "In 1977, the United States Senate held a hearing about a secret CIA program.",
-     "say": "In 1977, the United States Senate held a hearing about a secret CIA program.",
+     "text": "1977.",
+     "say": "1977.",
      "parts": [
-      "In 1977, the United States Senate held",
-      "a hearing about a secret CIA program."
+      "1977."
      ]
     },
     {
-     "text": "Its files had been destroyed years earlier.",
-     "say": "Its files had been destroyed years earlier.",
+     "text": "The United States Senate opens a hearing on a secret CIA program.",
+     "say": "The United States Senate opens a hearing on a secret CIA program.",
      "parts": [
-      "Its files had been destroyed years earlier."
+      "The United States Senate opens",
+      "a hearing on a secret CIA program."
+     ]
+    },
+    {
+     "text": "The problem?",
+     "say": "The problem?",
+     "parts": [
+      "The problem?"
+     ]
+    },
+    {
+     "text": "The files had been destroyed years earlier.",
+     "say": "The files had been destroyed years earlier.",
+     "parts": [
+      "The files had been destroyed years earlier."
      ]
     },
     {
@@ -67,10 +81,10 @@
      ]
     },
     {
-     "text": "So what was it?",
-     "say": "So what was it?",
+     "text": "What was it, really?",
+     "say": "What was it, really?",
      "parts": [
-      "So what was it?"
+      "What was it, really?"
      ]
     },
     {
@@ -89,62 +103,46 @@
      ]
     },
     {
-     "text": "According to the CIA director's testimony, MKUltra ran from 1953 to 1964.",
-     "say": "According to the CIA director's testimony, M K Ultra ran from 1953 to 1964.",
+     "text": "MKUltra ran from 1953 to 1964.",
+     "say": "M K Ultra ran from 1953 to 1964.",
      "parts": [
-      "According to the CIA director's testimony,",
       "M K Ultra ran from 1953 to 1964."
      ]
     },
     {
-     "text": "That's eleven years.",
-     "say": "That's eleven years.",
+     "text": "Eleven years.",
+     "say": "Eleven years.",
      "parts": [
-      "That's eleven years."
+      "Eleven years."
      ]
     },
     {
-     "text": "The surviving records list 149 subprojects.",
-     "say": "The surviving records list 149 subprojects.",
+     "text": "The records that survived list 149 subprojects, at 80 institutions.",
+     "say": "The records that survived list 149 subprojects, at 80 institutions.",
      "parts": [
-      "The surviving records list 149 subprojects."
+      "The records that survived list",
+      "149 subprojects, at 80 institutions."
      ]
     },
     {
-     "text": "They name 80 institutions, and 44 of them were colleges and universities.",
-     "say": "They name 80 institutions, and 44 of them were colleges and universities.",
+     "text": "More than half were colleges and universities.",
+     "say": "More than half were colleges and universities.",
      "parts": [
-      "They name 80 institutions,",
-      "and 44 of them were colleges and universities."
+      "More than half were colleges and universities."
      ]
     },
     {
-     "text": "They also name 185 researchers and assistants from outside the government.",
-     "say": "They also name 185 researchers and assistants from outside the government.",
+     "text": "So what were they actually doing?",
+     "say": "So what were they actually doing?",
      "parts": [
-      "They also name 185 researchers",
-      "and assistants from outside the government."
+      "So what were they actually doing?"
      ]
     },
     {
-     "text": "So what were all these subprojects actually doing?",
-     "say": "So what were all these subprojects actually doing?",
+     "text": "Drugs and alcohol.",
+     "say": "Drugs and alcohol.",
      "parts": [
-      "So what were all these subprojects actually doing?"
-     ]
-    },
-    {
-     "text": "The director sorted them into categories.",
-     "say": "The director sorted them into categories.",
-     "parts": [
-      "The director sorted them into categories."
-     ]
-    },
-    {
-     "text": "Among them: drugs and alcohol.",
-     "say": "Among them: drugs and alcohol.",
-     "parts": [
-      "Among them: drugs and alcohol."
+      "Drugs and alcohol."
      ]
     },
     {
@@ -155,105 +153,112 @@
      ]
     },
     {
-     "text": "Sleep research.",
-     "say": "Sleep research.",
+     "text": "Sleep experiments.",
+     "say": "Sleep experiments.",
      "parts": [
-      "Sleep research."
+      "Sleep experiments."
      ]
     },
     {
-     "text": "Polygraphs.",
-     "say": "Polygraphs.",
+     "text": "Lie detectors.",
+     "say": "Lie detectors.",
      "parts": [
-      "Polygraphs."
+      "Lie detectors."
      ]
     },
     {
-     "text": "The record also covers drugs meant as aids to interrogation.",
-     "say": "The record also covers drugs meant as aids to interrogation.",
+     "text": "And drugs meant to help interrogations.",
+     "say": "And drugs meant to help interrogations.",
      "parts": [
-      "The record also covers drugs",
-      "meant as aids to interrogation."
+      "And drugs meant to help interrogations."
      ]
     },
     {
-     "text": "LSD was among the drugs tested.",
-     "say": "LSD was among the drugs tested.",
+     "text": "And yes: LSD too.",
+     "say": "And yes: LSD too.",
      "parts": [
-      "LSD was among the drugs tested."
+      "And yes: LSD too."
      ]
     },
     {
-     "text": "And here is the part that matters most.",
-     "say": "And here is the part that matters most.",
+     "text": "Now, here's the part that matters.",
+     "say": "Now, here's the part that matters.",
      "parts": [
-      "And here is the part that matters most."
+      "Now, here's the part that matters."
      ]
     },
     {
-     "text": "Some of the people tested were volunteers.",
-     "say": "Some of the people tested were volunteers.",
+     "text": "Some people were volunteers.",
+     "say": "Some people were volunteers.",
      "parts": [
-      "Some of the people tested were volunteers."
+      "Some people were volunteers."
      ]
     },
     {
-     "text": "Some were never told.",
-     "say": "Some were never told.",
+     "text": "Others never knew a thing.",
+     "say": "Others never knew a thing.",
      "parts": [
-      "Some were never told."
+      "Others never knew a thing."
      ]
     },
     {
-     "text": "The testimony counted six subprojects that tested drugs on unwitting people.",
-     "say": "The testimony counted six subprojects that tested drugs on unwitting people.",
+     "text": "According to the testimony, six subprojects tested drugs on people who had no idea.",
+     "say": "According to the testimony, six subprojects tested drugs on people who had no idea.",
      "parts": [
-      "The testimony counted six subprojects",
-      "that tested drugs on unwitting people."
+      "According to the testimony,",
+      "six subprojects tested drugs on people",
+      "who had no idea."
      ]
     },
     {
-     "text": "Unwitting means they didn't know.",
-     "say": "Unwitting means they didn't know.",
+     "text": "Some of the tests happened in safe houses, in San Francisco and New York.",
+     "say": "Some of the tests happened in safe houses, in San Francisco and New York.",
      "parts": [
-      "Unwitting means they didn't know."
+      "Some of the tests happened in safe houses,",
+      "in San Francisco and New York."
      ]
     },
     {
-     "text": "Some of those tests happened in safe houses in San Francisco and New York City.",
-     "say": "Some of those tests happened in safe houses in San Francisco and New York City.",
+     "text": "No consent.",
+     "say": "No consent.",
      "parts": [
-      "Some of those tests happened in safe houses",
-      "in San Francisco and New York City."
+      "No consent."
      ]
     },
     {
-     "text": "There was no informed consent.",
-     "say": "There was no informed consent.",
+     "text": "What did that mean, in real life?",
+     "say": "What did that mean, in real life?",
      "parts": [
-      "There was no informed consent."
+      "What did that mean, in real life?"
      ]
     },
     {
-     "text": "One case shows what that meant.",
-     "say": "One case shows what that meant.",
+     "text": "Look at Frank Olson.",
+     "say": "Look at Frank Olson.",
      "parts": [
-      "One case shows what that meant."
+      "Look at Frank Olson."
      ]
     },
     {
-     "text": "Dr. Frank Olson was an Army civilian employee.",
-     "say": "Dr. Frank Olson was an Army civilian employee.",
+     "text": "He was a civilian employee of the Army.",
+     "say": "He was a civilian employee of the Army.",
      "parts": [
-      "Dr. Frank Olson was an Army civilian employee."
+      "He was a civilian employee of the Army."
      ]
     },
     {
-     "text": "In 1953, at a meeting called by the CIA, he was given LSD without knowing it.",
-     "say": "In 1953, at a meeting called by the CIA, he was given LSD without knowing it.",
+     "text": "In 1953, at a meeting called by the CIA, he was given LSD.",
+     "say": "In 1953, at a meeting called by the CIA, he was given LSD.",
      "parts": [
       "In 1953, at a meeting called by the CIA,",
-      "he was given LSD without knowing it."
+      "he was given LSD."
+     ]
+    },
+    {
+     "text": "Without being told.",
+     "say": "Without being told.",
+     "parts": [
+      "Without being told."
      ]
     },
     {
@@ -264,124 +269,271 @@
      ]
     },
     {
-     "text": "So how did any of this come out?",
-     "say": "So how did any of this come out?",
+     "text": "And then there's Montreal.",
+     "say": "And then there's Montreal.",
      "parts": [
-      "So how did any of this come out?"
+      "And then there's Montreal."
      ]
     },
     {
-     "text": "In January 1975, the Senate created a special committee, chaired by Senator Frank Church.",
-     "say": "In January 1975, the Senate created a special committee, chaired by Senator Frank Church.",
+     "text": "In 1957, the CIA funds the research of a psychiatrist: Dr. Ewen Cameron, head of psychiatry at McGill.",
+     "say": "In 1957, the CIA funds the research of a psychiatrist: Dr. Ewen Cameron, head of psychiatry at McGill.",
      "parts": [
-      "In January 1975, the Senate",
-      "created a special committee,",
-      "chaired by Senator Frank Church."
+      "In 1957, the CIA funds",
+      "the research of a psychiatrist:",
+      "Dr. Ewen Cameron, head of psychiatry at McGill."
      ]
     },
     {
-     "text": "Its job was to find out whether America's intelligence agencies had done anything illegal, improper or unethical.",
-     "say": "Its job was to find out whether America's intelligence agencies had done anything illegal, improper or unethical.",
+     "text": "The idea?",
+     "say": "The idea?",
      "parts": [
-      "Its job was to find out whether America's",
-      "intelligence agencies had done",
-      "anything illegal, improper or unethical."
+      "The idea?"
      ]
     },
     {
-     "text": "Then, in 1977, a CIA employee found seven boxes of MKUltra records at a retired records center.",
-     "say": "Then, in 1977, a CIA employee found seven boxes of M K Ultra records at a retired records center.",
+     "text": "Make a patient listen to the same message.",
+     "say": "Make a patient listen to the same message.",
      "parts": [
-      "Then, in 1977, a CIA employee found seven boxes",
-      "of M K Ultra records at a retired records center."
+      "Make a patient listen to the same message."
      ]
     },
     {
-     "text": "That August, senators questioned the CIA director at a joint hearing.",
-     "say": "That August, senators questioned the CIA director at a joint hearing.",
+     "text": "Again.",
+     "say": "Again.",
      "parts": [
-      "That August, senators questioned",
-      "the CIA director at a joint hearing."
+      "Again."
      ]
     },
     {
-     "text": "Senator Edward Kennedy said the CIA had drugged American citizens without their knowledge or consent.",
-     "say": "Senator Edward Kennedy said the CIA had drugged American citizens without their knowledge or consent.",
+     "text": "And again.",
+     "say": "And again.",
      "parts": [
-      "Senator Edward Kennedy said the CIA had drugged",
-      "American citizens without their knowledge or consent."
+      "And again."
      ]
     },
     {
-     "text": "But those boxes were never the full story.",
-     "say": "But those boxes were never the full story.",
+     "text": "And see what it does to their behavior.",
+     "say": "And see what it does to their behavior.",
      "parts": [
-      "But those boxes were never the full story."
+      "And see what it does to their behavior."
      ]
     },
     {
-     "text": "A 1963 report by the CIA's Inspector General led to the end of unwitting testing in 1964.",
-     "say": "A 1963 report by the CIA's Inspector General led to the end of unwitting testing in 1964.",
+     "text": "The technical name was “psychic driving”.",
+     "say": "The technical name was “psychic driving”.",
      "parts": [
-      "A 1963 report by the CIA's Inspector General",
-      "led to the end of unwitting testing in 1964."
+      "The technical name was “psychic driving”."
      ]
     },
     {
-     "text": "And in 1973, MKUltra files were destroyed on the authority of the CIA director at the time.",
-     "say": "And in 1973, M K Ultra files were destroyed on the authority of the CIA director at the time.",
+     "text": "The plan also looked for drugs that could break down patterns of behavior.",
+     "say": "The plan also looked for drugs that could break down patterns of behavior.",
      "parts": [
-      "And in 1973, M K Ultra files were destroyed",
-      "on the authority of the CIA director at the time."
+      "The plan also looked for drugs",
+      "that could break down patterns of behavior."
      ]
     },
     {
-     "text": "Senator Kennedy named him: Richard Helms.",
-     "say": "Senator Kennedy named him: Richard Helms.",
+     "text": "On the list: curare.",
+     "say": "On the list: curare.",
      "parts": [
-      "Senator Kennedy named him: Richard Helms."
+      "On the list: curare."
      ]
     },
     {
-     "text": "What survived was mostly finance folders.",
-     "say": "What survived was mostly finance folders.",
+     "text": "LSD.",
+     "say": "LSD.",
      "parts": [
-      "What survived was mostly finance folders."
+      "LSD."
      ]
     },
     {
-     "text": "Advances, vouchers, accountings.",
-     "say": "Advances, vouchers, accountings.",
+     "text": "And ways to keep the patient inert while the message played.",
+     "say": "And ways to keep the patient inert while the message played.",
      "parts": [
-      "Advances, vouchers, accountings."
+      "And ways to keep the patient",
+      "inert while the message played."
      ]
     },
     {
-     "text": "So what do we actually know?",
-     "say": "So what do we actually know?",
+     "text": "The money went through a cover organization.",
+     "say": "The money went through a cover organization.",
      "parts": [
-      "So what do we actually know?"
+      "The money went through a cover organization."
      ]
     },
     {
-     "text": "Enough to show it happened.",
-     "say": "Enough to show it happened.",
+     "text": "And Cameron?",
+     "say": "And Cameron?",
      "parts": [
-      "Enough to show it happened."
+      "And Cameron?"
      ]
     },
     {
-     "text": "Not enough to know everything that happened.",
-     "say": "Not enough to know everything that happened.",
+     "text": "He wasn't supposed to know the U.S. government was behind it.",
+     "say": "He wasn't supposed to know the U.S. government was behind it.",
      "parts": [
-      "Not enough to know everything that happened."
+      "He wasn't supposed to know",
+      "the U.S. government was behind it."
      ]
     },
     {
-     "text": "Much of the full story may never be known.",
-     "say": "Much of the full story may never be known.",
+     "text": "In 1992, Canada offers 100,000 dollars to Cameron's former patients at the Allan Memorial Institute who went through so-called “depatterning”.",
+     "say": "In 1992, Canada offers 100,000 dollars to Cameron's former patients at the Allan Memorial Institute who went through so-called “depatterning”.",
      "parts": [
-      "Much of the full story may never be known."
+      "In 1992, Canada offers 100,000",
+      "dollars to Cameron's former patients",
+      "at the Allan Memorial Institute",
+      "who went through so-called “depatterning”."
+     ]
+    },
+    {
+     "text": "Okay, but how did all of this come out?",
+     "say": "Okay, but how did all of this come out?",
+     "parts": [
+      "Okay, but how did all of this come out?"
+     ]
+    },
+    {
+     "text": "January 1975.",
+     "say": "January 1975.",
+     "parts": [
+      "January 1975."
+     ]
+    },
+    {
+     "text": "The Senate sets up a special committee, led by Senator Frank Church.",
+     "say": "The Senate sets up a special committee, led by Senator Frank Church.",
+     "parts": [
+      "The Senate sets up a special committee,",
+      "led by Senator Frank Church."
+     ]
+    },
+    {
+     "text": "The mission: find out whether American intelligence had done anything illegal, improper or unethical.",
+     "say": "The mission: find out whether American intelligence had done anything illegal, improper or unethical.",
+     "parts": [
+      "The mission: find out whether American intelligence",
+      "had done anything illegal, improper or unethical."
+     ]
+    },
+    {
+     "text": "Then, in 1977, a CIA employee finds seven boxes of MKUltra records, at a center for retired files.",
+     "say": "Then, in 1977, a CIA employee finds seven boxes of M K Ultra records, at a center for retired files.",
+     "parts": [
+      "Then, in 1977, a CIA employee",
+      "finds seven boxes of M K Ultra records,",
+      "at a center for retired files."
+     ]
+    },
+    {
+     "text": "In August, senators question the CIA director.",
+     "say": "In August, senators question the CIA director.",
+     "parts": [
+      "In August, senators question the CIA director."
+     ]
+    },
+    {
+     "text": "And Senator Edward Kennedy puts it plainly: the CIA had drugged American citizens.",
+     "say": "And Senator Edward Kennedy puts it plainly: the CIA had drugged American citizens.",
+     "parts": [
+      "And Senator Edward Kennedy puts it plainly:",
+      "the CIA had drugged American citizens."
+     ]
+    },
+    {
+     "text": "Without their knowledge.",
+     "say": "Without their knowledge.",
+     "parts": [
+      "Without their knowledge."
+     ]
+    },
+    {
+     "text": "Without their consent.",
+     "say": "Without their consent.",
+     "parts": [
+      "Without their consent."
+     ]
+    },
+    {
+     "text": "But those boxes aren't the whole story.",
+     "say": "But those boxes aren't the whole story.",
+     "parts": [
+      "But those boxes aren't the whole story."
+     ]
+    },
+    {
+     "text": "A 1963 report by the CIA's Inspector General leads, in 1964, to an end of the tests on unwitting people.",
+     "say": "A 1963 report by the CIA's Inspector General leads, in 1964, to an end of the tests on unwitting people.",
+     "parts": [
+      "A 1963 report by the CIA's Inspector General leads,",
+      "in 1964, to an end",
+      "of the tests on unwitting people."
+     ]
+    },
+    {
+     "text": "And in 1973, the MKUltra files are destroyed, with the OK of the director at the time.",
+     "say": "And in 1973, the M K Ultra files are destroyed, with the OK of the director at the time.",
+     "parts": [
+      "And in 1973, the M K Ultra files are destroyed,",
+      "with the OK of the director at the time."
+     ]
+    },
+    {
+     "text": "Kennedy names him: Richard Helms.",
+     "say": "Kennedy names him: Richard Helms.",
+     "parts": [
+      "Kennedy names him: Richard Helms."
+     ]
+    },
+    {
+     "text": "What survived?",
+     "say": "What survived?",
+     "parts": [
+      "What survived?"
+     ]
+    },
+    {
+     "text": "Mostly finance paperwork.",
+     "say": "Mostly finance paperwork.",
+     "parts": [
+      "Mostly finance paperwork."
+     ]
+    },
+    {
+     "text": "Advances, receipts, accountings.",
+     "say": "Advances, receipts, accountings.",
+     "parts": [
+      "Advances, receipts, accountings."
+     ]
+    },
+    {
+     "text": "So what do we really know?",
+     "say": "So what do we really know?",
+     "parts": [
+      "So what do we really know?"
+     ]
+    },
+    {
+     "text": "Enough to say it happened.",
+     "say": "Enough to say it happened.",
+     "parts": [
+      "Enough to say it happened."
+     ]
+    },
+    {
+     "text": "Not enough to know everything.",
+     "say": "Not enough to know everything.",
+     "parts": [
+      "Not enough to know everything."
+     ]
+    },
+    {
+     "text": "And the rest, maybe, we'll never know.",
+     "say": "And the rest, maybe, we'll never know.",
+     "parts": [
+      "And the rest, maybe, we'll never know."
      ]
     }
    ]
@@ -424,18 +576,32 @@
      ]
     },
     {
-     "text": "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA.",
-     "say": "Nel 1977, il Senato degli Stati Uniti tenne un'audizione su un programma segreto della CIA.",
+     "text": "1977.",
+     "say": "1977.",
      "parts": [
-      "Nel 1977, il Senato degli Stati Uniti",
-      "tenne un'audizione su un programma segreto della CIA."
+      "1977."
      ]
     },
     {
-     "text": "I suoi documenti erano stati distrutti anni prima.",
-     "say": "I suoi documenti erano stati distrutti anni prima.",
+     "text": "Il Senato degli Stati Uniti apre un'audizione su un programma segreto della CIA.",
+     "say": "Il Senato degli Stati Uniti apre un'audizione su un programma segreto della CIA.",
      "parts": [
-      "I suoi documenti erano stati distrutti anni prima."
+      "Il Senato degli Stati Uniti apre",
+      "un'audizione su un programma segreto della CIA."
+     ]
+    },
+    {
+     "text": "Il problema?",
+     "say": "Il problema?",
+     "parts": [
+      "Il problema?"
+     ]
+    },
+    {
+     "text": "I documenti erano stati distrutti anni prima.",
+     "say": "I documenti erano stati distrutti anni prima.",
+     "parts": [
+      "I documenti erano stati distrutti anni prima."
      ]
     },
     {
@@ -453,10 +619,10 @@
      ]
     },
     {
-     "text": "Quindi, che cos'era?",
-     "say": "Quindi, che cos'era?",
+     "text": "Cos'era davvero?",
+     "say": "Cos'era davvero?",
      "parts": [
-      "Quindi, che cos'era?"
+      "Cos'era davvero?"
      ]
     },
     {
@@ -467,70 +633,54 @@
      ]
     },
     {
-     "text": "Partiamo da ciò che la CIA stessa disse al Senato.",
-     "say": "Partiamo da ciò che la CIA stessa disse al Senato.",
+     "text": "Partiamo da quello che ha detto la CIA stessa, davanti al Senato.",
+     "say": "Partiamo da quello che ha detto la CIA stessa, davanti al Senato.",
      "parts": [
-      "Partiamo da ciò che la CIA stessa disse al Senato."
+      "Partiamo da quello che ha detto",
+      "la CIA stessa, davanti al Senato."
      ]
     },
     {
-     "text": "Secondo la testimonianza del direttore della CIA, MKUltra andò avanti dal 1953 al 1964.",
-     "say": "Secondo la testimonianza del direttore della CIA, emme kappa ultra andò avanti dal 1953 al 1964.",
+     "text": "MKUltra è andato avanti dal 1953 al 1964.",
+     "say": "emme kappa ultra è andato avanti dal 1953 al 1964.",
      "parts": [
-      "Secondo la testimonianza del direttore della CIA,",
-      "emme kappa ultra andò avanti dal 1953 al 1964."
+      "emme kappa ultra è andato avanti dal 1953 al 1964."
      ]
     },
     {
-     "text": "Sono undici anni.",
-     "say": "Sono undici anni.",
+     "text": "Undici anni.",
+     "say": "Undici anni.",
      "parts": [
-      "Sono undici anni."
+      "Undici anni."
      ]
     },
     {
-     "text": "I documenti sopravvissuti elencano 149 sottoprogetti.",
-     "say": "I documenti sopravvissuti elencano 149 sottoprogetti.",
+     "text": "Nei documenti rimasti ci sono 149 sottoprogetti, in 80 istituzioni.",
+     "say": "Nei documenti rimasti ci sono 149 sottoprogetti, in 80 istituzioni.",
      "parts": [
-      "I documenti sopravvissuti elencano 149 sottoprogetti."
+      "Nei documenti rimasti ci sono",
+      "149 sottoprogetti, in 80 istituzioni."
      ]
     },
     {
-     "text": "Citano 80 istituzioni, e 44 di queste erano college e università.",
-     "say": "Citano 80 istituzioni, e 44 di queste erano còllegi e università.",
+     "text": "Più della metà erano università e college.",
+     "say": "Più della metà erano università e còllegi.",
      "parts": [
-      "Citano 80 istituzioni, e 44 di queste",
-      "erano còllegi e università."
+      "Più della metà erano università e còllegi."
      ]
     },
     {
-     "text": "Citano anche 185 ricercatori e assistenti esterni al governo.",
-     "say": "Citano anche 185 ricercatori e assistenti esterni al governo.",
+     "text": "Ma cosa facevano, in pratica?",
+     "say": "Ma cosa facevano, in pratica?",
      "parts": [
-      "Citano anche 185 ricercatori",
-      "e assistenti esterni al governo."
+      "Ma cosa facevano, in pratica?"
      ]
     },
     {
-     "text": "Ma cosa facevano, in concreto, tutti questi sottoprogetti?",
-     "say": "Ma cosa facevano, in concreto, tutti questi sottoprogetti?",
+     "text": "Droghe e alcol.",
+     "say": "Droghe e alcol.",
      "parts": [
-      "Ma cosa facevano,",
-      "in concreto, tutti questi sottoprogetti?"
-     ]
-    },
-    {
-     "text": "Il direttore li divise in categorie.",
-     "say": "Il direttore li divise in categorie.",
-     "parts": [
-      "Il direttore li divise in categorie."
-     ]
-    },
-    {
-     "text": "Tra queste: droghe e alcol.",
-     "say": "Tra queste: droghe e alcol.",
-     "parts": [
-      "Tra queste: droghe e alcol."
+      "Droghe e alcol."
      ]
     },
     {
@@ -541,10 +691,10 @@
      ]
     },
     {
-     "text": "Ricerca sul sonno.",
-     "say": "Ricerca sul sonno.",
+     "text": "Esperimenti sul sonno.",
+     "say": "Esperimenti sul sonno.",
      "parts": [
-      "Ricerca sul sonno."
+      "Esperimenti sul sonno."
      ]
     },
     {
@@ -555,93 +705,97 @@
      ]
     },
     {
-     "text": "Gli atti parlano anche di droghe pensate come aiuto negli interrogatori.",
-     "say": "Gli atti parlano anche di droghe pensate come aiuto negli interrogatori.",
+     "text": "E droghe pensate per aiutare gli interrogatori.",
+     "say": "E droghe pensate per aiutare gli interrogatori.",
      "parts": [
-      "Gli atti parlano anche di droghe",
-      "pensate come aiuto negli interrogatori."
+      "E droghe pensate per aiutare gli interrogatori."
      ]
     },
     {
-     "text": "Tra le droghe testate c'era l'LSD.",
-     "say": "Tra le droghe testate c'era l'LSD.",
+     "text": "E sì: anche l'LSD.",
+     "say": "E sì: anche l'LSD.",
      "parts": [
-      "Tra le droghe testate c'era l'LSD."
+      "E sì: anche l'LSD."
      ]
     },
     {
-     "text": "E qui arriva la parte più importante.",
-     "say": "E qui arriva la parte più importante.",
+     "text": "Ora, la parte che conta.",
+     "say": "Ora, la parte che conta.",
      "parts": [
-      "E qui arriva la parte più importante."
+      "Ora, la parte che conta."
      ]
     },
     {
-     "text": "Alcune delle persone testate erano volontari.",
-     "say": "Alcune delle persone testate erano volontari.",
+     "text": "Alcuni erano volontari.",
+     "say": "Alcuni erano volontari.",
      "parts": [
-      "Alcune delle persone testate erano volontari."
+      "Alcuni erano volontari."
      ]
     },
     {
-     "text": "Ad altre non fu mai detto nulla.",
-     "say": "Ad altre non fu mai detto nulla.",
+     "text": "Altri non hanno mai saputo niente.",
+     "say": "Altri non hanno mai saputo niente.",
      "parts": [
-      "Ad altre non fu mai detto nulla."
+      "Altri non hanno mai saputo niente."
      ]
     },
     {
-     "text": "Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare.",
-     "say": "Secondo la testimonianza, sei sottoprogetti testarono droghe su persone ignare.",
+     "text": "Secondo la testimonianza, sei sottoprogetti hanno testato droghe su persone che non ne sapevano niente.",
+     "say": "Secondo la testimonianza, sei sottoprogetti hanno testato droghe su persone che non ne sapevano niente.",
      "parts": [
-      "Secondo la testimonianza, sei sottoprogetti",
-      "testarono droghe su persone ignare."
+      "Secondo la testimonianza, sei sottoprogetti hanno testato",
+      "droghe su persone che non ne sapevano niente."
      ]
     },
     {
-     "text": "Ignare significa che non lo sapevano.",
-     "say": "Ignare significa che non lo sapevano.",
+     "text": "Alcuni test avvenivano in case sicure, a San Francisco e a New York.",
+     "say": "Alcuni test avvenivano in case sicure, a San Francisco e a Niu Iòrk.",
      "parts": [
-      "Ignare significa che non lo sapevano."
-     ]
-    },
-    {
-     "text": "Alcuni di quei test avvennero in case sicure a San Francisco e a New York.",
-     "say": "Alcuni di quei test avvennero in case sicure a San Francisco e a Niu Iòrk.",
-     "parts": [
-      "Alcuni di quei test avvennero in case sicure",
+      "Alcuni test avvenivano in case sicure,",
       "a San Francisco e a Niu Iòrk."
      ]
     },
     {
-     "text": "Non c'era alcun consenso informato.",
-     "say": "Non c'era alcun consenso informato.",
+     "text": "Nessun consenso.",
+     "say": "Nessun consenso.",
      "parts": [
-      "Non c'era alcun consenso informato."
+      "Nessun consenso."
      ]
     },
     {
-     "text": "Un caso mostra cosa significasse.",
-     "say": "Un caso mostra cosa significasse.",
+     "text": "Cosa voleva dire, in concreto?",
+     "say": "Cosa voleva dire, in concreto?",
      "parts": [
-      "Un caso mostra cosa significasse."
+      "Cosa voleva dire, in concreto?"
      ]
     },
     {
-     "text": "Il dottor Frank Olson era un dipendente civile dell'Esercito.",
-     "say": "Il dottor Frank Olson era un dipendente civile dell'Esercito.",
+     "text": "Guarda Frank Olson.",
+     "say": "Guarda Frank Olson.",
      "parts": [
-      "Il dottor Frank Olson",
-      "era un dipendente civile dell'Esercito."
+      "Guarda Frank Olson."
      ]
     },
     {
-     "text": "Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa.",
-     "say": "Nel 1953, durante una riunione organizzata dalla CIA, gli fu dato dell'LSD a sua insaputa.",
+     "text": "Lavorava come civile per l'Esercito.",
+     "say": "Lavorava come civile per l'Esercito.",
      "parts": [
-      "Nel 1953, durante",
-      "una riunione organizzata dalla CIA,",
-      "gli fu dato dell'LSD a sua insaputa."
+      "Lavorava come civile per l'Esercito."
+     ]
+    },
+    {
+     "text": "Nel 1953, a una riunione organizzata dalla CIA, gli danno dell'LSD.",
+     "say": "Nel 1953, a una riunione organizzata dalla CIA, gli danno dell'LSD.",
+     "parts": [
+      "Nel 1953, a una riunione",
+      "organizzata dalla CIA, gli danno dell'LSD."
+     ]
+    },
+    {
+     "text": "Senza dirglielo.",
+     "say": "Senza dirglielo.",
+     "parts": [
+      "Senza dirglielo."
      ]
     },
     {
@@ -652,103 +806,246 @@
      ]
     },
     {
-     "text": "Quindi, come venne fuori tutto questo?",
-     "say": "Quindi, come venne fuori tutto questo?",
+     "text": "E poi c'è Montréal.",
+     "say": "E poi c'è Montréal.",
      "parts": [
-      "Quindi, come venne fuori tutto questo?"
+      "E poi c'è Montréal."
      ]
     },
     {
-     "text": "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Church.",
-     "say": "Nel gennaio 1975, il Senato creò una commissione speciale, presieduta dal senatore Frank Ciòrci.",
+     "text": "Nel 1957 la CIA finanzia la ricerca di uno psichiatra: il dottor Ewen Cameron, capo di psichiatria alla McGill.",
+     "say": "Nel 1957 la CIA finanzia la ricerca di uno psichiatra: il dottor Iùen Kèmeron, capo di psichiatria alla Mac Ghil.",
      "parts": [
-      "Nel gennaio 1975, il Senato",
-      "creò una commissione speciale,",
-      "presieduta dal senatore Frank Ciòrci."
+      "Nel 1957 la CIA finanzia",
+      "la ricerca di uno psichiatra:",
+      "il dottor Iùen Kèmeron,",
+      "capo di psichiatria alla Mac Ghil."
      ]
     },
     {
-     "text": "Il suo compito era scoprire se le agenzie di intelligence americane avessero fatto qualcosa di illegale, scorretto o immorale.",
-     "say": "Il suo compito era scoprire se le agenzie di intèlligens americane avessero fatto qualcosa di illegale, scorretto o immorale.",
+     "text": "L'idea?",
+     "say": "L'idea?",
      "parts": [
-      "Il suo compito era scoprire",
-      "se le agenzie di intèlligens",
-      "americane avessero fatto qualcosa",
-      "di illegale, scorretto o immorale."
+      "L'idea?"
      ]
     },
     {
-     "text": "Poi, nel 1977, un dipendente della CIA trovò sette scatole di documenti di MKUltra in un archivio di documenti dismessi.",
-     "say": "Poi, nel 1977, un dipendente della CIA trovò sette scatole di documenti di emme kappa ultra in un archivio di documenti dismessi.",
+     "text": "Far ascoltare a un paziente lo stesso messaggio.",
+     "say": "Far ascoltare a un paziente lo stesso messaggio.",
      "parts": [
-      "Poi, nel 1977, un dipendente",
-      "della CIA trovò sette scatole",
-      "di documenti di emme kappa ultra",
-      "in un archivio di documenti dismessi."
+      "Far ascoltare a un paziente lo stesso messaggio."
      ]
     },
     {
-     "text": "Quell'agosto, i senatori interrogarono il direttore della CIA in un'audizione congiunta.",
-     "say": "Quell'agosto, i senatori interrogarono il direttore della CIA in un'audizione congiunta.",
+     "text": "Ancora.",
+     "say": "Ancora.",
      "parts": [
-      "Quell'agosto, i senatori interrogarono il direttore",
-      "della CIA in un'audizione congiunta."
+      "Ancora."
      ]
     },
     {
-     "text": "Il senatore Edward Kennedy disse che la CIA aveva drogato cittadini americani senza che lo sapessero e senza il loro consenso.",
-     "say": "Il senatore Edward Kennedy disse che la CIA aveva drogato cittadini americani senza che lo sapessero e senza il loro consenso.",
+     "text": "E ancora.",
+     "say": "E ancora.",
      "parts": [
-      "Il senatore Edward Kennedy disse",
-      "che la CIA aveva drogato cittadini americani",
-      "senza che lo sapessero e senza il loro consenso."
+      "E ancora."
      ]
     },
     {
-     "text": "Ma quelle scatole non erano mai state tutta la storia.",
-     "say": "Ma quelle scatole non erano mai state tutta la storia.",
+     "text": "E vedere cosa cambia nel suo comportamento.",
+     "say": "E vedere cosa cambia nel suo comportamento.",
      "parts": [
-      "Ma quelle scatole non erano",
-      "mai state tutta la storia."
+      "E vedere cosa cambia nel suo comportamento."
      ]
     },
     {
-     "text": "Un rapporto del 1963 dell'Ispettore generale della CIA portò alla fine dei test su persone ignare nel 1964.",
-     "say": "Un rapporto del 1963 dell'Ispettore generale della CIA portò alla fine dei test su persone ignare nel 1964.",
+     "text": "Il nome tecnico era «psychic driving».",
+     "say": "Il nome tecnico era «sàichic dràiving».",
+     "parts": [
+      "Il nome tecnico era «sàichic dràiving»."
+     ]
+    },
+    {
+     "text": "Il piano cercava anche sostanze capaci di spezzare gli schemi di comportamento.",
+     "say": "Il piano cercava anche sostanze capaci di spezzare gli schemi di comportamento.",
+     "parts": [
+      "Il piano cercava anche sostanze capaci",
+      "di spezzare gli schemi di comportamento."
+     ]
+    },
+    {
+     "text": "Nella lista: curaro.",
+     "say": "Nella lista: curaro.",
+     "parts": [
+      "Nella lista: curaro."
+     ]
+    },
+    {
+     "text": "LSD.",
+     "say": "LSD.",
+     "parts": [
+      "LSD."
+     ]
+    },
+    {
+     "text": "E modi per rendere il paziente inerte, mentre il messaggio andava avanti.",
+     "say": "E modi per rendere il paziente inerte, mentre il messaggio andava avanti.",
+     "parts": [
+      "E modi per rendere il paziente inerte,",
+      "mentre il messaggio andava avanti."
+     ]
+    },
+    {
+     "text": "I soldi passavano da una società di copertura.",
+     "say": "I soldi passavano da una società di copertura.",
+     "parts": [
+      "I soldi passavano da una società di copertura."
+     ]
+    },
+    {
+     "text": "E Cameron?",
+     "say": "E Kèmeron?",
+     "parts": [
+      "E Kèmeron?"
+     ]
+    },
+    {
+     "text": "Non doveva sapere che dietro c'era il governo americano.",
+     "say": "Non doveva sapere che dietro c'era il governo americano.",
+     "parts": [
+      "Non doveva sapere che dietro",
+      "c'era il governo americano."
+     ]
+    },
+    {
+     "text": "Nel 1992, il Canada offre 100.000 dollari agli ex pazienti di Cameron all'Allan Memorial Institute, quelli sottoposti alla cosiddetta «destrutturazione».",
+     "say": "Nel 1992, il Canada offre 100.000 dollari agli ex pazienti di Kèmeron all'Àllan Memòrial Ìnstitiut, quelli sottoposti alla cosiddetta «destrutturazione».",
+     "parts": [
+      "Nel 1992, il Canada offre",
+      "100.000 dollari agli ex pazienti",
+      "di Kèmeron all'Àllan Memòrial Ìnstitiut,",
+      "quelli sottoposti alla cosiddetta «destrutturazione»."
+     ]
+    },
+    {
+     "text": "Ok, ma come è venuto fuori tutto questo?",
+     "say": "Ok, ma come è venuto fuori tutto questo?",
+     "parts": [
+      "Ok, ma come è venuto fuori tutto questo?"
+     ]
+    },
+    {
+     "text": "Gennaio 1975.",
+     "say": "Gennaio 1975.",
+     "parts": [
+      "Gennaio 1975."
+     ]
+    },
+    {
+     "text": "Il Senato crea una commissione speciale, guidata dal senatore Frank Church.",
+     "say": "Il Senato crea una commissione speciale, guidata dal senatore Frank Ciòrci.",
+     "parts": [
+      "Il Senato crea una commissione speciale,",
+      "guidata dal senatore Frank Ciòrci."
+     ]
+    },
+    {
+     "text": "La missione: capire se l'intelligence americana aveva fatto qualcosa di illegale, di scorretto o di immorale.",
+     "say": "La missione: capire se l'intèlligens americana aveva fatto qualcosa di illegale, di scorretto o di immorale.",
+     "parts": [
+      "La missione: capire se l'intèlligens",
+      "americana aveva fatto qualcosa di illegale,",
+      "di scorretto o di immorale."
+     ]
+    },
+    {
+     "text": "Poi, nel 1977, un dipendente della CIA trova sette scatole di documenti di MKUltra, in un archivio di vecchie carte.",
+     "say": "Poi, nel 1977, un dipendente della CIA trova sette scatole di documenti di emme kappa ultra, in un archivio di vecchie carte.",
+     "parts": [
+      "Poi, nel 1977, un dipendente della CIA",
+      "trova sette scatole di documenti di emme kappa ultra,",
+      "in un archivio di vecchie carte."
+     ]
+    },
+    {
+     "text": "Ad agosto, i senatori interrogano il direttore della CIA.",
+     "say": "Ad agosto, i senatori interrogano il direttore della CIA.",
+     "parts": [
+      "Ad agosto, i senatori",
+      "interrogano il direttore della CIA."
+     ]
+    },
+    {
+     "text": "E il senatore Edward Kennedy lo dice chiaro: la CIA aveva drogato cittadini americani.",
+     "say": "E il senatore Edward Kennedy lo dice chiaro: la CIA aveva drogato cittadini americani.",
+     "parts": [
+      "E il senatore Edward Kennedy lo dice chiaro:",
+      "la CIA aveva drogato cittadini americani."
+     ]
+    },
+    {
+     "text": "Senza che lo sapessero.",
+     "say": "Senza che lo sapessero.",
+     "parts": [
+      "Senza che lo sapessero."
+     ]
+    },
+    {
+     "text": "Senza il loro consenso.",
+     "say": "Senza il loro consenso.",
+     "parts": [
+      "Senza il loro consenso."
+     ]
+    },
+    {
+     "text": "Ma quelle scatole non sono tutta la storia.",
+     "say": "Ma quelle scatole non sono tutta la storia.",
+     "parts": [
+      "Ma quelle scatole non sono tutta la storia."
+     ]
+    },
+    {
+     "text": "Un rapporto del 1963 dell'Ispettore generale della CIA porta, nel 1964, a fermare i test su persone ignare.",
+     "say": "Un rapporto del 1963 dell'Ispettore generale della CIA porta, nel 1964, a fermare i test su persone ignare.",
      "parts": [
       "Un rapporto del 1963 dell'Ispettore",
-      "generale della CIA portò",
-      "alla fine dei test su persone ignare nel 1964."
+      "generale della CIA porta,",
+      "nel 1964, a fermare i test su persone ignare."
      ]
     },
     {
-     "text": "E nel 1973, i file di MKUltra furono distrutti su autorizzazione dell'allora direttore della CIA.",
-     "say": "E nel 1973, i file di emme kappa ultra furono distrutti su autorizzazione dell'allora direttore della CIA.",
+     "text": "E nel 1973 i file di MKUltra vengono distrutti, con l'ok del direttore di allora.",
+     "say": "E nel 1973 i file di emme kappa ultra vengono distrutti, con l'ok del direttore di allora.",
      "parts": [
-      "E nel 1973, i file di emme kappa ultra",
-      "furono distrutti su autorizzazione",
-      "dell'allora direttore della CIA."
+      "E nel 1973 i file di emme kappa ultra vengono distrutti,",
+      "con l'ok del direttore di allora."
      ]
     },
     {
-     "text": "Il senatore Kennedy fece il suo nome: Richard Helms.",
-     "say": "Il senatore Kennedy fece il suo nome: Richard Helms.",
+     "text": "Kennedy fa il suo nome: Richard Helms.",
+     "say": "Kennedy fa il suo nome: Richard Helms.",
      "parts": [
-      "Il senatore Kennedy fece il suo nome: Richard Helms."
+      "Kennedy fa il suo nome: Richard Helms."
      ]
     },
     {
-     "text": "Ciò che sopravvisse erano soprattutto fascicoli finanziari.",
-     "say": "Ciò che sopravvisse erano soprattutto fascicoli finanziari.",
+     "text": "Cosa è rimasto?",
+     "say": "Cosa è rimasto?",
      "parts": [
-      "Ciò che sopravvisse erano soprattutto fascicoli finanziari."
+      "Cosa è rimasto?"
      ]
     },
     {
-     "text": "Anticipi, giustificativi, rendiconti.",
-     "say": "Anticipi, giustificativi, rendiconti.",
+     "text": "Soprattutto carte contabili.",
+     "say": "Soprattutto carte contabili.",
      "parts": [
-      "Anticipi, giustificativi, rendiconti."
+      "Soprattutto carte contabili."
+     ]
+    },
+    {
+     "text": "Anticipi, ricevute, rendiconti.",
+     "say": "Anticipi, ricevute, rendiconti.",
+     "parts": [
+      "Anticipi, ricevute, rendiconti."
      ]
     },
     {
@@ -759,25 +1056,24 @@
      ]
     },
     {
-     "text": "Abbastanza per dimostrare che è successo.",
-     "say": "Abbastanza per dimostrare che è successo.",
+     "text": "Abbastanza per dire che è successo.",
+     "say": "Abbastanza per dire che è successo.",
      "parts": [
-      "Abbastanza per dimostrare che è successo."
+      "Abbastanza per dire che è successo."
      ]
     },
     {
-     "text": "Non abbastanza per sapere tutto ciò che è successo.",
-     "say": "Non abbastanza per sapere tutto ciò che è successo.",
+     "text": "Non abbastanza per sapere tutto.",
+     "say": "Non abbastanza per sapere tutto.",
      "parts": [
-      "Non abbastanza per sapere tutto ciò che è successo."
+      "Non abbastanza per sapere tutto."
      ]
     },
     {
-     "text": "Gran parte della storia completa potrebbe non venire mai alla luce.",
-     "say": "Gran parte della storia completa potrebbe non venire mai alla luce.",
+     "text": "E il resto, forse, non lo sapremo mai.",
+     "say": "E il resto, forse, non lo sapremo mai.",
      "parts": [
-      "Gran parte della storia completa",
-      "potrebbe non venire mai alla luce."
+      "E il resto, forse, non lo sapremo mai."
      ]
     }
    ]
@@ -813,18 +1109,32 @@
      ]
     },
     {
-     "text": "En 1977, el Senado de Estados Unidos celebró una audiencia sobre un programa secreto de la CIA.",
-     "say": "En 1977, el Senado de Estados Unidos celebró una audiencia sobre un programa secreto de la CIA.",
+     "text": "1977.",
+     "say": "1977.",
      "parts": [
-      "En 1977, el Senado de Estados Unidos celebró",
-      "una audiencia sobre un programa secreto de la CIA."
+      "1977."
      ]
     },
     {
-     "text": "Sus archivos se habían destruido años antes.",
-     "say": "Sus archivos se habían destruido años antes.",
+     "text": "El Senado de Estados Unidos abre una audiencia sobre un programa secreto de la CIA.",
+     "say": "El Senado de Estados Unidos abre una audiencia sobre un programa secreto de la CIA.",
      "parts": [
-      "Sus archivos se habían destruido años antes."
+      "El Senado de Estados Unidos abre una audiencia",
+      "sobre un programa secreto de la CIA."
+     ]
+    },
+    {
+     "text": "¿El problema?",
+     "say": "¿El problema?",
+     "parts": [
+      "¿El problema?"
+     ]
+    },
+    {
+     "text": "Los documentos habían sido destruidos años antes.",
+     "say": "Los documentos habían sido destruidos años antes.",
+     "parts": [
+      "Los documentos habían sido destruidos años antes."
      ]
     },
     {
@@ -842,10 +1152,10 @@
      ]
     },
     {
-     "text": "Entonces, ¿qué era?",
-     "say": "Entonces, ¿qué era?",
+     "text": "¿Qué era en realidad?",
+     "say": "¿Qué era en realidad?",
      "parts": [
-      "Entonces, ¿qué era?"
+      "¿Qué era en realidad?"
      ]
     },
     {
@@ -856,72 +1166,54 @@
      ]
     },
     {
-     "text": "Empecemos por lo que la propia CIA le contó al Senado.",
-     "say": "Empecemos por lo que la propia CIA le contó al Senado.",
+     "text": "Empecemos por lo que dijo la propia CIA ante el Senado.",
+     "say": "Empecemos por lo que dijo la propia CIA ante el Senado.",
      "parts": [
-      "Empecemos por lo que la propia CIA",
-      "le contó al Senado."
+      "Empecemos por lo que dijo",
+      "la propia CIA ante el Senado."
      ]
     },
     {
-     "text": "Según el testimonio del director de la CIA, MKUltra funcionó de 1953 a 1964.",
-     "say": "Según el testimonio del director de la CIA, eme ka ultra funcionó de 1953 a 1964.",
+     "text": "MKUltra duró de 1953 a 1964.",
+     "say": "eme ka ultra duró de 1953 a 1964.",
      "parts": [
-      "Según el testimonio del director de la CIA,",
-      "eme ka ultra funcionó de 1953 a 1964."
+      "eme ka ultra duró de 1953 a 1964."
      ]
     },
     {
-     "text": "Son once años.",
-     "say": "Son once años.",
+     "text": "Once años.",
+     "say": "Once años.",
      "parts": [
-      "Son once años."
+      "Once años."
      ]
     },
     {
-     "text": "Los registros que sobrevivieron enumeran 149 subproyectos.",
-     "say": "Los registros que sobrevivieron enumeran 149 subproyectos.",
+     "text": "En los documentos que quedaron hay 149 subproyectos, en 80 instituciones.",
+     "say": "En los documentos que quedaron hay 149 subproyectos, en 80 instituciones.",
      "parts": [
-      "Los registros que sobrevivieron enumeran 149 subproyectos."
+      "En los documentos que quedaron",
+      "hay 149 subproyectos, en 80 instituciones."
      ]
     },
     {
-     "text": "Nombran 80 instituciones, y 44 de ellas eran universidades y otros centros de educación superior.",
-     "say": "Nombran 80 instituciones, y 44 de ellas eran universidades y otros centros de educación superior.",
+     "text": "Más de la mitad eran universidades.",
+     "say": "Más de la mitad eran universidades.",
      "parts": [
-      "Nombran 80 instituciones, y 44 de ellas",
-      "eran universidades y otros",
-      "centros de educación superior."
+      "Más de la mitad eran universidades."
      ]
     },
     {
-     "text": "También nombran a 185 investigadores y asistentes ajenos al gobierno.",
-     "say": "También nombran a 185 investigadores y asistentes ajenos al gobierno.",
+     "text": "¿Pero qué hacían, en la práctica?",
+     "say": "¿Pero qué hacían, en la práctica?",
      "parts": [
-      "También nombran a 185 investigadores",
-      "y asistentes ajenos al gobierno."
+      "¿Pero qué hacían, en la práctica?"
      ]
     },
     {
-     "text": "Entonces, ¿qué hacían en realidad todos estos subproyectos?",
-     "say": "Entonces, ¿qué hacían en realidad todos estos subproyectos?",
+     "text": "Drogas y alcohol.",
+     "say": "Drogas y alcohol.",
      "parts": [
-      "Entonces, ¿qué hacían",
-      "en realidad todos estos subproyectos?"
-     ]
-    },
-    {
-     "text": "El director los clasificó en categorías.",
-     "say": "El director los clasificó en categorías.",
-     "parts": [
-      "El director los clasificó en categorías."
-     ]
-    },
-    {
-     "text": "Entre ellas: drogas y alcohol.",
-     "say": "Entre ellas: drogas y alcohol.",
-     "parts": [
-      "Entre ellas: drogas y alcohol."
+      "Drogas y alcohol."
      ]
     },
     {
@@ -932,106 +1224,112 @@
      ]
     },
     {
-     "text": "Investigación del sueño.",
-     "say": "Investigación del sueño.",
+     "text": "Experimentos con el sueño.",
+     "say": "Experimentos con el sueño.",
      "parts": [
-      "Investigación del sueño."
+      "Experimentos con el sueño."
      ]
     },
     {
-     "text": "Polígrafos.",
-     "say": "Polígrafos.",
+     "text": "Detector de mentiras.",
+     "say": "Detector de mentiras.",
      "parts": [
-      "Polígrafos."
+      "Detector de mentiras."
      ]
     },
     {
-     "text": "El registro también incluye drogas pensadas como ayuda en los interrogatorios.",
-     "say": "El registro también incluye drogas pensadas como ayuda en los interrogatorios.",
+     "text": "Y drogas pensadas para ayudar en los interrogatorios.",
+     "say": "Y drogas pensadas para ayudar en los interrogatorios.",
      "parts": [
-      "El registro también incluye drogas",
-      "pensadas como ayuda en los interrogatorios."
+      "Y drogas pensadas",
+      "para ayudar en los interrogatorios."
      ]
     },
     {
-     "text": "El LSD estaba entre las drogas probadas.",
-     "say": "El LSD estaba entre las drogas probadas.",
+     "text": "Y sí: también LSD.",
+     "say": "Y sí: también LSD.",
      "parts": [
-      "El LSD estaba entre las drogas probadas."
+      "Y sí: también LSD."
      ]
     },
     {
-     "text": "Y esta es la parte que más importa.",
-     "say": "Y esta es la parte que más importa.",
+     "text": "Ahora, lo importante.",
+     "say": "Ahora, lo importante.",
      "parts": [
-      "Y esta es la parte que más importa."
+      "Ahora, lo importante."
      ]
     },
     {
-     "text": "Algunas de las personas estudiadas eran voluntarias.",
-     "say": "Algunas de las personas estudiadas eran voluntarias.",
+     "text": "Algunos eran voluntarios.",
+     "say": "Algunos eran voluntarios.",
      "parts": [
-      "Algunas de las personas estudiadas eran voluntarias."
+      "Algunos eran voluntarios."
      ]
     },
     {
-     "text": "A otras nunca se lo dijeron.",
-     "say": "A otras nunca se lo dijeron.",
+     "text": "Otros nunca supieron nada.",
+     "say": "Otros nunca supieron nada.",
      "parts": [
-      "A otras nunca se lo dijeron."
+      "Otros nunca supieron nada."
      ]
     },
     {
-     "text": "Según el testimonio, seis subproyectos probaron drogas en personas desprevenidas.",
-     "say": "Según el testimonio, seis subproyectos probaron drogas en personas desprevenidas.",
+     "text": "Según el testimonio, seis subproyectos probaron drogas en personas que no sabían nada.",
+     "say": "Según el testimonio, seis subproyectos probaron drogas en personas que no sabían nada.",
      "parts": [
-      "Según el testimonio, seis subproyectos",
-      "probaron drogas en personas desprevenidas."
+      "Según el testimonio, seis subproyectos probaron",
+      "drogas en personas que no sabían nada."
      ]
     },
     {
-     "text": "Desprevenidas significa que no lo sabían.",
-     "say": "Desprevenidas significa que no lo sabían.",
+     "text": "Algunas pruebas se hicieron en pisos francos, en San Francisco y Nueva York.",
+     "say": "Algunas pruebas se hicieron en pisos francos, en San Francisco y Nueva York.",
      "parts": [
-      "Desprevenidas significa que no lo sabían."
+      "Algunas pruebas se hicieron en pisos francos,",
+      "en San Francisco y Nueva York."
      ]
     },
     {
-     "text": "Algunas de esas pruebas se hicieron en pisos francos de San Francisco y Nueva York.",
-     "say": "Algunas de esas pruebas se hicieron en pisos francos de San Francisco y Nueva York.",
+     "text": "Sin consentimiento.",
+     "say": "Sin consentimiento.",
      "parts": [
-      "Algunas de esas pruebas se hicieron",
-      "en pisos francos de San Francisco y Nueva York."
+      "Sin consentimiento."
      ]
     },
     {
-     "text": "No hubo consentimiento informado.",
-     "say": "No hubo consentimiento informado.",
+     "text": "¿Qué significaba eso, en concreto?",
+     "say": "¿Qué significaba eso, en concreto?",
      "parts": [
-      "No hubo consentimiento informado."
+      "¿Qué significaba eso, en concreto?"
      ]
     },
     {
-     "text": "Un caso muestra lo que eso significaba.",
-     "say": "Un caso muestra lo que eso significaba.",
+     "text": "Mira a Frank Olson.",
+     "say": "Mira a Frank Olson.",
      "parts": [
-      "Un caso muestra lo que eso significaba."
+      "Mira a Frank Olson."
      ]
     },
     {
-     "text": "El doctor Frank Olson era un empleado civil del Ejército.",
-     "say": "El doctor Frank Olson era un empleado civil del Ejército.",
+     "text": "Era un empleado civil del Ejército.",
+     "say": "Era un empleado civil del Ejército.",
      "parts": [
-      "El doctor Frank Olson era",
-      "un empleado civil del Ejército."
+      "Era un empleado civil del Ejército."
      ]
     },
     {
-     "text": "En 1953, en una reunión convocada por la CIA, le dieron LSD sin que lo supiera.",
-     "say": "En 1953, en una reunión convocada por la CIA, le dieron LSD sin que lo supiera.",
+     "text": "En 1953, en una reunión organizada por la CIA, le dan LSD.",
+     "say": "En 1953, en una reunión organizada por la CIA, le dan LSD.",
      "parts": [
-      "En 1953, en una reunión convocada por la CIA,",
-      "le dieron LSD sin que lo supiera."
+      "En 1953, en una reunión organizada",
+      "por la CIA, le dan LSD."
+     ]
+    },
+    {
+     "text": "Sin decírselo.",
+     "say": "Sin decírselo.",
+     "parts": [
+      "Sin decírselo."
      ]
     },
     {
@@ -1042,131 +1340,275 @@
      ]
     },
     {
-     "text": "Entonces, ¿cómo salió todo esto a la luz?",
-     "say": "Entonces, ¿cómo salió todo esto a la luz?",
+     "text": "Y luego está Montreal.",
+     "say": "Y luego está Montreal.",
      "parts": [
-      "Entonces, ¿cómo salió todo esto a la luz?"
+      "Y luego está Montreal."
      ]
     },
     {
-     "text": "En enero de 1975, el Senado creó un comité especial, presidido por el senador Frank Church.",
-     "say": "En enero de 1975, el Senado creó un comité especial, presidido por el senador Frank Chorch.",
+     "text": "En 1957, la CIA financia la investigación de un psiquiatra: el doctor Ewen Cameron, jefe de psiquiatría en McGill.",
+     "say": "En 1957, la CIA financia la investigación de un psiquiatra: el doctor Iúen Cámeron, jefe de psiquiatría en Mac Guil.",
      "parts": [
-      "En enero de 1975, el Senado creó un comité especial,",
-      "presidido por el senador Frank Chorch."
+      "En 1957, la CIA financia",
+      "la investigación de un psiquiatra:",
+      "el doctor Iúen Cámeron,",
+      "jefe de psiquiatría en Mac Guil."
      ]
     },
     {
-     "text": "Su tarea era averiguar si las agencias de inteligencia de Estados Unidos habían hecho algo ilegal, indebido o poco ético.",
-     "say": "Su tarea era averiguar si las agencias de inteligencia de Estados Unidos habían hecho algo ilegal, indebido o poco ético.",
+     "text": "¿La idea?",
+     "say": "¿La idea?",
      "parts": [
-      "Su tarea era averiguar",
-      "si las agencias de inteligencia",
-      "de Estados Unidos habían hecho algo ilegal,",
+      "¿La idea?"
+     ]
+    },
+    {
+     "text": "Hacer que un paciente escuche el mismo mensaje.",
+     "say": "Hacer que un paciente escuche el mismo mensaje.",
+     "parts": [
+      "Hacer que un paciente escuche el mismo mensaje."
+     ]
+    },
+    {
+     "text": "Otra vez.",
+     "say": "Otra vez.",
+     "parts": [
+      "Otra vez."
+     ]
+    },
+    {
+     "text": "Y otra.",
+     "say": "Y otra.",
+     "parts": [
+      "Y otra."
+     ]
+    },
+    {
+     "text": "Y ver cómo cambia su comportamiento.",
+     "say": "Y ver cómo cambia su comportamiento.",
+     "parts": [
+      "Y ver cómo cambia su comportamiento."
+     ]
+    },
+    {
+     "text": "El nombre técnico era «psychic driving».",
+     "say": "El nombre técnico era «sáiquic dráiving».",
+     "parts": [
+      "El nombre técnico era «sáiquic dráiving»."
+     ]
+    },
+    {
+     "text": "El plan también buscaba sustancias capaces de romper los patrones de comportamiento.",
+     "say": "El plan también buscaba sustancias capaces de romper los patrones de comportamiento.",
+     "parts": [
+      "El plan también buscaba sustancias capaces",
+      "de romper los patrones de comportamiento."
+     ]
+    },
+    {
+     "text": "En la lista: curare.",
+     "say": "En la lista: curare.",
+     "parts": [
+      "En la lista: curare."
+     ]
+    },
+    {
+     "text": "LSD.",
+     "say": "LSD.",
+     "parts": [
+      "LSD."
+     ]
+    },
+    {
+     "text": "Y formas de dejar al paciente inerte mientras sonaba el mensaje.",
+     "say": "Y formas de dejar al paciente inerte mientras sonaba el mensaje.",
+     "parts": [
+      "Y formas de dejar al paciente",
+      "inerte mientras sonaba el mensaje."
+     ]
+    },
+    {
+     "text": "El dinero pasaba por una organización tapadera.",
+     "say": "El dinero pasaba por una organización tapadera.",
+     "parts": [
+      "El dinero pasaba por una organización tapadera."
+     ]
+    },
+    {
+     "text": "¿Y Cameron?",
+     "say": "¿Y Cámeron?",
+     "parts": [
+      "¿Y Cámeron?"
+     ]
+    },
+    {
+     "text": "No debía saber que detrás estaba el gobierno de Estados Unidos.",
+     "say": "No debía saber que detrás estaba el gobierno de Estados Unidos.",
+     "parts": [
+      "No debía saber que detrás",
+      "estaba el gobierno de Estados Unidos."
+     ]
+    },
+    {
+     "text": "En 1992, Canadá ofrece 100.000 dólares a los ex pacientes de Cameron en el Allan Memorial Institute sometidos a la llamada «desestructuración».",
+     "say": "En 1992, Canadá ofrece 100.000 dólares a los ex pacientes de Cámeron en el Álan Memórial Ínstitiut sometidos a la llamada «desestructuración».",
+     "parts": [
+      "En 1992, Canadá ofrece 100.000",
+      "dólares a los ex pacientes",
+      "de Cámeron en el Álan Memórial Ínstitiut",
+      "sometidos a la llamada «desestructuración»."
+     ]
+    },
+    {
+     "text": "Vale, ¿pero cómo salió todo esto a la luz?",
+     "say": "Vale, ¿pero cómo salió todo esto a la luz?",
+     "parts": [
+      "Vale, ¿pero cómo salió todo esto a la luz?"
+     ]
+    },
+    {
+     "text": "Enero de 1975.",
+     "say": "Enero de 1975.",
+     "parts": [
+      "Enero de 1975."
+     ]
+    },
+    {
+     "text": "El Senado crea una comisión especial, dirigida por el senador Frank Church.",
+     "say": "El Senado crea una comisión especial, dirigida por el senador Frank Chorch.",
+     "parts": [
+      "El Senado crea una comisión especial,",
+      "dirigida por el senador Frank Chorch."
+     ]
+    },
+    {
+     "text": "La misión: averiguar si la inteligencia estadounidense había hecho algo ilegal, indebido o poco ético.",
+     "say": "La misión: averiguar si la inteligencia estadounidense había hecho algo ilegal, indebido o poco ético.",
+     "parts": [
+      "La misión: averiguar si la inteligencia",
+      "estadounidense había hecho algo ilegal,",
       "indebido o poco ético."
      ]
     },
     {
-     "text": "Después, en 1977, un empleado de la CIA encontró siete cajas de registros de MKUltra en un centro de archivos inactivos.",
-     "say": "Después, en 1977, un empleado de la CIA encontró siete cajas de registros de eme ka ultra en un centro de archivos inactivos.",
+     "text": "Luego, en 1977, un empleado de la CIA encuentra siete cajas de documentos de MKUltra, en un archivo de papeles viejos.",
+     "say": "Luego, en 1977, un empleado de la CIA encuentra siete cajas de documentos de eme ka ultra, en un archivo de papeles viejos.",
      "parts": [
-      "Después, en 1977, un empleado",
-      "de la CIA encontró siete cajas",
-      "de registros de eme ka ultra",
-      "en un centro de archivos inactivos."
+      "Luego, en 1977, un empleado de la CIA",
+      "encuentra siete cajas de documentos de eme ka ultra,",
+      "en un archivo de papeles viejos."
      ]
     },
     {
-     "text": "Ese agosto, los senadores interrogaron al director de la CIA en una audiencia conjunta.",
-     "say": "Ese agosto, los senadores interrogaron al director de la CIA en una audiencia conjunta.",
+     "text": "En agosto, los senadores interrogan al director de la CIA.",
+     "say": "En agosto, los senadores interrogan al director de la CIA.",
      "parts": [
-      "Ese agosto, los senadores interrogaron al director",
-      "de la CIA en una audiencia conjunta."
+      "En agosto, los senadores interrogan",
+      "al director de la CIA."
      ]
     },
     {
-     "text": "El senador Edward Kennedy dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.",
-     "say": "El senador Edward Kénedi dijo que la CIA había drogado a ciudadanos estadounidenses sin su conocimiento ni su consentimiento.",
+     "text": "Y el senador Edward Kennedy lo dice claro: la CIA había drogado a ciudadanos estadounidenses.",
+     "say": "Y el senador Edward Kénedi lo dice claro: la CIA había drogado a ciudadanos estadounidenses.",
      "parts": [
-      "El senador Edward Kénedi dijo",
-      "que la CIA había drogado",
-      "a ciudadanos estadounidenses sin",
-      "su conocimiento ni su consentimiento."
+      "Y el senador Edward Kénedi lo dice claro:",
+      "la CIA había drogado a ciudadanos estadounidenses."
      ]
     },
     {
-     "text": "Pero esas cajas nunca fueron toda la historia.",
-     "say": "Pero esas cajas nunca fueron toda la historia.",
+     "text": "Sin que lo supieran.",
+     "say": "Sin que lo supieran.",
      "parts": [
-      "Pero esas cajas nunca fueron toda la historia."
+      "Sin que lo supieran."
      ]
     },
     {
-     "text": "Un informe de 1963 del Inspector General de la CIA llevó al fin de las pruebas en personas desprevenidas en 1964.",
-     "say": "Un informe de 1963 del Inspector General de la CIA llevó al fin de las pruebas en personas desprevenidas en 1964.",
+     "text": "Sin su consentimiento.",
+     "say": "Sin su consentimiento.",
      "parts": [
-      "Un informe de 1963 del Inspector General de la CIA",
-      "llevó al fin de las pruebas",
-      "en personas desprevenidas en 1964."
+      "Sin su consentimiento."
      ]
     },
     {
-     "text": "Y en 1973, los archivos de MKUltra fueron destruidos con la autorización del entonces director de la CIA.",
-     "say": "Y en 1973, los archivos de eme ka ultra fueron destruidos con la autorización del entonces director de la CIA.",
+     "text": "Pero esas cajas no son toda la historia.",
+     "say": "Pero esas cajas no son toda la historia.",
      "parts": [
-      "Y en 1973, los archivos de eme ka ultra fueron destruidos",
-      "con la autorización del entonces director de la CIA."
+      "Pero esas cajas no son toda la historia."
      ]
     },
     {
-     "text": "El senador Kennedy dijo su nombre: Richard Helms.",
-     "say": "El senador Kénedi dijo su nombre: Richard Jelms.",
+     "text": "Un informe de 1963 del Inspector General de la CIA lleva, en 1964, a parar las pruebas con personas que no sabían nada.",
+     "say": "Un informe de 1963 del Inspector General de la CIA lleva, en 1964, a parar las pruebas con personas que no sabían nada.",
      "parts": [
-      "El senador Kénedi dijo su nombre: Richard Jelms."
+      "Un informe de 1963 del Inspector General",
+      "de la CIA lleva,",
+      "en 1964, a parar las pruebas",
+      "con personas que no sabían nada."
      ]
     },
     {
-     "text": "Lo que sobrevivió fueron sobre todo carpetas financieras.",
-     "say": "Lo que sobrevivió fueron sobre todo carpetas financieras.",
+     "text": "Y en 1973, los archivos de MKUltra se destruyen, con el visto bueno del director de entonces.",
+     "say": "Y en 1973, los archivos de eme ka ultra se destruyen, con el visto bueno del director de entonces.",
      "parts": [
-      "Lo que sobrevivió fueron",
-      "sobre todo carpetas financieras."
+      "Y en 1973, los archivos de eme ka ultra se destruyen,",
+      "con el visto bueno del director de entonces."
      ]
     },
     {
-     "text": "Anticipos, comprobantes, rendiciones de cuentas.",
-     "say": "Anticipos, comprobantes, rendiciones de cuentas.",
+     "text": "Kennedy dice su nombre: Richard Helms.",
+     "say": "Kénedi dice su nombre: Richard Jelms.",
      "parts": [
-      "Anticipos, comprobantes, rendiciones de cuentas."
+      "Kénedi dice su nombre: Richard Jelms."
      ]
     },
     {
-     "text": "Entonces, ¿qué sabemos realmente?",
-     "say": "Entonces, ¿qué sabemos realmente?",
+     "text": "¿Qué quedó?",
+     "say": "¿Qué quedó?",
      "parts": [
-      "Entonces, ¿qué sabemos realmente?"
+      "¿Qué quedó?"
      ]
     },
     {
-     "text": "Lo suficiente para demostrar que ocurrió.",
-     "say": "Lo suficiente para demostrar que ocurrió.",
+     "text": "Sobre todo papeles de contabilidad.",
+     "say": "Sobre todo papeles de contabilidad.",
      "parts": [
-      "Lo suficiente para demostrar que ocurrió."
+      "Sobre todo papeles de contabilidad."
      ]
     },
     {
-     "text": "No lo suficiente para saber todo lo que ocurrió.",
-     "say": "No lo suficiente para saber todo lo que ocurrió.",
+     "text": "Anticipos, recibos, rendiciones de cuentas.",
+     "say": "Anticipos, recibos, rendiciones de cuentas.",
      "parts": [
-      "No lo suficiente para saber todo lo que ocurrió."
+      "Anticipos, recibos, rendiciones de cuentas."
      ]
     },
     {
-     "text": "Puede que gran parte de la historia completa nunca llegue a conocerse.",
-     "say": "Puede que gran parte de la historia completa nunca llegue a conocerse.",
+     "text": "Entonces, ¿qué sabemos de verdad?",
+     "say": "Entonces, ¿qué sabemos de verdad?",
      "parts": [
-      "Puede que gran parte de la historia",
-      "completa nunca llegue a conocerse."
+      "Entonces, ¿qué sabemos de verdad?"
+     ]
+    },
+    {
+     "text": "Lo suficiente para decir que pasó.",
+     "say": "Lo suficiente para decir que pasó.",
+     "parts": [
+      "Lo suficiente para decir que pasó."
+     ]
+    },
+    {
+     "text": "No lo suficiente para saberlo todo.",
+     "say": "No lo suficiente para saberlo todo.",
+     "parts": [
+      "No lo suficiente para saberlo todo."
+     ]
+    },
+    {
+     "text": "Y el resto, quizá, no lo sabremos nunca.",
+     "say": "Y el resto, quizá, no lo sabremos nunca.",
+     "parts": [
+      "Y el resto, quizá, no lo sabremos nunca."
      ]
     }
    ]
@@ -1196,26 +1638,40 @@
      ]
     },
     {
-     "text": "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la CIA.",
-     "say": "En 1977, le Sénat des États-Unis a tenu une audition sur un programme secret de la cé i a.",
+     "text": "1977.",
+     "say": "1977.",
      "parts": [
-      "En 1977, le Sénat des États-Unis a tenu",
-      "une audition sur un programme secret de la cé i a."
+      "1977."
      ]
     },
     {
-     "text": "Ses archives avaient été détruites des années plus tôt.",
-     "say": "Ses archives avaient été détruites des années plus tôt.",
+     "text": "Le Sénat des États-Unis ouvre une audition sur un programme secret de la CIA.",
+     "say": "Le Sénat des États-Unis ouvre une audition sur un programme secret de la cé i a.",
      "parts": [
-      "Ses archives avaient été détruites",
+      "Le Sénat des États-Unis ouvre une audition",
+      "sur un programme secret de la cé i a."
+     ]
+    },
+    {
+     "text": "Le problème ?",
+     "say": "Le problème ?",
+     "parts": [
+      "Le problème ?"
+     ]
+    },
+    {
+     "text": "Les dossiers avaient été détruits des années plus tôt.",
+     "say": "Les dossiers avaient été détruits des années plus tôt.",
+     "parts": [
+      "Les dossiers avaient été détruits",
       "des années plus tôt."
      ]
     },
     {
-     "text": "Mais pas toutes.",
-     "say": "Mais pas toutes.",
+     "text": "Mais pas tous.",
+     "say": "Mais pas tous.",
      "parts": [
-      "Mais pas toutes."
+      "Mais pas tous."
      ]
     },
     {
@@ -1226,10 +1682,10 @@
      ]
     },
     {
-     "text": "Alors, qu'est-ce que c'était ?",
-     "say": "Alors, qu'est-ce que c'était ?",
+     "text": "C'était quoi, au juste ?",
+     "say": "C'était quoi, au juste ?",
      "parts": [
-      "Alors, qu'est-ce que c'était ?"
+      "C'était quoi, au juste ?"
      ]
     },
     {
@@ -1240,71 +1696,54 @@
      ]
     },
     {
-     "text": "Commençons par ce que la CIA elle-même a dit au Sénat.",
-     "say": "Commençons par ce que la cé i a elle-même a dit au Sénat.",
+     "text": "Partons de ce que la CIA elle-même a dit devant le Sénat.",
+     "say": "Partons de ce que la cé i a elle-même a dit devant le Sénat.",
      "parts": [
-      "Commençons par ce que la cé i a",
-      "elle-même a dit au Sénat."
+      "Partons de ce que la cé i a",
+      "elle-même a dit devant le Sénat."
      ]
     },
     {
-     "text": "Selon le témoignage de son directeur, MKUltra a duré de 1953 à 1964.",
-     "say": "Selon le témoignage de son directeur, èm ka ultra a duré de 1953 à 1964.",
+     "text": "MKUltra a duré de 1953 à 1964.",
+     "say": "èm ka ultra a duré de 1953 à 1964.",
      "parts": [
-      "Selon le témoignage de son directeur,",
       "èm ka ultra a duré de 1953 à 1964."
      ]
     },
     {
-     "text": "Soit onze ans.",
-     "say": "Soit onze ans.",
+     "text": "Onze ans.",
+     "say": "Onze ans.",
      "parts": [
-      "Soit onze ans."
+      "Onze ans."
      ]
     },
     {
-     "text": "Les archives restantes recensent 149 sous-projets.",
-     "say": "Les archives restantes recensent 149 sous-projets.",
+     "text": "Dans les documents qui restent, il y a 149 sous-projets, dans 80 institutions.",
+     "say": "Dans les documents qui restent, il y a 149 sous-projets, dans 80 institutions.",
      "parts": [
-      "Les archives restantes recensent 149 sous-projets."
+      "Dans les documents qui restent,",
+      "il y a 149 sous-projets, dans 80 institutions."
      ]
     },
     {
-     "text": "Elles citent 80 institutions, dont 44 universités et écoles supérieures.",
-     "say": "Elles citent 80 institutions, dont 44 universités et écoles supérieures.",
+     "text": "Plus de la moitié étaient des universités.",
+     "say": "Plus de la moitié étaient des universités.",
      "parts": [
-      "Elles citent 80 institutions,",
-      "dont 44 universités et écoles supérieures."
+      "Plus de la moitié étaient des universités."
      ]
     },
     {
-     "text": "Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.",
-     "say": "Elles citent aussi 185 chercheurs et assistants extérieurs au gouvernement.",
+     "text": "Mais concrètement, ils faisaient quoi ?",
+     "say": "Mais concrètement, ils faisaient quoi ?",
      "parts": [
-      "Elles citent aussi 185 chercheurs",
-      "et assistants extérieurs au gouvernement."
+      "Mais concrètement, ils faisaient quoi ?"
      ]
     },
     {
-     "text": "Alors, que faisaient concrètement tous ces sous-projets ?",
-     "say": "Alors, que faisaient concrètement tous ces sous-projets ?",
+     "text": "Drogues et alcool.",
+     "say": "Drogues et alcool.",
      "parts": [
-      "Alors, que faisaient concrètement",
-      "tous ces sous-projets ?"
-     ]
-    },
-    {
-     "text": "Le directeur les a classés par catégories.",
-     "say": "Le directeur les a classés par catégories.",
-     "parts": [
-      "Le directeur les a classés par catégories."
-     ]
-    },
-    {
-     "text": "Parmi elles : drogues et alcool.",
-     "say": "Parmi elles : drogues et alcool.",
-     "parts": [
-      "Parmi elles : drogues et alcool."
+      "Drogues et alcool."
      ]
     },
     {
@@ -1315,106 +1754,111 @@
      ]
     },
     {
-     "text": "Recherche sur le sommeil.",
-     "say": "Recherche sur le sommeil.",
+     "text": "Expériences sur le sommeil.",
+     "say": "Expériences sur le sommeil.",
      "parts": [
-      "Recherche sur le sommeil."
+      "Expériences sur le sommeil."
      ]
     },
     {
-     "text": "Détecteurs de mensonge.",
-     "say": "Détecteurs de mensonge.",
+     "text": "Détecteur de mensonges.",
+     "say": "Détecteur de mensonges.",
      "parts": [
-      "Détecteurs de mensonge."
+      "Détecteur de mensonges."
      ]
     },
     {
-     "text": "Les archives évoquent aussi des drogues destinées aux interrogatoires.",
-     "say": "Les archives évoquent aussi des drogues destinées aux interrogatoires.",
+     "text": "Et des drogues censées aider les interrogatoires.",
+     "say": "Et des drogues censées aider les interrogatoires.",
      "parts": [
-      "Les archives évoquent aussi",
-      "des drogues destinées aux interrogatoires."
+      "Et des drogues censées aider les interrogatoires."
      ]
     },
     {
-     "text": "Le LSD faisait partie des drogues testées.",
-     "say": "Le LSD faisait partie des drogues testées.",
+     "text": "Et oui : du LSD aussi.",
+     "say": "Et oui : du LSD aussi.",
      "parts": [
-      "Le LSD faisait partie des drogues testées."
+      "Et oui : du LSD aussi."
      ]
     },
     {
-     "text": "Et voici le plus important.",
-     "say": "Et voici le plus important.",
+     "text": "Maintenant, le point important.",
+     "say": "Maintenant, le point important.",
      "parts": [
-      "Et voici le plus important."
+      "Maintenant, le point important."
      ]
     },
     {
-     "text": "Certaines des personnes testées étaient volontaires.",
-     "say": "Certaines des personnes testées étaient volontaires.",
+     "text": "Certains étaient volontaires.",
+     "say": "Certains étaient volontaires.",
      "parts": [
-      "Certaines des personnes testées étaient volontaires."
+      "Certains étaient volontaires."
      ]
     },
     {
-     "text": "D'autres n'ont jamais été prévenues.",
-     "say": "D'autres n'ont jamais été prévenues.",
+     "text": "D'autres n'ont jamais rien su.",
+     "say": "D'autres n'ont jamais rien su.",
      "parts": [
-      "D'autres n'ont jamais été prévenues."
+      "D'autres n'ont jamais rien su."
      ]
     },
     {
-     "text": "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu.",
-     "say": "Selon le témoignage, six sous-projets ont testé des drogues sur des personnes à leur insu.",
+     "text": "D'après le témoignage, six sous-projets ont testé des drogues sur des gens qui n'en savaient rien.",
+     "say": "D'après le témoignage, six sous-projets ont testé des drogues sur des gens qui n'en savaient rien.",
      "parts": [
-      "Selon le témoignage, six sous-projets ont testé",
-      "des drogues sur des personnes à leur insu."
+      "D'après le témoignage, six sous-projets ont testé",
+      "des drogues sur des gens qui n'en savaient rien."
      ]
     },
     {
-     "text": "À leur insu, ça veut dire sans le savoir.",
-     "say": "À leur insu, ça veut dire sans le savoir.",
+     "text": "Certains tests ont eu lieu dans des planques, à San Francisco et à New York.",
+     "say": "Certains tests ont eu lieu dans des planques, à San Francisco et à Niou Yorque.",
      "parts": [
-      "À leur insu, ça veut dire sans le savoir."
+      "Certains tests ont eu lieu dans des planques,",
+      "à San Francisco et à Niou Yorque."
      ]
     },
     {
-     "text": "Certains de ces tests ont eu lieu dans des planques à San Francisco et à New York.",
-     "say": "Certains de ces tests ont eu lieu dans des planques à San Francisco et à Niou Yorque.",
+     "text": "Sans consentement.",
+     "say": "Sans consentement.",
      "parts": [
-      "Certains de ces tests ont eu lieu",
-      "dans des planques à San Francisco et à Niou Yorque."
+      "Sans consentement."
      ]
     },
     {
-     "text": "Il n'y avait aucun consentement éclairé.",
-     "say": "Il n'y avait aucun consentement éclairé.",
+     "text": "Qu'est-ce que ça voulait dire, concrètement ?",
+     "say": "Qu'est-ce que ça voulait dire, concrètement ?",
      "parts": [
-      "Il n'y avait aucun consentement éclairé."
+      "Qu'est-ce que ça voulait dire, concrètement ?"
      ]
     },
     {
-     "text": "Un cas montre ce que cela voulait dire.",
-     "say": "Un cas montre ce que cela voulait dire.",
+     "text": "Prenez Frank Olson.",
+     "say": "Prenez Franque Olsonne.",
      "parts": [
-      "Un cas montre ce que cela voulait dire."
+      "Prenez Franque Olsonne."
      ]
     },
     {
-     "text": "Le docteur Frank Olson était un employé civil de l'armée.",
-     "say": "Le docteur Franque Olsonne était un employé civil de l'armée.",
+     "text": "Il était employé civil de l'Armée.",
+     "say": "Il était employé civil de l'Armée.",
      "parts": [
-      "Le docteur Franque Olsonne était",
-      "un employé civil de l'armée."
+      "Il était employé civil de l'Armée."
      ]
     },
     {
-     "text": "En 1953, lors d'une réunion organisée par la CIA, on lui a fait prendre du LSD à son insu.",
-     "say": "En 1953, lors d'une réunion organisée par la cé i a, on lui a fait prendre du LSD à son insu.",
+     "text": "En 1953, lors d'une réunion organisée par la CIA, on lui donne du LSD.",
+     "say": "En 1953, lors d'une réunion organisée par la cé i a, on lui donne du LSD.",
      "parts": [
       "En 1953, lors d'une réunion organisée par la cé i a,",
-      "on lui a fait prendre du LSD à son insu."
+      "on lui donne du LSD."
+     ]
+    },
+    {
+     "text": "Sans le lui dire.",
+     "say": "Sans le lui dire.",
+     "parts": [
+      "Sans le lui dire."
      ]
     },
     {
@@ -1425,130 +1869,276 @@
      ]
     },
     {
-     "text": "Alors, comment cela a-t-il été découvert ?",
-     "say": "Alors, comment cela a-t-il été découvert ?",
+     "text": "Et puis, il y a Montréal.",
+     "say": "Et puis, il y a Montréal.",
      "parts": [
-      "Alors, comment cela a-t-il été découvert ?"
+      "Et puis, il y a Montréal."
      ]
     },
     {
-     "text": "En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Frank Church.",
-     "say": "En janvier 1975, le Sénat a créé une commission spéciale, présidée par le sénateur Franque Tcheurtch.",
+     "text": "En 1957, la CIA finance les recherches d'un psychiatre : le docteur Ewen Cameron, à la tête de la psychiatrie à McGill.",
+     "say": "En 1957, la cé i a finance les recherches d'un psychiatre : le docteur Iouène Kamerone, à la tête de la psychiatrie à Mac Guil.",
      "parts": [
-      "En janvier 1975, le Sénat",
-      "a créé une commission spéciale,",
-      "présidée par le sénateur Franque Tcheurtch."
+      "En 1957, la cé i a finance",
+      "les recherches d'un psychiatre :",
+      "le docteur Iouène Kamerone,",
+      "à la tête de la psychiatrie à Mac Guil."
      ]
     },
     {
-     "text": "Sa mission : savoir si les services de renseignement américains avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.",
-     "say": "Sa mission : savoir si les services de renseignement américains avaient fait quoi que ce soit d'illégal, d'inapproprié ou de contraire à l'éthique.",
+     "text": "L'idée ?",
+     "say": "L'idée ?",
      "parts": [
-      "Sa mission : savoir si les services de renseignement",
-      "américains avaient fait quoi que ce soit d'illégal,",
+      "L'idée ?"
+     ]
+    },
+    {
+     "text": "Faire écouter à un patient le même message.",
+     "say": "Faire écouter à un patient le même message.",
+     "parts": [
+      "Faire écouter à un patient le même message."
+     ]
+    },
+    {
+     "text": "Encore.",
+     "say": "Encore.",
+     "parts": [
+      "Encore."
+     ]
+    },
+    {
+     "text": "Et encore.",
+     "say": "Et encore.",
+     "parts": [
+      "Et encore."
+     ]
+    },
+    {
+     "text": "Et voir ce que ça change à son comportement.",
+     "say": "Et voir ce que ça change à son comportement.",
+     "parts": [
+      "Et voir ce que ça change à son comportement."
+     ]
+    },
+    {
+     "text": "Le nom technique : le « psychic driving ».",
+     "say": "Le nom technique : le « saïkik draïvingue ».",
+     "parts": [
+      "Le nom technique : le « saïkik draïvingue »."
+     ]
+    },
+    {
+     "text": "Le plan cherchait aussi des substances capables de briser les schémas de comportement.",
+     "say": "Le plan cherchait aussi des substances capables de briser les schémas de comportement.",
+     "parts": [
+      "Le plan cherchait aussi des substances",
+      "capables de briser les schémas de comportement."
+     ]
+    },
+    {
+     "text": "Sur la liste : du curare.",
+     "say": "Sur la liste : du curare.",
+     "parts": [
+      "Sur la liste : du curare."
+     ]
+    },
+    {
+     "text": "Du LSD.",
+     "say": "Du LSD.",
+     "parts": [
+      "Du LSD."
+     ]
+    },
+    {
+     "text": "Et des moyens de rendre le patient inerte pendant que le message tournait.",
+     "say": "Et des moyens de rendre le patient inerte pendant que le message tournait.",
+     "parts": [
+      "Et des moyens de rendre le patient",
+      "inerte pendant que le message tournait."
+     ]
+    },
+    {
+     "text": "L'argent passait par une organisation écran.",
+     "say": "L'argent passait par une organisation écran.",
+     "parts": [
+      "L'argent passait par une organisation écran."
+     ]
+    },
+    {
+     "text": "Et Cameron ?",
+     "say": "Et Kamerone ?",
+     "parts": [
+      "Et Kamerone ?"
+     ]
+    },
+    {
+     "text": "Il ne devait pas savoir que le gouvernement américain était derrière.",
+     "say": "Il ne devait pas savoir que le gouvernement américain était derrière.",
+     "parts": [
+      "Il ne devait pas savoir",
+      "que le gouvernement américain était derrière."
+     ]
+    },
+    {
+     "text": "En 1992, le Canada offre 100 000 dollars aux anciens patients de Cameron à l'Institut Allan Memorial qui avaient subi la « déstructuration ».",
+     "say": "En 1992, le Canada offre 100 000 dollars aux anciens patients de Kamerone à l'Institut Allane Mémorial qui avaient subi la « déstructuration ».",
+     "parts": [
+      "En 1992, le Canada offre",
+      "100 000 dollars aux anciens patients",
+      "de Kamerone à l'Institut Allane Mémorial",
+      "qui avaient subi la « déstructuration »."
+     ]
+    },
+    {
+     "text": "D'accord, mais comment tout ça a-t-il été découvert ?",
+     "say": "D'accord, mais comment tout ça a-t-il été découvert ?",
+     "parts": [
+      "D'accord, mais comment tout",
+      "ça a-t-il été découvert ?"
+     ]
+    },
+    {
+     "text": "Janvier 1975.",
+     "say": "Janvier 1975.",
+     "parts": [
+      "Janvier 1975."
+     ]
+    },
+    {
+     "text": "Le Sénat crée une commission spéciale, dirigée par le sénateur Frank Church.",
+     "say": "Le Sénat crée une commission spéciale, dirigée par le sénateur Franque Tcheurtch.",
+     "parts": [
+      "Le Sénat crée une commission spéciale,",
+      "dirigée par le sénateur Franque Tcheurtch."
+     ]
+    },
+    {
+     "text": "La mission : savoir si le renseignement américain avait fait quelque chose d'illégal, d'inapproprié ou de contraire à l'éthique.",
+     "say": "La mission : savoir si le renseignement américain avait fait quelque chose d'illégal, d'inapproprié ou de contraire à l'éthique.",
+     "parts": [
+      "La mission : savoir si le renseignement",
+      "américain avait fait quelque chose d'illégal,",
       "d'inapproprié ou de contraire à l'éthique."
      ]
     },
     {
-     "text": "En 1977, un employé de la CIA a retrouvé sept cartons d'archives de MKUltra dans un dépôt d'archives inactives.",
-     "say": "En 1977, un employé de la cé i a a retrouvé sept cartons d'archives de èm ka ultra dans un dépôt d'archives inactives.",
+     "text": "Puis, en 1977, un employé de la CIA retrouve sept cartons de documents de MKUltra, dans un centre de vieilles archives.",
+     "say": "Puis, en 1977, un employé de la cé i a retrouve sept cartons de documents de èm ka ultra, dans un centre de vieilles archives.",
      "parts": [
-      "En 1977, un employé de la cé i a a retrouvé",
-      "sept cartons d'archives de èm ka ultra",
-      "dans un dépôt d'archives inactives."
+      "Puis, en 1977, un employé de la cé i a",
+      "retrouve sept cartons de documents de èm ka ultra,",
+      "dans un centre de vieilles archives."
      ]
     },
     {
-     "text": "En août, les sénateurs ont interrogé le directeur de la CIA lors d'une audition conjointe.",
-     "say": "En août, les sénateurs ont interrogé le directeur de la cé i a lors d'une audition conjointe.",
+     "text": "En août, les sénateurs interrogent le directeur de la CIA.",
+     "say": "En août, les sénateurs interrogent le directeur de la cé i a.",
      "parts": [
-      "En août, les sénateurs ont interrogé le directeur",
-      "de la cé i a lors d'une audition conjointe."
+      "En août, les sénateurs interrogent",
+      "le directeur de la cé i a."
      ]
     },
     {
-     "text": "Le sénateur Edward Kennedy a déclaré que la CIA avait drogué des citoyens américains à leur insu et sans leur consentement.",
-     "say": "Le sénateur Èdouard Kénédi a déclaré que la cé i a avait drogué des citoyens américains à leur insu et sans leur consentement.",
+     "text": "Et le sénateur Edward Kennedy le dit clairement : la CIA avait drogué des citoyens américains.",
+     "say": "Et le sénateur Èdouard Kénédi le dit clairement : la cé i a avait drogué des citoyens américains.",
      "parts": [
-      "Le sénateur Èdouard Kénédi a déclaré",
-      "que la cé i a avait drogué",
-      "des citoyens américains à leur insu",
-      "et sans leur consentement."
+      "Et le sénateur Èdouard Kénédi le dit clairement :",
+      "la cé i a avait drogué des citoyens américains."
      ]
     },
     {
-     "text": "Mais ces cartons n'ont jamais été toute l'histoire.",
-     "say": "Mais ces cartons n'ont jamais été toute l'histoire.",
+     "text": "À leur insu.",
+     "say": "À leur insu.",
      "parts": [
-      "Mais ces cartons n'ont jamais été toute l'histoire."
+      "À leur insu."
      ]
     },
     {
-     "text": "Un rapport de 1963 de l'inspecteur général de la CIA a mené à la fin des tests à l'insu des sujets en 1964.",
-     "say": "Un rapport de 1963 de l'inspecteur général de la cé i a a mené à la fin des tests à l'insu des sujets en 1964.",
+     "text": "Sans leur consentement.",
+     "say": "Sans leur consentement.",
      "parts": [
-      "Un rapport de 1963 de l'inspecteur",
-      "général de la cé i a a mené",
-      "à la fin des tests",
-      "à l'insu des sujets en 1964."
+      "Sans leur consentement."
      ]
     },
     {
-     "text": "Et en 1973, les dossiers de MKUltra ont été détruits sur l'autorité du directeur de la CIA de l'époque.",
-     "say": "Et en 1973, les dossiers de èm ka ultra ont été détruits sur l'autorité du directeur de la cé i a de l'époque.",
+     "text": "Mais ces cartons ne racontent pas toute l'histoire.",
+     "say": "Mais ces cartons ne racontent pas toute l'histoire.",
      "parts": [
-      "Et en 1973, les dossiers de èm ka ultra ont été détruits",
-      "sur l'autorité du directeur de la cé i a de l'époque."
+      "Mais ces cartons ne racontent pas toute l'histoire."
      ]
     },
     {
-     "text": "Le sénateur Kennedy l'a nommé : Richard Helms.",
-     "say": "Le sénateur Kénédi l'a nommé : Richard Hèlmz.",
+     "text": "Un rapport de 1963 de l'Inspecteur général de la CIA mène, en 1964, à l'arrêt des tests sur des gens non avertis.",
+     "say": "Un rapport de 1963 de l'Inspecteur général de la cé i a mène, en 1964, à l'arrêt des tests sur des gens non avertis.",
      "parts": [
-      "Le sénateur Kénédi l'a nommé : Richard Hèlmz."
+      "Un rapport de 1963 de l'Inspecteur",
+      "général de la cé i a mène,",
+      "en 1964, à l'arrêt des tests",
+      "sur des gens non avertis."
      ]
     },
     {
-     "text": "Il reste surtout des dossiers financiers.",
-     "say": "Il reste surtout des dossiers financiers.",
+     "text": "Et en 1973, les dossiers de MKUltra sont détruits, avec l'accord du directeur de l'époque.",
+     "say": "Et en 1973, les dossiers de èm ka ultra sont détruits, avec l'accord du directeur de l'époque.",
      "parts": [
-      "Il reste surtout des dossiers financiers."
+      "Et en 1973, les dossiers de èm ka ultra sont détruits,",
+      "avec l'accord du directeur de l'époque."
      ]
     },
     {
-     "text": "Des avances, des pièces justificatives, des comptes.",
-     "say": "Des avances, des pièces justificatives, des comptes.",
+     "text": "Kennedy cite son nom : Richard Helms.",
+     "say": "Kénédi cite son nom : Richard Hèlmz.",
      "parts": [
-      "Des avances, des pièces justificatives, des comptes."
+      "Kénédi cite son nom : Richard Hèlmz."
      ]
     },
     {
-     "text": "Alors, que sait-on vraiment ?",
-     "say": "Alors, que sait-on vraiment ?",
+     "text": "Qu'est-ce qui reste ?",
+     "say": "Qu'est-ce qui reste ?",
      "parts": [
-      "Alors, que sait-on vraiment ?"
+      "Qu'est-ce qui reste ?"
      ]
     },
     {
-     "text": "Assez pour montrer que c'est arrivé.",
-     "say": "Assez pour montrer que c'est arrivé.",
+     "text": "Surtout des papiers comptables.",
+     "say": "Surtout des papiers comptables.",
      "parts": [
-      "Assez pour montrer que c'est arrivé."
+      "Surtout des papiers comptables."
      ]
     },
     {
-     "text": "Pas assez pour savoir tout ce qui est arrivé.",
-     "say": "Pas assez pour savoir tout ce qui est arrivé.",
+     "text": "Des avances, des reçus, des relevés de dépenses.",
+     "say": "Des avances, des reçus, des relevés de dépenses.",
      "parts": [
-      "Pas assez pour savoir tout ce qui est arrivé."
+      "Des avances, des reçus, des relevés de dépenses."
      ]
     },
     {
-     "text": "Une grande partie de l'histoire complète ne sera peut-être jamais connue.",
-     "say": "Une grande partie de l'histoire complète ne sera peut-être jamais connue.",
+     "text": "Alors, qu'est-ce qu'on sait vraiment ?",
+     "say": "Alors, qu'est-ce qu'on sait vraiment ?",
      "parts": [
-      "Une grande partie de l'histoire",
-      "complète ne sera peut-être jamais connue."
+      "Alors, qu'est-ce qu'on sait vraiment ?"
+     ]
+    },
+    {
+     "text": "Assez pour dire que c'est arrivé.",
+     "say": "Assez pour dire que c'est arrivé.",
+     "parts": [
+      "Assez pour dire que c'est arrivé."
+     ]
+    },
+    {
+     "text": "Pas assez pour tout savoir.",
+     "say": "Pas assez pour tout savoir.",
+     "parts": [
+      "Pas assez pour tout savoir."
+     ]
+    },
+    {
+     "text": "Et le reste, on ne le saura peut-être jamais.",
+     "say": "Et le reste, on ne le saura peut-être jamais.",
+     "parts": [
+      "Et le reste, on ne le saura peut-être jamais."
      ]
     }
    ]
@@ -1584,18 +2174,32 @@
      ]
     },
     {
-     "text": "Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da CIA.",
-     "say": "Em 1977, o Senado dos Estados Unidos fez uma audiência sobre um programa secreto da cía.",
+     "text": "1977.",
+     "say": "1977.",
      "parts": [
-      "Em 1977, o Senado dos Estados Unidos fez",
+      "1977."
+     ]
+    },
+    {
+     "text": "O Senado dos Estados Unidos abre uma audiência sobre um programa secreto da CIA.",
+     "say": "O Senado dos Estados Unidos abre uma audiência sobre um programa secreto da cía.",
+     "parts": [
+      "O Senado dos Estados Unidos abre",
       "uma audiência sobre um programa secreto da cía."
      ]
     },
     {
-     "text": "Seus arquivos tinham sido destruídos anos antes.",
-     "say": "Seus arquivos tinham sido destruídos anos antes.",
+     "text": "O problema?",
+     "say": "O problema?",
      "parts": [
-      "Seus arquivos tinham sido destruídos anos antes."
+      "O problema?"
+     ]
+    },
+    {
+     "text": "Os documentos tinham sido destruídos anos antes.",
+     "say": "Os documentos tinham sido destruídos anos antes.",
+     "parts": [
+      "Os documentos tinham sido destruídos anos antes."
      ]
     },
     {
@@ -1613,85 +2217,68 @@
      ]
     },
     {
-     "text": "Então, o que era?",
-     "say": "Então, o que era?",
+     "text": "O que era, de verdade?",
+     "say": "O que era, de verdade?",
      "parts": [
-      "Então, o que era?"
+      "O que era, de verdade?"
      ]
     },
     {
-     "text": "E como a gente sabe?",
-     "say": "E como a gente sabe?",
+     "text": "E como a gente sabe disso?",
+     "say": "E como a gente sabe disso?",
      "parts": [
-      "E como a gente sabe?"
+      "E como a gente sabe disso?"
      ]
     },
     {
-     "text": "Vamos começar pelo que a própria CIA contou ao Senado.",
-     "say": "Vamos começar pelo que a própria cía contou ao Senado.",
+     "text": "Vamos começar pelo que a própria CIA disse ao Senado.",
+     "say": "Vamos começar pelo que a própria cía disse ao Senado.",
      "parts": [
       "Vamos começar pelo que a própria",
-      "cía contou ao Senado."
+      "cía disse ao Senado."
      ]
     },
     {
-     "text": "Segundo o depoimento do diretor da CIA, o MKUltra funcionou de 1953 a 1964.",
-     "say": "Segundo o depoimento do diretor da cía, o eme cá ultra funcionou de 1953 a 1964.",
+     "text": "O MKUltra durou de 1953 a 1964.",
+     "say": "O eme cá ultra durou de 1953 a 1964.",
      "parts": [
-      "Segundo o depoimento do diretor da cía,",
-      "o eme cá ultra funcionou de 1953 a 1964."
+      "O eme cá ultra durou de 1953 a 1964."
      ]
     },
     {
-     "text": "São onze anos.",
-     "say": "São onze anos.",
+     "text": "Onze anos.",
+     "say": "Onze anos.",
      "parts": [
-      "São onze anos."
+      "Onze anos."
      ]
     },
     {
-     "text": "Os registros que sobreviveram listam 149 subprojetos.",
-     "say": "Os registros que sobreviveram listam 149 subprojetos.",
+     "text": "Nos documentos que sobraram, há 149 subprojetos, em 80 instituições.",
+     "say": "Nos documentos que sobraram, há 149 subprojetos, em 80 instituições.",
      "parts": [
-      "Os registros que sobreviveram listam 149 subprojetos."
+      "Nos documentos que sobraram,",
+      "há 149 subprojetos, em 80 instituições."
      ]
     },
     {
-     "text": "Eles citam 80 instituições, e 44 delas eram faculdades e universidades.",
-     "say": "Eles citam 80 instituições, e 44 delas eram faculdades e universidades.",
+     "text": "Mais da metade eram universidades.",
+     "say": "Mais da metade eram universidades.",
      "parts": [
-      "Eles citam 80 instituições,",
-      "e 44 delas eram faculdades e universidades."
+      "Mais da metade eram universidades."
      ]
     },
     {
-     "text": "Também citam 185 pesquisadores e assistentes de fora do governo.",
-     "say": "Também citam 185 pesquisadores e assistentes de fora do governo.",
+     "text": "Mas o que eles faziam, na prática?",
+     "say": "Mas o que eles faziam, na prática?",
      "parts": [
-      "Também citam 185 pesquisadores",
-      "e assistentes de fora do governo."
+      "Mas o que eles faziam, na prática?"
      ]
     },
     {
-     "text": "Então, o que todos esses subprojetos faziam de verdade?",
-     "say": "Então, o que todos esses subprojetos faziam de verdade?",
+     "text": "Drogas e álcool.",
+     "say": "Drogas e álcool.",
      "parts": [
-      "Então, o que todos",
-      "esses subprojetos faziam de verdade?"
-     ]
-    },
-    {
-     "text": "O diretor os dividiu em categorias.",
-     "say": "O diretor os dividiu em categorias.",
-     "parts": [
-      "O diretor os dividiu em categorias."
-     ]
-    },
-    {
-     "text": "Entre elas: drogas e álcool.",
-     "say": "Entre elas: drogas e álcool.",
-     "parts": [
-      "Entre elas: drogas e álcool."
+      "Drogas e álcool."
      ]
     },
     {
@@ -1702,210 +2289,358 @@
      ]
     },
     {
-     "text": "Pesquisa sobre o sono.",
-     "say": "Pesquisa sobre o sono.",
+     "text": "Experimentos com o sono.",
+     "say": "Experimentos com o sono.",
      "parts": [
-      "Pesquisa sobre o sono."
+      "Experimentos com o sono."
      ]
     },
     {
-     "text": "Polígrafos.",
-     "say": "Polígrafos.",
+     "text": "Detector de mentiras.",
+     "say": "Detector de mentiras.",
      "parts": [
-      "Polígrafos."
+      "Detector de mentiras."
      ]
     },
     {
-     "text": "O registro também fala de drogas pensadas para ajudar em interrogatórios.",
-     "say": "O registro também fala de drogas pensadas para ajudar em interrogatórios.",
+     "text": "E drogas pensadas para ajudar em interrogatórios.",
+     "say": "E drogas pensadas para ajudar em interrogatórios.",
      "parts": [
-      "O registro também fala de drogas",
-      "pensadas para ajudar em interrogatórios."
+      "E drogas pensadas para ajudar em interrogatórios."
      ]
     },
     {
-     "text": "O LSD estava entre as drogas testadas.",
-     "say": "O LSD estava entre as drogas testadas.",
+     "text": "E sim: LSD também.",
+     "say": "E sim: LSD também.",
      "parts": [
-      "O LSD estava entre as drogas testadas."
+      "E sim: LSD também."
      ]
     },
     {
-     "text": "E aqui está a parte que mais importa.",
-     "say": "E aqui está a parte que mais importa.",
+     "text": "Agora, a parte que importa.",
+     "say": "Agora, a parte que importa.",
      "parts": [
-      "E aqui está a parte que mais importa."
+      "Agora, a parte que importa."
      ]
     },
     {
-     "text": "Algumas das pessoas testadas eram voluntárias.",
-     "say": "Algumas das pessoas testadas eram voluntárias.",
+     "text": "Alguns eram voluntários.",
+     "say": "Alguns eram voluntários.",
      "parts": [
-      "Algumas das pessoas testadas eram voluntárias."
+      "Alguns eram voluntários."
      ]
     },
     {
-     "text": "Outras nunca foram avisadas.",
-     "say": "Outras nunca foram avisadas.",
+     "text": "Outros nunca souberam de nada.",
+     "say": "Outros nunca souberam de nada.",
      "parts": [
-      "Outras nunca foram avisadas."
+      "Outros nunca souberam de nada."
      ]
     },
     {
-     "text": "Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas.",
-     "say": "Segundo o depoimento, seis subprojetos testaram drogas em pessoas desavisadas.",
+     "text": "Segundo o depoimento, seis subprojetos testaram drogas em pessoas que não sabiam de nada.",
+     "say": "Segundo o depoimento, seis subprojetos testaram drogas em pessoas que não sabiam de nada.",
      "parts": [
-      "Segundo o depoimento, seis subprojetos",
-      "testaram drogas em pessoas desavisadas."
+      "Segundo o depoimento, seis subprojetos testaram drogas",
+      "em pessoas que não sabiam de nada."
      ]
     },
     {
-     "text": "Desavisadas quer dizer que elas não sabiam.",
-     "say": "Desavisadas quer dizer que elas não sabiam.",
+     "text": "Alguns testes aconteceram em casas seguras, em San Francisco e Nova York.",
+     "say": "Alguns testes aconteceram em casas seguras, em San Francisco e Nova York.",
      "parts": [
-      "Desavisadas quer dizer que elas não sabiam."
+      "Alguns testes aconteceram em casas seguras,",
+      "em San Francisco e Nova York."
      ]
     },
     {
-     "text": "Alguns desses testes aconteceram em casas seguras em São Francisco e Nova York.",
-     "say": "Alguns desses testes aconteceram em casas seguras em São Francisco e Nova York.",
+     "text": "Sem consentimento.",
+     "say": "Sem consentimento.",
      "parts": [
-      "Alguns desses testes aconteceram em casas seguras",
-      "em São Francisco e Nova York."
+      "Sem consentimento."
      ]
     },
     {
-     "text": "Não houve consentimento informado.",
-     "say": "Não houve consentimento informado.",
+     "text": "O que isso queria dizer, na prática?",
+     "say": "O que isso queria dizer, na prática?",
      "parts": [
-      "Não houve consentimento informado."
+      "O que isso queria dizer, na prática?"
      ]
     },
     {
-     "text": "Um caso mostra o que isso significava.",
-     "say": "Um caso mostra o que isso significava.",
+     "text": "Olha o Frank Olson.",
+     "say": "Olha o Frank Olson.",
      "parts": [
-      "Um caso mostra o que isso significava."
+      "Olha o Frank Olson."
      ]
     },
     {
-     "text": "O doutor Frank Olson era um funcionário civil do Exército.",
-     "say": "O doutor Frank Olson era um funcionário civil do Exército.",
+     "text": "Ele era funcionário civil do Exército.",
+     "say": "Ele era funcionário civil do Exército.",
      "parts": [
-      "O doutor Frank Olson era",
-      "um funcionário civil do Exército."
+      "Ele era funcionário civil do Exército."
      ]
     },
     {
-     "text": "Em 1953, numa reunião convocada pela CIA, ele recebeu LSD sem saber.",
-     "say": "Em 1953, numa reunião convocada pela cía, ele recebeu LSD sem saber.",
+     "text": "Em 1953, numa reunião organizada pela CIA, deram LSD para ele.",
+     "say": "Em 1953, numa reunião organizada pela cía, deram LSD para ele.",
      "parts": [
-      "Em 1953, numa reunião convocada pela cía,",
-      "ele recebeu LSD sem saber."
+      "Em 1953, numa reunião organizada pela cía,",
+      "deram LSD para ele."
      ]
     },
     {
-     "text": "Cerca de uma semana depois, estava morto.",
-     "say": "Cerca de uma semana depois, estava morto.",
+     "text": "Sem avisar.",
+     "say": "Sem avisar.",
      "parts": [
-      "Cerca de uma semana depois, estava morto."
+      "Sem avisar."
      ]
     },
     {
-     "text": "Então, como tudo isso veio à tona?",
-     "say": "Então, como tudo isso veio à tona?",
+     "text": "Cerca de uma semana depois, ele estava morto.",
+     "say": "Cerca de uma semana depois, ele estava morto.",
      "parts": [
-      "Então, como tudo isso veio à tona?"
+      "Cerca de uma semana depois, ele estava morto."
      ]
     },
     {
-     "text": "Em janeiro de 1975, o Senado criou um comitê especial, presidido pelo senador Frank Church.",
-     "say": "Em janeiro de 1975, o Senado criou um comitê especial, presidido pelo senador Frank Tchârtch.",
+     "text": "E aí tem Montreal.",
+     "say": "E aí tem Montreal.",
      "parts": [
-      "Em janeiro de 1975,",
-      "o Senado criou um comitê especial,",
-      "presidido pelo senador Frank Tchârtch."
+      "E aí tem Montreal."
      ]
     },
     {
-     "text": "A missão dele era descobrir se as agências de inteligência dos Estados Unidos tinham feito algo ilegal, impróprio ou antiético.",
-     "say": "A missão dele era descobrir se as agências de inteligência dos Estados Unidos tinham feito algo ilegal, impróprio ou antiético.",
+     "text": "Em 1957, a CIA financia a pesquisa de um psiquiatra: o doutor Ewen Cameron, chefe de psiquiatria na McGill.",
+     "say": "Em 1957, a cía financia a pesquisa de um psiquiatra: o doutor Iúen Kâmeron, chefe de psiquiatria na Méc Guil.",
      "parts": [
-      "A missão dele era descobrir",
-      "se as agências de inteligência",
-      "dos Estados Unidos tinham feito",
-      "algo ilegal, impróprio ou antiético."
+      "Em 1957, a cía financia a pesquisa de um psiquiatra:",
+      "o doutor Iúen Kâmeron,",
+      "chefe de psiquiatria na Méc Guil."
      ]
     },
     {
-     "text": "Depois, em 1977, um funcionário da CIA encontrou sete caixas de registros do MKUltra num centro de arquivos inativos.",
-     "say": "Depois, em 1977, um funcionário da cía encontrou sete caixas de registros do eme cá ultra num centro de arquivos inativos.",
+     "text": "A ideia?",
+     "say": "A ideia?",
      "parts": [
-      "Depois, em 1977, um funcionário",
-      "da cía encontrou sete caixas",
-      "de registros do eme cá ultra",
-      "num centro de arquivos inativos."
+      "A ideia?"
      ]
     },
     {
-     "text": "Naquele agosto, os senadores interrogaram o diretor da CIA numa audiência conjunta.",
-     "say": "Naquele agosto, os senadores interrogaram o diretor da cía numa audiência conjunta.",
+     "text": "Fazer um paciente ouvir a mesma mensagem.",
+     "say": "Fazer um paciente ouvir a mesma mensagem.",
      "parts": [
-      "Naquele agosto, os senadores interrogaram",
-      "o diretor da cía numa audiência conjunta."
+      "Fazer um paciente ouvir a mesma mensagem."
      ]
     },
     {
-     "text": "O senador Edward Kennedy disse que a CIA tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.",
-     "say": "O senador Edward Kénedi disse que a cía tinha drogado cidadãos americanos sem o conhecimento nem o consentimento deles.",
+     "text": "De novo.",
+     "say": "De novo.",
      "parts": [
-      "O senador Edward Kénedi disse que a cía tinha",
-      "drogado cidadãos americanos sem",
-      "o conhecimento nem o consentimento deles."
+      "De novo."
      ]
     },
     {
-     "text": "Mas essas caixas nunca foram a história toda.",
-     "say": "Mas essas caixas nunca foram a história toda.",
+     "text": "E de novo.",
+     "say": "E de novo.",
      "parts": [
-      "Mas essas caixas nunca foram a história toda."
+      "E de novo."
      ]
     },
     {
-     "text": "Um relatório de 1963 do Inspetor-Geral da CIA levou ao fim dos testes em pessoas desavisadas em 1964.",
-     "say": "Um relatório de 1963 do Inspetor-Geral da cía levou ao fim dos testes em pessoas desavisadas em 1964.",
+     "text": "E ver o que muda no comportamento dele.",
+     "say": "E ver o que muda no comportamento dele.",
      "parts": [
-      "Um relatório de 1963 do Inspetor-Geral da cía levou",
-      "ao fim dos testes em pessoas desavisadas em 1964."
+      "E ver o que muda no comportamento dele."
      ]
     },
     {
-     "text": "E em 1973, arquivos do MKUltra foram destruídos com a autorização do então diretor da CIA.",
-     "say": "E em 1973, arquivos do eme cá ultra foram destruídos com a autorização do então diretor da cía.",
+     "text": "O nome técnico era “psychic driving”.",
+     "say": "O nome técnico era “sáiquic dráivin”.",
      "parts": [
-      "E em 1973, arquivos do eme cá ultra foram destruídos",
-      "com a autorização do então diretor da cía."
+      "O nome técnico era “sáiquic dráivin”."
      ]
     },
     {
-     "text": "O senador Kennedy disse o nome dele: Richard Helms.",
-     "say": "O senador Kénedi disse o nome dele: Richard Rélms.",
+     "text": "O plano também buscava substâncias capazes de quebrar os padrões de comportamento.",
+     "say": "O plano também buscava substâncias capazes de quebrar os padrões de comportamento.",
      "parts": [
-      "O senador Kénedi disse o nome dele: Richard Rélms."
+      "O plano também buscava substâncias capazes",
+      "de quebrar os padrões de comportamento."
      ]
     },
     {
-     "text": "O que sobreviveu foram, principalmente, pastas financeiras.",
-     "say": "O que sobreviveu foram, principalmente, pastas financeiras.",
+     "text": "Na lista: curare.",
+     "say": "Na lista: curare.",
      "parts": [
-      "O que sobreviveu foram, principalmente, pastas financeiras."
+      "Na lista: curare."
      ]
     },
     {
-     "text": "Adiantamentos, comprovantes, prestações de contas.",
-     "say": "Adiantamentos, comprovantes, prestações de contas.",
+     "text": "LSD.",
+     "say": "LSD.",
      "parts": [
-      "Adiantamentos, comprovantes, prestações de contas."
+      "LSD."
+     ]
+    },
+    {
+     "text": "E jeitos de deixar o paciente inerte enquanto a mensagem tocava.",
+     "say": "E jeitos de deixar o paciente inerte enquanto a mensagem tocava.",
+     "parts": [
+      "E jeitos de deixar o paciente",
+      "inerte enquanto a mensagem tocava."
+     ]
+    },
+    {
+     "text": "O dinheiro passava por uma organização de fachada.",
+     "say": "O dinheiro passava por uma organização de fachada.",
+     "parts": [
+      "O dinheiro passava por uma organização de fachada."
+     ]
+    },
+    {
+     "text": "E o Cameron?",
+     "say": "E o Kâmeron?",
+     "parts": [
+      "E o Kâmeron?"
+     ]
+    },
+    {
+     "text": "Ele não devia saber que o governo americano estava por trás.",
+     "say": "Ele não devia saber que o governo americano estava por trás.",
+     "parts": [
+      "Ele não devia saber",
+      "que o governo americano estava por trás."
+     ]
+    },
+    {
+     "text": "Em 1992, o Canadá oferece 100 mil dólares aos ex-pacientes de Cameron no Allan Memorial Institute que passaram pela chamada “desestruturação”.",
+     "say": "Em 1992, o Canadá oferece 100 mil dólares aos ex-pacientes de Kâmeron no Álan Memórial Ínstitiut que passaram pela chamada “desestruturação”.",
+     "parts": [
+      "Em 1992, o Canadá oferece",
+      "100 mil dólares aos ex-pacientes",
+      "de Kâmeron no Álan Memórial Ínstitiut",
+      "que passaram pela chamada “desestruturação”."
+     ]
+    },
+    {
+     "text": "Tá, mas como tudo isso veio à tona?",
+     "say": "Tá, mas como tudo isso veio à tona?",
+     "parts": [
+      "Tá, mas como tudo isso veio à tona?"
+     ]
+    },
+    {
+     "text": "Janeiro de 1975.",
+     "say": "Janeiro de 1975.",
+     "parts": [
+      "Janeiro de 1975."
+     ]
+    },
+    {
+     "text": "O Senado cria uma comissão especial, liderada pelo senador Frank Church.",
+     "say": "O Senado cria uma comissão especial, liderada pelo senador Frank Tchârtch.",
+     "parts": [
+      "O Senado cria uma comissão especial,",
+      "liderada pelo senador Frank Tchârtch."
+     ]
+    },
+    {
+     "text": "A missão: descobrir se a inteligência americana tinha feito algo ilegal, impróprio ou antiético.",
+     "say": "A missão: descobrir se a inteligência americana tinha feito algo ilegal, impróprio ou antiético.",
+     "parts": [
+      "A missão: descobrir se a inteligência americana",
+      "tinha feito algo ilegal, impróprio ou antiético."
+     ]
+    },
+    {
+     "text": "Aí, em 1977, um funcionário da CIA encontra sete caixas de documentos do MKUltra, num arquivo de papéis antigos.",
+     "say": "Aí, em 1977, um funcionário da cía encontra sete caixas de documentos do eme cá ultra, num arquivo de papéis antigos.",
+     "parts": [
+      "Aí, em 1977, um funcionário da cía",
+      "encontra sete caixas de documentos do eme cá ultra,",
+      "num arquivo de papéis antigos."
+     ]
+    },
+    {
+     "text": "Em agosto, os senadores interrogam o diretor da CIA.",
+     "say": "Em agosto, os senadores interrogam o diretor da cía.",
+     "parts": [
+      "Em agosto, os senadores interrogam o diretor da cía."
+     ]
+    },
+    {
+     "text": "E o senador Edward Kennedy diz com todas as letras: a CIA tinha drogado cidadãos americanos.",
+     "say": "E o senador Edward Kénedi diz com todas as letras: a cía tinha drogado cidadãos americanos.",
+     "parts": [
+      "E o senador Edward Kénedi diz com todas as letras:",
+      "a cía tinha drogado cidadãos americanos."
+     ]
+    },
+    {
+     "text": "Sem que eles soubessem.",
+     "say": "Sem que eles soubessem.",
+     "parts": [
+      "Sem que eles soubessem."
+     ]
+    },
+    {
+     "text": "Sem o consentimento deles.",
+     "say": "Sem o consentimento deles.",
+     "parts": [
+      "Sem o consentimento deles."
+     ]
+    },
+    {
+     "text": "Mas essas caixas não são a história toda.",
+     "say": "Mas essas caixas não são a história toda.",
+     "parts": [
+      "Mas essas caixas não são a história toda."
+     ]
+    },
+    {
+     "text": "Um relatório de 1963 do Inspetor-Geral da CIA leva, em 1964, ao fim dos testes em pessoas que não sabiam.",
+     "say": "Um relatório de 1963 do Inspetor-Geral da cía leva, em 1964, ao fim dos testes em pessoas que não sabiam.",
+     "parts": [
+      "Um relatório de 1963 do Inspetor-Geral da cía leva,",
+      "em 1964, ao fim dos testes",
+      "em pessoas que não sabiam."
+     ]
+    },
+    {
+     "text": "E em 1973, os arquivos do MKUltra são destruídos, com o aval do diretor da época.",
+     "say": "E em 1973, os arquivos do eme cá ultra são destruídos, com o aval do diretor da época.",
+     "parts": [
+      "E em 1973, os arquivos do eme cá ultra são destruídos,",
+      "com o aval do diretor da época."
+     ]
+    },
+    {
+     "text": "Kennedy diz o nome dele: Richard Helms.",
+     "say": "Kénedi diz o nome dele: Richard Rélms.",
+     "parts": [
+      "Kénedi diz o nome dele: Richard Rélms."
+     ]
+    },
+    {
+     "text": "O que sobrou?",
+     "say": "O que sobrou?",
+     "parts": [
+      "O que sobrou?"
+     ]
+    },
+    {
+     "text": "Principalmente papéis de contabilidade.",
+     "say": "Principalmente papéis de contabilidade.",
+     "parts": [
+      "Principalmente papéis de contabilidade."
+     ]
+    },
+    {
+     "text": "Adiantamentos, recibos, prestações de contas.",
+     "say": "Adiantamentos, recibos, prestações de contas.",
+     "parts": [
+      "Adiantamentos, recibos, prestações de contas."
      ]
     },
     {
@@ -1916,25 +2651,24 @@
      ]
     },
     {
-     "text": "O suficiente para mostrar que aconteceu.",
-     "say": "O suficiente para mostrar que aconteceu.",
+     "text": "O suficiente para dizer que aconteceu.",
+     "say": "O suficiente para dizer que aconteceu.",
      "parts": [
-      "O suficiente para mostrar que aconteceu."
+      "O suficiente para dizer que aconteceu."
      ]
     },
     {
-     "text": "Não o suficiente para saber tudo o que aconteceu.",
-     "say": "Não o suficiente para saber tudo o que aconteceu.",
+     "text": "Não o suficiente para saber tudo.",
+     "say": "Não o suficiente para saber tudo.",
      "parts": [
-      "Não o suficiente para saber tudo o que aconteceu."
+      "Não o suficiente para saber tudo."
      ]
     },
     {
-     "text": "Boa parte da história completa talvez nunca seja conhecida.",
-     "say": "Boa parte da história completa talvez nunca seja conhecida.",
+     "text": "E o resto, talvez, a gente nunca vá saber.",
+     "say": "E o resto, talvez, a gente nunca vá saber.",
      "parts": [
-      "Boa parte da história",
-      "completa talvez nunca seja conhecida."
+      "E o resto, talvez, a gente nunca vá saber."
      ]
     }
    ]

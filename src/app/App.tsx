@@ -257,6 +257,10 @@ export function App() {
         note(msg);
       };
       if (!remote) {
+        // Push only an episode the repository really lacks: a failed read (file being written, an image not there
+        // yet) returned null too and pushed the built-in template over the edited episode twice (2026-10-26).
+        const known = (await syncStatus().catch(() => null))?.episodes ?? null;
+        if (!alive || startedFromTemplate || !known || local.id in known) return;
         await pushEpisode(local);
         markSynced(local);
       } else {

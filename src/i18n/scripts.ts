@@ -120,6 +120,11 @@ const italian: LocalizedScript = {
   },
   say: [
     ['MKUltra', 'emme kappa ultra'],
+    ['psychic driving', 'sàichic dràiving'],
+    ['Ewen', 'Iùen'],
+    ['Cameron', 'Kèmeron'],
+    ['McGill', 'Mac Ghil'],
+    ['Allan Memorial Institute', 'Àllan Memòrial Ìnstitiut'],
     // (Whisper heard "colleghe", "Chork" and "intelligenza": soft endings spelled out)
     ['Church', 'Ciòrci'],
     ['New York', 'Niu Iòrk'],
@@ -209,6 +214,11 @@ const spanish: LocalizedScript = {
   },
   say: [
     ['MKUltra', 'eme ka ultra'],
+    ['psychic driving', 'sáiquic dráiving'],
+    ['Ewen', 'Iúen'],
+    ['Cameron', 'Cámeron'],
+    ['McGill', 'Mac Guil'],
+    ['Allan Memorial Institute', 'Álan Memórial Ínstitiut'],
     ['Church', 'Chorch'],
     ['Helms', 'Jelms'],
     ['Kennedy', 'Kénedi'],
@@ -296,6 +306,11 @@ const french: LocalizedScript = {
   },
   say: [
     ['MKUltra', 'èm ka ultra'],
+    ['psychic driving', 'saïkik draïvingue'],
+    ['Ewen', 'Iouène'],
+    ['Cameron', 'Kamerone'],
+    ['McGill', 'Mac Guil'],
+    ['Allan Memorial', 'Allane Mémorial'],
     ['Frank', 'Franque'],
     ['Olson', 'Olsonne'],
     ['Edward', 'Èdouard'],
@@ -388,6 +403,11 @@ const portuguese: LocalizedScript = {
   },
   say: [
     ['MKUltra', 'eme cá ultra'],
+    ['psychic driving', 'sáiquic dráivin'],
+    ['Ewen', 'Iúen'],
+    ['Cameron', 'Kâmeron'],
+    ['McGill', 'Méc Guil'],
+    ['Allan Memorial Institute', 'Álan Memórial Ínstitiut'],
     ['Church', 'Tchârtch'],
     ['Helms', 'Rélms'],
     ['Kennedy', 'Kénedi'],

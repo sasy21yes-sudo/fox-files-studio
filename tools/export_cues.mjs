@@ -1,8 +1,7 @@
 // Writes voice/cues.json: every narration sentence of every language, split
 // exactly as the app splits them (with the subtitle parts of long sentences), plus the voice catalogue. tools/render_voice.py reads it.
 //   node tools/export_cues.mjs [out.json] [project.json]
-// With a saved project JSON (Export → "Cue list for the voice tool") the
-// edited narration of that project's language is used instead of the script.
+// With a project JSON (episodes/<id>.foxproj.json) its scenes and their narrations in every language are used.
 import { build } from 'esbuild';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,11 +19,12 @@ export function collect(project) {
   const langs = {};
   for (const [lang, script] of Object.entries(SCRIPTS)) {
     const texts = [...splitSentences(script.hook.text)];
-    const edited = project && (project.settings?.language ?? 'en') === lang ? project.scenes : null;
-    for (const [id, scene] of Object.entries(script.scenes)) {
-      const narration = edited?.find((s) => s.id === id)?.narration ?? scene.narration;
-      texts.push(...splitSentences(narration));
-    }
+    // With a project: every scene of the episode (its own scenes too), in each language its narrations give.
+    const current = project?.settings?.language ?? 'en';
+    const scenes = project
+      ? project.scenes.map((s) => s.narrations?.[lang] || (lang === current ? s.narration : script.scenes[s.id]?.narration) || '')
+      : Object.values(script.scenes).map((s) => s.narration);
+    for (const narration of scenes) texts.push(...splitSentences(narration));
     const uniq = [...new Set(texts)];
     langs[lang] = { voices: STUDIO_VOICES[lang], sentences: uniq.map((text) => ({ text, say: spokenText(text, lang), parts: splitSentence(text).map((p) => spokenText(p, lang)) })) };
   }
