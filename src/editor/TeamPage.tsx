@@ -44,8 +44,13 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
   const [offline, setOffline] = useState(false);
   const [filter, setFilter] = useState<string>('all');
   const [text, setText] = useState('');
-  const [to, setTo] = useState('all');
   const [replyTo, setReplyTo] = useState<TeamMessage | null>(null);
+  /** Private chats: the agent answers at once (Claude Code, Sonnet, low effort); deep lets it read the files. */
+  const [live, setLive] = useState(true);
+  const [deep, setDeep] = useState(false);
+  const [typing, setTyping] = useState<Record<string, boolean>>({});
+  const [askError, setAskError] = useState<string | null>(null);
+  const dm = filter !== 'all';
   const last = useRef(0);
   const list = useRef<HTMLDivElement>(null);
   const stick = useRef(true);
@@ -88,8 +93,9 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
     };
   }, []);
 
+  // Everyone: the whole team chat. An agent: the private chat between Salvatore and that agent only.
   const shown = useMemo(
-    () => (filter === 'all' ? messages : messages.filter((m) => m.from === filter || m.to === filter)),
+    () => (filter === 'all' ? messages : messages.filter((m) => (m.from === 'salvatore' && m.to === filter) || (m.from === filter && m.to === 'salvatore'))),
     [messages, filter],
   );
   const byId = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages]);
@@ -106,15 +112,27 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
 
   const send = async () => {
     if (!text.trim()) return;
+    const agent = filter;
     const r = await fetch('/api/team/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim(), to, reply: replyTo?.id }),
+      body: JSON.stringify({ text: text.trim(), to: dm ? agent : 'all', reply: replyTo?.id }),
     });
-    if (r.ok) {
-      setText('');
-      setReplyTo(null);
-      stick.current = true;
+    if (!r.ok) return;
+    const { message } = (await r.json()) as { message: TeamMessage };
+    setText('');
+    setReplyTo(null);
+    stick.current = true;
+    if (!dm || !live) return;
+    setAskError(null);
+    setTyping((t) => ({ ...t, [agent]: true }));
+    try {
+      const a = await fetch('/api/team/ask', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agent, id: message.id, deep }) });
+      if (!a.ok) setAskError((await a.json().catch(() => ({ error: `HTTP ${a.status}` }))).error);
+    } catch (e) {
+      setAskError(String(e));
+    } finally {
+      setTyping((t) => ({ ...t, [agent]: false }));
     }
   };
 
@@ -124,20 +142,22 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
         <button className={`team-person ${filter === 'all' ? 'on' : ''}`} onClick={() => setFilter('all')}>
           <span className="team-avatar" style={{ background: '#3d3228' }}>★</span>
           <span>
-            <strong>Review team</strong>
+            <strong>Everyone</strong>
             <small>
-              {messages.length} messages · {open.length} open findings
+              team chat · {messages.length} messages · {open.length} open findings
             </small>
           </span>
         </button>
-        {Object.entries(ROSTER).map(([id, p]) => (
-          <button key={id} className={`team-person ${filter === id ? 'on' : ''}`} onClick={() => setFilter(id)} title={p.role}>
+        {Object.entries(ROSTER)
+          .filter(([id]) => id !== 'salvatore')
+          .map(([id, p]) => (
+          <button key={id} className={`team-person ${filter === id ? 'on' : ''}`} onClick={() => setFilter(id)} title={`Private chat with ${p.name} (${p.role})`}>
             <span className="team-avatar" style={{ background: p.color }}>
               {p.name[0]}
             </span>
             <span>
               <strong>{p.name}</strong>
-              <small>{p.role}</small>
+              <small>{typing[id] ? 'is writing…' : p.role}</small>
             </span>
             {counts[id] ? <span className="team-count">{counts[id]}</span> : null}
           </button>
@@ -146,7 +166,8 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
 
       <section className="team-chat" aria-label="Chat">
         <header className="team-head">
-          <strong>{filter === 'all' ? 'Review team' : person(filter).name}</strong>
+          <strong>{filter === 'all' ? 'Everyone' : `${person(filter).name} · private chat`}</strong>
+          {dm && typing[filter] && <span className="team-typing">{person(filter).name} is writing…</span>}
           {onChannelPreview && (
             <button className="btn small ghost team-yt" onClick={onChannelPreview} title="The channel page with its banner and icon">
               YouTube preview
@@ -226,22 +247,27 @@ export function TeamPage({ onSeek, onChannelPreview }: Props) {
               </button>
             </div>
           )}
+          {dm && (
+            <div className="row gap small team-dm-opts">
+              <label className="chk" title="The agent answers now (Claude Code, Sonnet, low effort: a few thousand tokens)">
+                <input type="checkbox" checked={live} onChange={(e) => setLive(e.target.checked)} /> Live answer
+              </label>
+              <label className="chk" title="It may open the project's files to answer (Read, Grep, Glob): more tokens">
+                <input type="checkbox" checked={deep} disabled={!live} onChange={(e) => setDeep(e.target.checked)} /> May read the files
+              </label>
+              {askError && <span className="warn-text">{askError}</span>}
+            </div>
+          )}
           <div className="row gap">
-            <select className="iselect" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To">
-              <option value="all">To everyone</option>
-              {Object.entries(ROSTER)
-                .filter(([id]) => id !== 'salvatore')
-                .map(([id, p]) => (
-                  <option key={id} value={id}>
-                    To {p.name}
-                  </option>
-                ))}
-            </select>
             <textarea
               className="itext"
               rows={2}
               value={text}
-              placeholder="Write to the team… (Enter sends, Shift+Enter new line). The producer reads it at the next round."
+              placeholder={
+                dm
+                  ? `Write to ${person(filter).name}… (Enter sends)${live ? ' - it answers here' : ' - it reads it at the next review'}`
+                  : 'Write to everyone… (Enter sends, Shift+Enter new line). The team reads it at the next round.'
+              }
               onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {

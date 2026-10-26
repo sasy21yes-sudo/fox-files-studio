@@ -28,6 +28,7 @@ import { Inspector, withBeats } from '../editor/Inspector';
 import { MediaPage } from '../editor/MediaPage';
 import { TeamPage } from '../editor/TeamPage';
 import { ChannelPage, type ChannelTab } from '../editor/ChannelPage';
+import { ToolsPage } from '../editor/ToolsPage';
 import { Splitters, usePanelSizes } from '../editor/Splitters';
 import { ShortPanel } from '../editor/ShortPanel';
 import { ShortStrip } from '../editor/ShortStrip';
@@ -691,6 +692,8 @@ export function App() {
           }}
         />
       )}
+
+      {page === 'tools' && <ToolsPage project={project} />}
 
       {page === 'channel' && <ChannelPage key={channelTab} project={project} timing={timing} initialTab={channelTab} />}
 

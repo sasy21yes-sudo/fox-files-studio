@@ -27,6 +27,8 @@ interface ChannelInfo {
   /** The thumbnail chosen in the Thumbnails tab: layout and the episode second of its frame. */
   thumbLayout?: ThumbLayout;
   thumbAt?: number;
+  /** Sponsors: set ready after a /yt-audit pass; stats typed by Salvatore from YouTube Studio (never estimated). */
+  collaborations?: { ready: boolean; stats?: { subscribers?: string; avgViews?: string } };
 }
 const DEFAULT: ChannelInfo = {
   name: 'The Fox Files',
@@ -378,6 +380,21 @@ function Brand({ info, lang, onChange }: { info: ChannelInfo; lang: Lang; onChan
           Description
           <textarea className="itext" rows={4} value={info.description[lang] ?? ''} onChange={(e) => setLang('description', e.target.value)} />
         </label>
+        <h3>Collaborations</h3>
+        <label className="chk small" title="The yt-sponsors skill only looks for sponsors when this is on">
+          <input type="checkbox" checked={!!info.collaborations?.ready} onChange={(e) => set({ collaborations: { ...info.collaborations, ready: e.target.checked } })} /> Ready for sponsors
+        </label>
+        {(['subscribers', 'avgViews'] as const).map((k) => (
+          <label key={k} className="tune-row ch-row">
+            <span>{k === 'subscribers' ? 'Subscribers' : 'Average views'}</span>
+            <input
+              className="itext"
+              value={info.collaborations?.stats?.[k] ?? ''}
+              placeholder="from YouTube Studio"
+              onChange={(e) => set({ collaborations: { ready: !!info.collaborations?.ready, stats: { ...info.collaborations?.stats, [k]: e.target.value } } })}
+            />
+          </label>
+        ))}
         <label className="ch-row-col small">
           Keywords
           <input className="itext" value={info.keywords} onChange={(e) => set({ keywords: e.target.value })} />

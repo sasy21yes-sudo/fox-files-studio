@@ -22,7 +22,7 @@ export function teamChat(): Plugin {
     configureServer(server) {
       const root = server.config.root;
       const review = path.join(root, 'qa-out', 'review');
-      server.middlewares.use('/api/team', (req, res) => {
+      server.middlewares.use('/api/team', (req, res, next) => {
         const url = new URL(req.url ?? '/', 'http://x');
         const json = (status: number, body: unknown) => {
           res.statusCode = status;
@@ -73,7 +73,7 @@ export function teamChat(): Plugin {
           res.setHeader('Content-Type', /\.png$/i.test(p) ? 'image/png' : /\.webp$/i.test(p) ? 'image/webp' : 'image/jpeg');
           return fs.createReadStream(p).pipe(res);
         }
-        json(404, { error: 'not found' });
+        next(); // (other /api/team routes: teamAsk.ts)
       });
     },
   };

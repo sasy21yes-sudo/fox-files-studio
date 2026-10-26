@@ -47,6 +47,8 @@ export function postChat(msg, file = CHAT_FILE) {
   const all = readChat(file);
   const text = String(msg.text ?? '').replace(/\s+/g, ' ').trim();
   if (!text) throw new Error('empty message');
+  // (a private answer from the Team page may run longer: up to 1200 characters)
+  const cap = Math.min(1200, Number(msg.max) || MAX_TEXT);
   const m = {
     id: (all.at(-1)?.id ?? 0) + 1,
     ts: new Date().toISOString(),
@@ -57,11 +59,11 @@ export function postChat(msg, file = CHAT_FILE) {
     ...(Number.isFinite(Number(msg.at)) && msg.at !== undefined && msg.at !== '' ? { at: Number(msg.at) } : {}),
     ...(msg.img ? { img: String(msg.img).replace(/\\/g, '/') } : {}),
     ...(msg.reply ? { reply: Number(msg.reply) } : {}),
-    text: text.length > MAX_TEXT ? `${text.slice(0, MAX_TEXT - 1)}…` : text,
+    text: text.length > cap ? `${text.slice(0, cap - 1)}…` : text,
   };
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.appendFileSync(file, `${JSON.stringify(m)}\n`);
-  return { message: m, truncated: text.length > MAX_TEXT };
+  return { message: m, truncated: text.length > cap };
 }
 
 /** One compact line per message: what an agent reads (a few tokens each). */

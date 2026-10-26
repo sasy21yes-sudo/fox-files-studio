@@ -745,7 +745,7 @@ interface Backend {
 }
 
 /** The newest Claude Code binary on this computer: CLAUDE_CODE_BIN, PATH, the native installer, then editor extensions. */
-function findClaudeCode(env: Record<string, string>): string | null {
+export function findClaudeCode(env: Record<string, string>): string | null {
   const exe = process.platform === 'win32' ? 'claude.exe' : 'claude';
   const given = env.CLAUDE_CODE_BIN || process.env.CLAUDE_CODE_BIN;
   if (given) return fs.existsSync(given) ? given : null;
@@ -775,7 +775,7 @@ function findClaudeCode(env: Record<string, string>): string | null {
 }
 
 /** Variables that tie a process to a running Claude Code session; the studio's call must be its own session. */
-const SESSION_VARS = /^(CLAUDECODE|CLAUDE_PID|CLAUDE_EFFORT|CLAUDE_AGENT_SDK_VERSION|CLAUDE_CODE_(ENTRYPOINT|SESSION_ID|CHILD_SESSION|MESSAGING_SOCKET|MESSAGING_TOKEN|SESSION_ATTENDED|EXECPATH|EMIT_STARTUP_TIMING|ENABLE_SDK_FILE_CHECKPOINTING))$/;
+export const SESSION_VARS = /^(CLAUDECODE|CLAUDE_PID|CLAUDE_EFFORT|CLAUDE_AGENT_SDK_VERSION|CLAUDE_CODE_(ENTRYPOINT|SESSION_ID|CHILD_SESSION|MESSAGING_SOCKET|MESSAGING_TOKEN|SESSION_ATTENDED|EXECPATH|EMIT_STARTUP_TIMING|ENABLE_SDK_FILE_CHECKPOINTING))$/;
 
 function claudeCodeBackend(bin: string, model: string, webAllowed: boolean): Backend {
   // Runs outside the project so no CLAUDE.md, settings or MCP servers are picked up.
