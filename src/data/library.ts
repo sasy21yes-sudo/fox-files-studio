@@ -95,12 +95,20 @@ export function loadProject(id: string): Project | null {
 }
 
 /** The episode to open at startup: the last one used, else MKUltra. */
+/** True when the page started from the built-in template because the library had no episode to open: that
+ *  project must never be pushed over the repository's copy (it replaced the edited 8-scene episode, 2026-10-26). */
+export let startedFromTemplate = false;
+
 export function loadInitialProject(): Project {
   const s = storage();
-  if (!s) return createMkultraProject();
+  const fallback = () => {
+    startedFromTemplate = true;
+    return createMkultraProject();
+  };
+  if (!s) return fallback();
   const idx = migrateLegacy(s, readIndex(s));
   const id = idx.current ?? idx.projects[0]?.id;
-  return (id && loadProject(id)) || createMkultraProject();
+  return (id && loadProject(id)) || fallback();
 }
 
 /** Save (and make current); returns what was saved (stamped with the time). Throws when storage is full or unavailable. */

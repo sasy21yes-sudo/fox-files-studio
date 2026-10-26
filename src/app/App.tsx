@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Project, ProjectSettings, Scene, SubtitleStyle } from '../types';
 import { switchLanguage } from '../data/project';
-import { loadInitialProject, loadProject, saveProject, stashProject, storage } from '../data/library';
+import { loadInitialProject, loadProject, saveProject, startedFromTemplate, stashProject, storage } from '../data/library';
 import { recorderStatus, startRecorder, type RecorderStatus } from '../audio/voiceRecorder';
 import { episodeHash, markSynced, onEpisodesChanged, pullEpisode, pushEpisode, syncAvailable, syncedHash, syncStatus, type SyncStatus } from '../data/episodeSync';
 import { projectHook } from '../data/projectText';
@@ -264,6 +264,7 @@ export function App() {
         const rh = episodeHash(remote);
         const lh = episodeHash(local);
         if (rh === lh) markSynced(local);
+        else if (startedFromTemplate) take(remote, 'Loaded the episode from the repository');
         else if (base === null) {
           // This browser never synced: the repository wins. Comparing `updated` let a fresh browser's default
           // project (created "now") overwrite the edited episode (2026-10-25); a differing local version is kept.
