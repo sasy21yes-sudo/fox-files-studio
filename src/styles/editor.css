@@ -1895,3 +1895,7 @@ body.resizing-v * {
   border-radius: 8px;
   margin-bottom: 8px;
 }
+.sheet-view {
+  grid-template-columns: none;
+  grid-auto-flow: column;
+}

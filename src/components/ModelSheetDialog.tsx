@@ -5,12 +5,16 @@ import { HandsTab } from '../editor/HandLab';
 import { ShoeLab } from '../editor/ShoeLab';
 import { MouthLab } from '../editor/MouthLab';
 import { SHEET_H, SHEET_W, drawModelSheet } from '../character/modelSheet';
+import { drawFrontSheet } from '../character/frontSheet';
+import { loadFront } from '../character/foxFront';
 import { loadCanvasFonts } from '../app/fonts';
 
 /** Agent Fox model sheet, drawn live by the same rig the episode uses. */
 export function ModelSheetDialog({ onClose }: { onClose(): void }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const [tab, setTab] = useState<'sheet' | 'tune' | 'hands' | 'shoes' | 'mouths' | 'clips'>('sheet');
+  /** Which sheet: the 3/4 figure (animated) or the front bust (drawn once: about fifty busts). */
+  const [view, setView] = useState<'34' | 'front'>('34');
 
   useEffect(() => {
     if (tab !== 'sheet') return;
@@ -23,12 +27,17 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
       drawModelSheet(g, 0.4 + (performance.now() - t0) / 1000);
       raf = requestAnimationFrame(draw);
     };
-    void loadCanvasFonts().then(() => alive && draw());
+    if (view === 'front')
+      void Promise.all([loadCanvasFonts(), loadFront()]).then(() => {
+        const g = ref.current?.getContext('2d');
+        if (g && alive) drawFrontSheet(g);
+      });
+    else void loadCanvasFonts().then(() => alive && draw());
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
     };
-  }, [tab]);
+  }, [tab, view]);
 
   const save = () => {
     const c = ref.current;
@@ -38,7 +47,7 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
       const url = URL.createObjectURL(b);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'agent-fox-model-sheet.png';
+      a.download = view === 'front' ? 'agent-fox-model-sheet-front.png' : 'agent-fox-model-sheet.png';
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -59,6 +68,15 @@ export function ModelSheetDialog({ onClose }: { onClose(): void }) {
             ))}
           </div>
           <div className="row gap">
+            {tab === 'sheet' && (
+              <div className="segmented compact sheet-view" role="radiogroup" aria-label="Sheet view">
+                {(['34', 'front'] as const).map((v) => (
+                  <button key={v} role="radio" aria-checked={view === v} className={view === v ? 'on' : ''} onClick={() => setView(v)}>
+                    {v === '34' ? '3/4' : 'Front'}
+                  </button>
+                ))}
+              </div>
+            )}
             {tab === 'sheet' && (
               <button className="btn small" onClick={save}>
                 Save PNG
