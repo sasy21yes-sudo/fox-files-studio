@@ -134,6 +134,10 @@ interface ArmPose {
   hand: string;
   /** In front of the chest (drawn over the coat and the head's neck) or hanging beside the coat. */
   front: boolean;
+  /** Raised to the head: the arm is drawn under the head (the head covers the forearm); gloveOver: the glove
+   *  alone comes back over the head (a hand on the brim). Front review 2026-10-26: these arms crossed the face. */
+  under?: boolean;
+  gloveOver?: boolean;
 }
 /**
  * Poses for the viewer-right arm (the side rig's far arm: it reaches, counts, points); the viewer-left
@@ -142,8 +146,10 @@ interface ArmPose {
 const ARM: Record<string, ArmPose> = {
   rest: { t: [25, 520], rot: null, hand: 'relaxed', front: false },
   notebook: { t: [25, 520], rot: null, hand: 'relaxed', front: false },
-  hips: { t: [5, 400], rot: 2.6, hand: 'fist', front: true },
-  point: { t: [430, 20], rot: null, hand: 'point', front: false },
+  // Closed hands show the knuckles (n_knock), not the palm.
+  hips: { t: [5, 400], rot: 2.6, hand: 'n_knock', front: true },
+  // Pointing out and up, in front of the coat (it pointed at the floor, the sleeve trailing from under the coat).
+  point: { t: [250, -70], rot: -0.4, hand: 'point', front: true },
   wave: { t: [150, -330], rot: -1.6, hand: 'wave', front: false },
   one: { t: [-110, 110], rot: -1.5, hand: 'n_one', front: true },
   two: { t: [-110, 110], rot: -1.5, hand: 'n_two', front: true },
@@ -152,13 +158,15 @@ const ARM: Record<string, ArmPose> = {
   knock: { t: [-90, 200], rot: -0.2, hand: 'n_knock', front: true },
   pinch: { t: [-140, 150], rot: -1.3, hand: 'n_pinch_paper_palm', front: true },
   shake: { t: [-110, 90], rot: -1.5, hand: 'n_fist_tremble', front: true },
-  magnify: { t: [-60, 20], rot: -1.2, hand: 'fist', front: true },
-  pencil: { t: [-140, 230], rot: -2.3, hand: 'fist', front: true },
-  chin: { t: [-205, 35], rot: -1.9, hand: 'n_chin', front: true },
-  hold: { t: [-170, 250], rot: -0.3, hand: 'fist', front: true },
-  hatChest: { t: [-200, 230], rot: -0.4, hand: 'fist', front: true },
-  scratch: { t: [-40, -400], rot: -2.4, hand: 'open', front: true },
-  tiphat: { t: [-60, -420], rot: -1.2, hand: 'fist', front: true },
+  // The gloves that hold the lens and the pencil (an empty fist read as a mime).
+  magnify: { t: [-60, 20], rot: -1.2, hand: 'n_magnifier', front: true },
+  pencil: { t: [-140, 230], rot: -2.3, hand: 'n_pencil', front: true },
+  // Below the mouth, not over it.
+  chin: { t: [-205, 100], rot: -1.9, hand: 'n_chin', front: true },
+  hold: { t: [-170, 250], rot: -0.3, hand: 'n_knock', front: true },
+  hatChest: { t: [-200, 230], rot: -0.4, hand: 'n_knock', front: true },
+  scratch: { t: [-90, -360], rot: -2.0, hand: 'open', front: true, under: true },
+  tiphat: { t: [-120, -440], rot: -1.2, hand: 'n_fist_tremble', front: true, under: true, gloveOver: true },
   shield: { t: [-150, -60], rot: -1.5, hand: 'flat', front: true },
 };
 const armPose = (m: string) => ARM[m] ?? ARM.rest;
@@ -250,12 +258,14 @@ function armState(side: Side, A: FrontArm, time: number) {
   const d = Math.hypot(dx, dy) || 1;
   if (d > L1) E = [S[0] + (dx / d) * L1, S[1] + (dy / d) * L1];
   else if (d < L1 * 0.45) E = [E[0] + dir * (L1 * 0.45 - d), E[1]];
-  // Mid-move the elbow is a plain IK elbow bowing outward and down (no loops while the glove turns).
-  if (swing > 0.01) {
+  // Mid-move, and always in front of the chest, the elbow is a plain IK elbow bowing outward and down: the
+  // 'behind the wrist' elbow folded raised forearms onto the upper arm (one/two/three/stop, front review).
+  const ikW = Math.max(swing > 0.01 ? smooth(swing) * (f0 !== f1 ? 1 : 0.25) : 0, smooth(frontness));
+  if (ikW > 0.001) {
     const e1 = ik(S, H, L1, L2, 1).e;
     const e2 = ik(S, H, L1, L2, -1).e;
     const score = (e: V2) => dir * (e[0] - S[0]) + 0.6 * (e[1] - S[1]);
-    E = mixV(E, score(e1) >= score(e2) ? e1 : e2, smooth(swing) * (f0 !== f1 ? 1 : 0.25));
+    E = mixV(E, score(e1) >= score(e2) ? e1 : e2, ikW);
   }
   // One smooth sleeve passing through the elbow at its middle.
   const c: V2 = [2 * E[0] - (S[0] + H[0]) / 2, 2 * E[1] - (S[1] + H[1]) / 2];
@@ -265,18 +275,24 @@ function armState(side: Side, A: FrontArm, time: number) {
   // Follow-through: the fingers trail the turn, then curl back.
   const drag = -Math.sign(turn) * (side === 'right' ? 1 : -1) * swing * 0.35;
   const bend = drag + Math.sin(time * 1.7 + ph) * 0.05;
-  return { S, c, H, rot, fore, bend, glove: P.hand, front: frontness >= 0.5 };
+  const under = !!P.under && frontness >= 0.5;
+  return { S, c, H, rot, fore, bend, glove: P.hand, front: frontness >= 0.5, under, gloveOver: under && !!P.gloveOver };
 }
 
-function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolean) {
+/** layer: 'back' hanging beside the coat, 'under' raised to the head (under it), 'front' over the chest, 'glove' the
+ *  glove alone of an arm whose hand comes back over the head. */
+function drawArm(g: G, side: Side, A: FrontArm, time: number, layer: 'back' | 'under' | 'front' | 'glove') {
   const st = armState(side, A, time);
-  if (st.front !== layerFront) return;
+  const mine = layer === 'glove' ? st.gloveOver : layer === 'back' ? !st.front : layer === 'under' ? st.front && st.under : st.front && !st.under;
+  if (!mine) return;
   g.save();
   g.scale(F, F);
   const s = (p: V2): V2 => [p[0] / F, p[1] / F];
-  // Glove first, the cuff of the sleeve over its wrist.
+  // Glove first, the cuff of the sleeve over its wrist. (No strip bending in the front view: the strips showed
+  // as see-through stripes mid-move - front review.)
+  void st.bend;
   anchoredFlex(g, `hand_${st.glove}${side === 'right' ? '_back' : ''}`, st.H[0] / F + Math.cos(st.fore) * 10, st.H[1] / F + Math.sin(st.fore) * 10, st.rot, {
-    bend: st.bend,
+    bend: 0,
     pivot: 0.42,
     scale: 1.12,
     sx: 1,
@@ -285,7 +301,7 @@ function drawArm(g: G, side: Side, A: FrontArm, time: number, layerFront: boolea
     flipY: gloveFlip(st.glove, side === 'right', side === 'left'),
   });
   // Seen from the front the hose reads thinner than in the 3/4 view.
-  noodle(g, side === 'right' ? 'sleeve_back' : 'sleeve_front', s(st.S), s(st.c), s(st.H), 0, 1, () => SLEEVE_W);
+  if (layer !== 'glove') noodle(g, side === 'right' ? 'sleeve_back' : 'sleeve_front', s(st.S), s(st.c), s(st.H), 0, 1, () => SLEEVE_W);
   g.restore();
 }
 
@@ -307,9 +323,12 @@ export function drawFoxFront(g: G, I: FrontInput): void {
   g.translate(-CX, -BOTTOM);
   g.translate(0, B * 0.6);
   // Hanging arms come out from under the coat.
-  drawArm(g, 'left', I.arms.left, time, false);
-  drawArm(g, 'right', I.arms.right, time, false);
+  drawArm(g, 'left', I.arms.left, time, 'back');
+  drawArm(g, 'right', I.arms.right, time, 'back');
   placed(g, 'torso');
+  // Arms raised to the head go under it (the head covers the forearm).
+  drawArm(g, 'left', I.arms.left, time, 'under');
+  drawArm(g, 'right', I.arms.right, time, 'under');
   // Head on the neck: talking nods and sway turn it about the top of the neck; it lags the body's bounce.
   const N = FRONT.neckPivot;
   g.save();
@@ -326,8 +345,11 @@ export function drawFoxFront(g: G, I: FrontInput): void {
   g.restore();
   placed(g, 'torso_front');
   // Arms gesturing in front of the chest.
-  drawArm(g, 'left', I.arms.left, time, true);
-  drawArm(g, 'right', I.arms.right, time, true);
+  drawArm(g, 'left', I.arms.left, time, 'front');
+  drawArm(g, 'right', I.arms.right, time, 'front');
+  // A hand on the brim: the glove over the head.
+  drawArm(g, 'left', I.arms.left, time, 'glove');
+  drawArm(g, 'right', I.arms.right, time, 'glove');
   g.restore();
   g.restore();
 }
