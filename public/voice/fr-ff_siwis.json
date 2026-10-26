@@ -5,7 +5,7 @@
 "engine": "Kokoro-82M v1.0 (kokoro-onnx)",
 "sampleRate": 24000,
 "audio": "fr-ff_siwis.mp3",
-"duration": 209.09,
+"duration": 200.127,
 "sentences": {
 "La CIA a drogué des gens qui n'en savaient rien.": [
 0.35,
@@ -19,265 +19,265 @@
 ],
 "1977.": [
 5.23,
-1.64,
+1.0901,
 []
 ],
 "Le Sénat des États-Unis ouvre une audition sur un programme secret de la CIA.": [
-7.22,
+6.6701,
 4.5,
 [
 2.389
 ]
 ],
 "Le problème ?": [
-12.07,
+11.5201,
 0.98,
 []
 ],
 "Les dossiers avaient été détruits des années plus tôt.": [
-13.4,
+12.8501,
 2.56,
 [
 1.583
 ]
 ],
 "Mais pas tous.": [
-16.31,
-0.93,
+15.7601,
+0.6788,
 []
 ],
 "Le programme s'appelait MKUltra.": [
-17.59,
+16.7889,
 1.88,
 []
 ],
 "C'était quoi, au juste ?": [
-19.82,
+19.0189,
 1.26,
 []
 ],
 "Et comment le sait-on ?": [
-21.43,
+20.6289,
 1.17,
 []
 ],
 "Partons de ce que la CIA elle-même a dit devant le Sénat.": [
-22.95,
+22.1489,
 3.15,
 [
 1.446
 ]
 ],
 "MKUltra a duré de 1953 à 1964.": [
-26.45,
-4.56,
+25.6489,
+3.1594,
 []
 ],
 "Onze ans.": [
-31.36,
+29.1583,
 0.69,
 []
 ],
 "Dans les documents qui restent, il y a 149 sous-projets, dans 80 institutions.": [
-32.4,
-4.89,
+30.1983,
+4.6194,
 [
-1.575
+1.508
 ]
 ],
 "Plus de la moitié étaient des universités.": [
-37.64,
+35.1678,
 2.25,
 []
 ],
 "Mais concrètement, ils faisaient quoi ?": [
-40.24,
+37.7678,
 1.71,
 []
 ],
 "Drogues et alcool.": [
-42.3,
+39.8278,
 1.08,
 []
 ],
 "Hypnose.": [
-43.73,
-0.79,
+41.2578,
+0.6793,
 []
 ],
 "Expériences sur le sommeil.": [
-44.87,
+42.287,
 1.58,
 []
 ],
 "Détecteur de mensonges.": [
-46.8,
+44.217,
 1.44,
 []
 ],
 "Et des drogues censées aider les interrogatoires.": [
-48.59,
+46.007,
 2.48,
 []
 ],
 "Et oui : du LSD aussi.": [
-51.42,
-1.31,
+48.837,
+1.1685,
 []
 ],
 "Maintenant, le point important.": [
-53.08,
+50.3555,
 1.42,
 []
 ],
 "Certains étaient volontaires.": [
-54.85,
+52.1255,
 1.34,
 []
 ],
 "D'autres n'ont jamais rien su.": [
-56.54,
+53.8155,
 1.38,
 []
 ],
 "D'après le témoignage, six sous-projets ont testé des drogues sur des gens qui n'en savaient rien.": [
-58.27,
+55.5455,
 4.73,
 [
 2.395
 ]
 ],
 "Certains tests ont eu lieu dans des planques, à San Francisco et à New York.": [
-63.35,
+60.6255,
 4.18,
 [
 2.32
 ]
 ],
 "Sans consentement.": [
-67.88,
+65.1555,
 1.05,
 []
 ],
 "Qu'est-ce que ça voulait dire, concrètement ?": [
-69.28,
+66.5555,
 1.87,
 []
 ],
 "Prenez Frank Olson.": [
-71.5,
+68.7755,
 1.22,
 []
 ],
 "Il était employé civil de l'Armée.": [
-73.07,
+70.3455,
 1.94,
 []
 ],
 "En 1953, lors d'une réunion organisée par la CIA, on lui donne du LSD.": [
-75.36,
-5.37,
+72.6355,
+4.3816,
 [
-4.11
+3.3947
 ]
 ],
 "Sans le lui dire.": [
-81.08,
+77.3671,
 0.99,
 []
 ],
 "Environ une semaine plus tard, il était mort.": [
-82.42,
+78.7071,
 2.25,
 []
 ],
 "Et puis, il y a Montréal.": [
-85.02,
+81.3071,
 1.25,
 []
 ],
 "En 1957, la CIA finance les recherches d'un psychiatre : le docteur Ewen Cameron, à la tête de la psychiatrie à McGill.": [
-86.62,
-8.22,
+82.9071,
+8.0659,
 [
-1.63,
-3.94,
-5.5
+1.6125,
+3.8976,
+5.4409
 ]
 ],
 "L'idée ?": [
-95.19,
-0.64,
+91.323,
+0.4303,
 []
 ],
 "Faire écouter à un patient le même message.": [
-96.18,
+92.1033,
 2.18,
 []
 ],
 "Encore.": [
-98.71,
+94.6333,
 0.67,
 []
 ],
 "Et encore.": [
-99.73,
+95.6533,
 0.74,
 []
 ],
 "Et voir ce que ça change à son comportement.": [
-100.82,
+96.7433,
 2.35,
 []
 ],
 "Le nom technique : le « psychic driving ».": [
-103.52,
+99.4433,
 2.24,
 []
 ],
 "Le plan cherchait aussi des substances capables de briser les schémas de comportement.": [
-106.11,
+102.0333,
 4.54,
 [
 2.035
 ]
 ],
 "Sur la liste : du curare.": [
-111.0,
+106.9233,
 1.34,
 []
 ],
 "Du LSD.": [
-112.69,
-0.88,
+108.6133,
+0.5567,
 []
 ],
 "Et des moyens de rendre le patient inerte pendant que le message tournait.": [
-113.92,
+109.5201,
 3.81,
 [
 1.778
 ]
 ],
 "L'argent passait par une organisation écran.": [
-118.08,
+113.6801,
 2.23,
 []
 ],
 "Et Cameron ?": [
-120.66,
+116.2601,
 0.88,
 []
 ],
 "Il ne devait pas savoir que le gouvernement américain était derrière.": [
-121.89,
+117.4901,
 3.74,
 [
 1.282
 ]
 ],
 "En 1992, le Canada offre 100 000 dollars aux anciens patients de Cameron à l'Institut Allan Memorial qui avaient subi la « déstructuration ».": [
-125.98,
+121.5801,
 9.22,
 [
 1.601,
@@ -286,26 +286,26 @@
 ]
 ],
 "D'accord, mais comment tout ça a-t-il été découvert ?": [
-135.55,
+131.1501,
 2.47,
 [
 1.281
 ]
 ],
 "Janvier 1975.": [
-138.37,
-1.92,
+133.9701,
+1.3034,
 []
 ],
 "Le Sénat crée une commission spéciale, dirigée par le sénateur Frank Church.": [
-140.64,
+135.6235,
 4.47,
 [
 2.17
 ]
 ],
 "La mission : savoir si le renseignement américain avait fait quelque chose d'illégal, d'inapproprié ou de contraire à l'éthique.": [
-145.46,
+140.4435,
 6.91,
 [
 2.143,
@@ -313,97 +313,98 @@
 ]
 ],
 "Puis, en 1977, un employé de la CIA retrouve sept cartons de documents de MKUltra, dans un centre de vieilles archives.": [
-152.72,
-8.72,
+147.7035,
+7.5878,
 [
-2.678,
-6.015
+2.3459,
+5.2692
 ]
 ],
 "En août, les sénateurs interrogent le directeur de la CIA.": [
-161.79,
+155.6413,
 3.45,
 [
 1.948
 ]
 ],
 "Et le sénateur Edward Kennedy le dit clairement : la CIA avait drogué des citoyens américains.": [
-165.59,
+159.4413,
 5.35,
 [
 2.69
 ]
 ],
 "À leur insu.": [
-171.29,
+165.1413,
 0.86,
 []
 ],
 "Sans leur consentement.": [
-172.5,
+166.3513,
 1.24,
 []
 ],
 "Mais ces cartons ne racontent pas toute l'histoire.": [
-174.09,
+167.9413,
 2.32,
 []
 ],
 "Un rapport de 1963 de l'Inspecteur général de la CIA mène, en 1964, à l'arrêt des tests sur des gens non avertis.": [
-176.76,
-8.86,
+170.6113,
+7.0967,
 [
-2.65,
-4.77,
-6.891
+2.1373,
+3.8472,
+5.5579
 ]
 ],
 "Et en 1973, les dossiers de MKUltra sont détruits, avec l'accord du directeur de l'époque.": [
-185.97,
-6.32,
+178.058,
+5.619,
 [
-4.25
+3.8112
 ]
 ],
 "Kennedy cite son nom : Richard Helms.": [
-192.64,
+184.027,
 2.01,
 []
 ],
 "Qu'est-ce qui reste ?": [
-195.0,
+186.387,
 1.01,
 []
 ],
 "Surtout des papiers comptables.": [
-196.36,
+187.747,
 1.57,
 []
 ],
 "Des avances, des reçus, des relevés de dépenses.": [
-198.28,
+189.667,
 2.32,
 []
 ],
 "Alors, qu'est-ce qu'on sait vraiment ?": [
-200.95,
+192.337,
 1.45,
 []
 ],
 "Assez pour dire que c'est arrivé.": [
-202.75,
+194.137,
 1.56,
 []
 ],
 "Pas assez pour tout savoir.": [
-204.66,
+196.047,
 1.4,
 []
 ],
 "Et le reste, on ne le saura peut-être jamais.": [
-206.41,
+197.797,
 2.33,
 []
 ]
-}
+},
+"pace": 1.0447
 }
