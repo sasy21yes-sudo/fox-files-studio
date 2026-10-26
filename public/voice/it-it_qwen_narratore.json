@@ -5,7 +5,7 @@
 "engine": "Qwen3-TTS 1.7B (VoiceDesign reference + Base clone)",
 "sampleRate": 24000,
 "audio": "it-it_qwen_narratore.mp3",
-"duration": 111.374,
+"duration": 189.305,
 "sentences": {
 "La CIA ha drogato persone che non ne sapevano nulla.": [
 0.35,
@@ -24,171 +24,329 @@
 ],
 "Il Senato degli Stati Uniti apre un'audizione su un programma segreto della CIA.": [
 5.6516,
-3.9798,
+3.7931,
 [
-1.6469
+1.5672
 ]
 ],
 "Il problema?": [
-9.9814,
-0.4931,
+9.7947,
+0.483,
 []
 ],
 "I documenti erano stati distrutti anni prima.": [
-10.8245,
-2.3238,
+10.6277,
+2.2847,
 []
 ],
 "Ma non tutti.": [
-13.4983,
+13.2624,
 0.5567,
 []
 ],
 "Il programma si chiamava MKUltra.": [
-14.4051,
+14.1692,
 2.1141,
 []
 ],
 "Cos'era davvero?": [
-16.8692,
-0.7626,
+16.6332,
+0.7464,
 []
 ],
 "E come facciamo a saperlo?": [
-17.9817,
-1.334,
+17.7297,
+1.2606,
 []
 ],
 "Partiamo da quello che ha detto la CIA stessa, davanti al Senato.": [
-19.6657,
-3.3301,
+19.3402,
+3.0101,
 [
-1.6458
+1.4866
 ]
 ],
 "MKUltra è andato avanti dal 1953 al 1964.": [
-23.3458,
+22.7003,
 5.7194,
 []
 ],
 "Undici anni.": [
-29.4153,
+28.7698,
 0.6634,
 []
 ],
 "Nei documenti rimasti ci sono 149 sottoprogetti, in 80 istituzioni.": [
-30.4287,
-3.9274,
+29.7832,
+4.5461,
 [
-1.7577
+2.0246
 ]
 ],
 "Più della metà erano università e college.": [
-34.7061,
-2.3157,
+34.6793,
+2.4554,
 []
 ],
 "Ma cosa facevano, in pratica?": [
-37.3718,
-1.5594,
+37.4847,
+1.6021,
 []
 ],
 "Droghe e alcol.": [
-39.2813,
+39.4368,
 0.9621,
 []
 ],
 "Ipnosi.": [
-40.5933,
+40.7488,
 0.5781,
 []
 ],
 "Esperimenti sul sonno.": [
-41.5214,
-1.1327,
+41.6769,
+1.1754,
 []
 ],
 "Macchina della verità.": [
-43.0042,
-1.0441,
+43.2023,
+0.9936,
 []
 ],
 "E droghe pensate per aiutare gli interrogatori.": [
-44.3983,
-2.3013,
+44.5459,
+2.2421,
 []
 ],
 "E sì: anche l'LSD.": [
-47.0496,
-1.7514,
+47.138,
+1.6447,
 []
 ],
 "Ora, la parte che conta.": [
-49.151,
-1.2394,
+49.1328,
+1.3461,
 []
 ],
 "Alcuni erano volontari.": [
-50.7404,
-1.3337,
+50.8288,
+1.2539,
 []
 ],
 "Altri non hanno mai saputo niente.": [
-52.4241,
-1.8368,
+52.4328,
+1.4314,
 []
 ],
 "Secondo la testimonianza, sei sottoprogetti hanno testato droghe su persone che non ne sapevano niente.": [
-54.6108,
-4.82,
+54.2142,
+4.8021,
 [
-2.7195
+2.707
 ]
 ],
 "Alcuni test avvenivano in case sicure, a San Francisco e a New York.": [
-59.7808,
-4.1834,
+59.3663,
+3.9061,
 [
-2.3556
+2.1761
 ]
 ],
 "Nessun consenso.": [
-64.3143,
-0.8127,
+63.6223,
+1.0261,
 []
 ],
+"Cosa voleva dire, in concreto?": [
+64.9984,
+1.6661,
+[]
+],
+"Guarda Frank Olson.": [
+67.0145,
+1.1327,
+[]
+],
+"Lavorava come civile per l'Esercito.": [
+68.4973,
+1.8084,
+[]
+],
+"Nel 1953, a una riunione organizzata dalla CIA, gli danno dell'LSD.": [
+70.6557,
+5.2287,
+[
+1.9394
+]
+],
+"Senza dirglielo.": [
+76.2344,
+0.7914,
+[]
+],
+"Circa una settimana dopo, era morto.": [
+77.3758,
+2.0074,
+[]
+],
+"E poi c'è Montréal.": [
+79.7332,
+1.1114,
+[]
+],
+"Nel 1957 la CIA finanzia la ricerca di uno psichiatra: il dottor Ewen Cameron, capo di psichiatria alla McGill.": [
+81.1947,
+7.5328,
+[
+1.6634,
+4.2711,
+5.7782
+]
+],
+"L'idea?": [
+89.0774,
+0.3648,
+[]
+],
+"Far ascoltare a un paziente lo stesso messaggio.": [
+89.7922,
+2.2207,
+[]
+],
+"Ancora.": [
+92.3629,
+0.3648,
+[]
+],
+"E ancora.": [
+93.0777,
+0.4928,
+[]
+],
+"E vedere cosa cambia nel suo comportamento.": [
+93.9204,
+1.9392,
+[]
+],
+"Il nome tecnico era «psychic driving».": [
+96.2096,
+2.1354,
+[]
+],
+"Il piano cercava anche sostanze capaci di spezzare gli schemi di comportamento.": [
+98.695,
+3.5232,
+[
+1.7455
+]
+],
+"Nella lista: curaro.": [
+102.5682,
+1.2821,
+[]
+],
+"LSD.": [
+104.2002,
+0.9621,
+[]
+],
+"E modi per rendere il paziente inerte, mentre il messaggio andava avanti.": [
+105.5123,
+3.379,
+[
+1.9358
+]
+],
+"I soldi passavano da una società di copertura.": [
+109.2413,
+2.3306,
+[]
+],
+"E Cameron?": [
+111.9219,
+0.5781,
+[]
+],
+"Non doveva sapere che dietro c'era il governo americano.": [
+112.85,
+2.8181,
+[
+1.4634
+]
+],
+"Nel 1992, il Canada offre 100.000 dollari agli ex pazienti di Cameron all'Allan Memorial Institute, quelli sottoposti alla cosiddetta «destrutturazione».": [
+116.0181,
+8.5781,
+[
+1.457,
+3.307,
+5.757
+]
+],
 "Ok, ma come è venuto fuori tutto questo?": [
-65.477,
+124.9462,
 2.1994,
 []
 ],
 "Gennaio 1975.": [
-68.0264,
+127.4956,
 2.0288,
 []
 ],
 "Il Senato crea una commissione speciale, guidata dal senatore Frank Church.": [
-70.4052,
-3.2858,
+129.8743,
+3.2661,
 [
-1.7667
+1.7535
 ]
 ],
 "La missione: capire se l'intelligence americana aveva fatto qualcosa di illegale, di scorretto o di immorale.": [
-74.041,
-5.6595,
+133.4904,
+5.3932,
 [
-1.9403,
-4.266
+1.8463,
+4.0594
 ]
 ],
+"Poi, nel 1977, un dipendente della CIA trova sette scatole di documenti di MKUltra, in un archivio di vecchie carte.": [
+139.2336,
+7.4474,
+[
+2.3232,
+5.7289
+]
+],
+"Ad agosto, i senatori interrogano il direttore della CIA.": [
+147.031,
+2.9888,
+[
+1.1528
+]
+],
+"E il senatore Edward Kennedy lo dice chiaro: la CIA aveva drogato cittadini americani.": [
+150.3697,
+4.3541,
+[
+2.3486
+]
+],
+"Senza che lo sapessero.": [
+155.0738,
+0.9936,
+[]
+],
+"Senza il loro consenso.": [
+156.4174,
+1.3461,
+[]
+],
 "Ma quelle scatole non sono tutta la storia.": [
-80.0505,
-1.8894,
+158.1135,
+1.7935,
 []
 ],
 "Un rapporto del 1963 dell'Ispettore generale della CIA porta, nel 1964, a fermare i test su persone ignare.": [
-82.2899,
+160.257,
 7.5328,
 [
 2.531,
@@ -196,52 +354,52 @@
 ]
 ],
 "E nel 1973 i file di MKUltra vengono distrutti, con l'ok del direttore di allora.": [
-90.1727,
+168.1397,
 5.1434,
 [
 3.4049
 ]
 ],
 "Kennedy fa il suo nome: Richard Helms.": [
-95.6661,
+173.6332,
 2.0928,
 []
 ],
 "Cosa è rimasto?": [
-98.1088,
-0.7874,
+176.0759,
+0.7701,
 []
 ],
 "Soprattutto carte contabili.": [
-99.2462,
+177.196,
 1.4314,
 []
 ],
 "Anticipi, ricevute, rendiconti.": [
-101.0277,
+178.9774,
 2.3487,
 []
 ],
 "Quindi, cosa sappiamo davvero?": [
-103.7264,
+181.6762,
 1.4314,
 []
 ],
 "Abbastanza per dire che è successo.": [
-105.5078,
-1.6211,
+183.4576,
+1.6021,
 []
 ],
 "Non abbastanza per sapere tutto.": [
-107.4789,
-1.4737,
+185.4097,
+1.4741,
 []
 ],
 "E il resto, forse, non lo sapremo mai.": [
-109.3027,
+187.2337,
 2.0714,
 []
 ]
 },
-"pace": 1.3828
+"pace": 1.3976
 }
